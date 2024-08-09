@@ -3,6 +3,7 @@ import { Suspense } from "react"
 import CommonLayout from "@/components/common-layout"
 import Loading from "./Loading"
 import "./globals.css";
+import SessionWrapper from "@/components/SessionWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -13,16 +14,19 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <SessionWrapper>
+      <html lang="en">
         <body className={inter.className}>
           <Suspense fallback={<Loading />}>
             <CommonLayout
               attribute="class"
               defaultTheme="system"
+              // eslint-disable-next-line react/no-children-prop
               children={children}
             />
           </Suspense>
         </body>
       </html>
+    </SessionWrapper>
   );
 }
