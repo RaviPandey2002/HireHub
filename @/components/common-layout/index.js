@@ -8,8 +8,7 @@ function CommonLayout( { children }){
         {/* Header Component */}
 
         {/* Main Content */}
-        <main>{children}</main>
-
+        <main>{children}</main>        
         {/* Main Content */}
       </div>
     )
