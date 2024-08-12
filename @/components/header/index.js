@@ -45,6 +45,7 @@ function Header() {
             <Link className="mr-6 hidden lg:flex" href={"#"}>
               <h3>HireHub</h3>
             </Link>
+
             <div className="grid gap-2 py-6">
               {menuItems.map((menuItem) =>
                 menuItem.show ? (

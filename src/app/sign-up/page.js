@@ -1,80 +1,99 @@
 "use client";
 
-import { useState } from "react";
-import { signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import React from "react";
+import { SignUpPage } from "../../../@/components/auth/SignUpPage.tsx";
 
-export default function Register() {
-  const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [isOtpSent, setIsOtpSent] = useState(false);
+const Register = () => {
+  const { data: session } = useSession();
+  return <>{!session ? <SignUpPage /> : null}</>;
+};
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    if (!isOtpSent) {
-      // Trigger email provider sign-in
-      const response = await signIn("email", { email, redirect: false });
-      if (response?.ok) {
-        setIsOtpSent(true);
-      }
-    } else {
-      // Verify OTP
-      const response = await fetch("/api/auth/verify-otp", {
-        method: "POST",
-        body: JSON.stringify({ email, otp }),
-      });
+export default Register;
 
-      if (response.ok) {
-        window.location.href = "/";
-      } else {
-        alert("Invalid OTP");
-      }
-    }
-  };
-
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <form
-        onSubmit={handleRegister}
-        className="bg-white p-6 rounded shadow-md"
-      >
-        <h2 className="text-2xl mb-4">
-          {isOtpSent ? "Verify OTP" : "Register"}
-        </h2>
-        <div className="mb-4">
-          <label className="block text-sm mb-2" htmlFor="email">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 border rounded"
-            required
-          />
-        </div>
-        {isOtpSent && (
-          <div className="mb-4">
-            <label className="block text-sm mb-2" htmlFor="otp">
-              OTP
-            </label>
-            <input
-              id="otp"
-              type="text"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              className="w-full p-2 border rounded"
-              required
-            />
+// import CredentialsForm from "../../../@/components/CredentialsForm/index";
+/* {
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+            <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-lg">
+              <h2 className="text-center text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
+              
+              <CredentialsForm />
+          
+              <div className="mt-6">
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-300"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                  </div>
+                </div>
+                <div className="flex space-x-5 ">
+                  <button
+                    onClick={() => signIn("google")}
+                    className="border border-black rounder-lg px-5 py-1 rounded-lg"
+                  >
+                    Sign in with google
+                  </button>
+                  <button
+                    onClick={() => signIn("github")}
+                    className="border border-black rounder-lg bg-green-500 px-5 py-1 rounded-lg"
+                  >
+                    Sign in with github
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
-        )}
-        <button
-          type="submit"
-          className="w-full p-2 bg-blue-500 text-white rounded"
-        >
-          {isOtpSent ? "Verify OTP" : "Send OTP"}
-        </button>
-      </form>
-    </div>
-  );
+           */
+
+{
+  /* <h1>Welcome Back</h1>
+          <h3 className="text-green-600">{session?.user.name}</h3>
+          <button
+            onClick={() => signOut({ callbackUrl: `/` })}
+            className="border border-black rounder-lg bg-red-500 px-5 py-1 rounded-lg"
+          >
+            SignOut
+          </button> */
 }
+
+// <>
+//   <div className="max-2-7xl mx-auto my-12 space-y-5">
+//     <h1 className=" text-red-500"> You are not logged IN!!</h1>
+//     <Card>
+//       <CardHeader>
+//         <CardTitle>Card Title</CardTitle>
+//         <CardDescription>Card Description</CardDescription>
+//       </CardHeader>
+//       <CardContent>
+//         <div>
+//           <button
+//             onClick={() => signIn("email")}
+//             className="border border-black rounder-lg px-5 py-1 rounded-lg"
+//           >
+//             Sign in with email
+//           </button>
+//         </div>
+// <div className="flex space-x-5 ">
+//   <button
+//     onClick={() => signIn("google")}
+//     className="border border-black rounder-lg px-5 py-1 rounded-lg"
+//   >
+//     Sign in with google
+//   </button>
+//   <button
+//     onClick={() => signIn("github")}
+//     className="border border-black rounder-lg bg-green-500 px-5 py-1 rounded-lg"
+//   >
+//     Sign in with github
+//   </button>
+// </div>
+
+//       </CardContent>
+//       <CardFooter>
+//         <p>Card Footer</p>
+//       </CardFooter>
+//     </Card>
+//   </div>
+// </>

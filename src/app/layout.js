@@ -1,6 +1,6 @@
 import { Inter } from "next/font/google";
 import { Suspense } from "react"
-import CommonLayout from "../../@/components/common-layout"
+import CommonLayout from "/@/components/layout"
 import Loading from "../../@/components/Loading"
 import "./globals.css";
 import SessionWrapper from "../../@/components/SessionWrapper";
