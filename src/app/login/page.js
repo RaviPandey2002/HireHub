@@ -2,16 +2,8 @@
 
 import { useSession } from "next-auth/react";
 import React from "react";
-import { LogInPage }  from "../../../@/components/auth/LogInPage";
-import CredentialsForm from "../../../@/components/CredentialsForm/index";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../../../@/components/ui/card";
+import { LogInPage }  from "../../../components/auth/LogInPage";
+
 
 const SignInPage = () => {
   const { data: session } = useSession();

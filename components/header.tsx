@@ -4,11 +4,8 @@ import {
   Sheet,
   SheetTrigger,
   SheetContent,
-  SheetTitle,
-  SheetDescription,
-  SheetHeader,
-} from "../ui/sheet";
-import { Button } from "../ui/button";
+} from "./ui/sheet";
+import { Button } from "./ui/button";
 import { AlignJustify } from "lucide-react";
 import Link from "next/link";
 
@@ -21,12 +18,12 @@ function Header() {
     },
     {
       label: "Login",
-      path: "/sign-in",
+      path: "/login",
       show: "true",
     },
     {
       label: "Register",
-      path: "/sign-up",
+      path: "/register",
       show: "true",
     },
   ];

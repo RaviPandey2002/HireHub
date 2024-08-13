@@ -2,11 +2,11 @@
 
 import { useSession } from "next-auth/react";
 import React from "react";
-import { SignUpPage } from "../../../@/components/auth/SignUpPage.tsx";
+import { RegisterPage } from "/components/auth/RegisterPage.tsx";
 
 const Register = () => {
   const { data: session } = useSession();
-  return <>{!session ? <SignUpPage /> : null}</>;
+  return <>{!session ? <RegisterPage /> : null}</>;
 };
 
 export default Register;
