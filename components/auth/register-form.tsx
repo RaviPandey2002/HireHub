@@ -33,6 +33,8 @@ export const RegisterForm = () => {
   });
 
   const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
+    setError("");
+    setSuccess("");
     startTransition(() => {
       register(values)
         .then((data) => {
@@ -109,7 +111,7 @@ export const RegisterForm = () => {
         <FormError message={error} />
         <FormSuccess message={success} />
         <Button disabled={isPending} type="submit" className="w-full bg-black text-white border rounded-lg " >
-          Login
+          SignIn
         </Button>
       </form>
 

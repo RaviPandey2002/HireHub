@@ -1,13 +1,12 @@
 "use client";
 
-import { signIn, useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import React from "react";
 import Link from "next/link"
 import { LoginForm } from "./login-form"
 import { OtherProviders } from './other-providers'
 
 export const LogInPage = () => {
-  const { data: session } = useSession();
   return (
     <>
       <div className="min-h-screen flex items-center justify-center bg-gray-50">

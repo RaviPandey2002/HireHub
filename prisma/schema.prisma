@@ -10,6 +10,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole{
+  Candidate
+  Recruiter
+  OnBoarding
+}
+
 model User {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   name          String?
@@ -17,6 +23,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
+  role          UserRole @default(OnBoarding)
   accounts      Account[]
   // sessions      Session[]
 }

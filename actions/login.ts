@@ -1,16 +1,45 @@
 "use server"
 
-import * as z from 'zod'
-import { LoginSchema } from '../schema'
-
+import * as z from 'zod';
+import { LoginSchema } from '../schema';
+import { AuthError } from 'next-auth'
+import { signIn } from '../auth';
+import { DEFAULT_LOGIN_REDIRECT } from "../routes"
+import { getUserByEmail } from '../data/user'
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
-
     const validatedFeilds = LoginSchema.safeParse(values);
-    if(!validatedFeilds){
-        return { error: "Invalid fields"};
+
+    if (!validatedFeilds) {
+        return { error: "Invalid fields" };
     }
 
-    return { success: "Email sent"}
+    const { email, password } = validatedFeilds.data;
+    const existingUser = await getUserByEmail(email);
 
-}
+    if (!existingUser) {
+        return { error: "Email is not registered!!" }
+    }
+    
+    try {
+        await signIn("credentials", {
+            email,
+            password,
+            redirectTo: DEFAULT_LOGIN_REDIRECT,
+        })
+    }
+    catch (error) {
+        if (error instanceof AuthError) {
+            switch (error.type) {
+                case "CredentialsSignin":
+                    return { error: "Invalid Credentials" }
+                default:
+                    return { error: "Something went wrong!" };
+
+            }
+        }
+        throw error;
+    }
+
+    return { success: "Email Sent!" };
+};

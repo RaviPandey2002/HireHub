@@ -9,7 +9,9 @@ import { Button } from "./ui/button";
 import { AlignJustify } from "lucide-react";
 import Link from "next/link";
 
-function Header() {
+function Header({ user }: any) {
+  console.log("USERR: ", user);
+
   const menuItems = [
     {
       label: "Home",
@@ -19,12 +21,12 @@ function Header() {
     {
       label: "Login",
       path: "/login",
-      show: "true",
+      show: !user,
     },
     {
       label: "Register",
       path: "/register",
-      show: "true",
+      show: !user,
     },
   ];
 
@@ -61,7 +63,7 @@ function Header() {
         <Link className="hidden font-bold text-3xl lg:flex mr-6" href={"/"}>
           HIREHUB
         </Link>
-        <nav className="ml-auto hidden lg:flex gap-6 items-center">
+        <nav className=" ml-auto hidden lg:flex gap-6 items-center">
           {menuItems.map((menuItem) =>
             menuItem.show ? (
               <Link

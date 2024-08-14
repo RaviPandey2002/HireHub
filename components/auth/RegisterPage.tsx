@@ -28,7 +28,7 @@ export const RegisterPage = () => {
       //Redirect to homepage (/timeline)
       router.push("/timeline");
     } else {
-      console.log("Error: ", signInResponse);
+      console.log("Errorss: ", signInResponse);
       setError("Your Email or Password is wrong!");
     }
   };

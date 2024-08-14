@@ -1,9 +1,15 @@
+import { auth } from "../../auth"
 
-export default function Home() {
+
+export default async function Home() {
+  const session = await auth();
+  const user = JSON.stringify(session);
+  console.log(user);
+
   return (
-    <section>
-      Main Content      
-    </section>
+    <>
+    
+    </>
   );
 }
 
