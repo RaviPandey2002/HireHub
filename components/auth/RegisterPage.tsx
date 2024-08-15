@@ -43,7 +43,7 @@ export const RegisterPage = () => {
             <OtherProviders/>
             <span className="flex justify-center">
               Already Have an account? Click
-              <Link href="/register" className="text-blue-500">
+              <Link href="/login" className="text-blue-500">
                 . Here
               </Link>
             </span>

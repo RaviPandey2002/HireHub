@@ -34,12 +34,16 @@ export const LoginForm = () => {
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     setError("");
     setSuccess("");
-    startTransition(() => {
-      login(values)
-        .then((data) => {
-          setError(data.error);
-          setSuccess(data.success);
-        })
+    startTransition(async () => {
+      // OlD_Methord
+      // login(values)
+      //   .then((data) => {
+      //     setError(data.error);
+      //     setSuccess(data.success);
+      // })
+      const response = await login(values);
+      if (response && response.error) setError(response.error);
+      if (response && response.success) setError(response.success);
     })
   }
 

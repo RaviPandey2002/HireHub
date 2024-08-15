@@ -1,14 +1,21 @@
-import { auth } from "../../auth"
+import { auth } from "../../auth";
+import OnBoardingPage from "./(protected)/onboard/page";
+import CandidatePage from "./(protected)/candidate/page";
+// import RecruiterPage from "./(protected)/recruiter/page";
+// import InvalidPage from "./(protected)/Invalid";
 
-
-export default async function Home() {
-  const session = await auth();
-  const user = JSON.stringify(session);
-  console.log(user);
-
+export default function Home() {
+  // const session = await auth();
+  // let role = null;
+  // if (session && session.user) {
+  //   console.log("middleWare: ", session.user.role);
+  //   redirect("../settings");
+  //   role = session.user.role;
+  // }
+  // console.log("ROLE:", role);
   return (
     <>
-    
+      HOME Page
     </>
   );
 }

@@ -9,6 +9,7 @@ import { Button } from "./ui/button";
 import { AlignJustify } from "lucide-react";
 import Link from "next/link";
 
+
 function Header({ user }: any) {
   console.log("USERR: ", user);
 
@@ -77,6 +78,7 @@ function Header({ user }: any) {
             ) : null
           )}
         </nav>
+        
       </header>
     </div>
   );

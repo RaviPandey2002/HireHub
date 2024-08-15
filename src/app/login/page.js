@@ -2,22 +2,21 @@
 
 import { useSession } from "next-auth/react";
 import React from "react";
-import { LogInPage }  from "../../../components/auth/LogInPage";
+import { LogInPage } from "../../../components/auth/LogInPage";
+
+const LoginPage = () => {
+  const { data: session, update } = useSession();
+  if (update === "authenticated") {
+    console.log("AUTH_SES: ", session);
+  } else {
+    console.log("UN+AUTH_SES: ", session);
+  }
 
 
-const SignInPage = () => {
-  const { data: session } = useSession();
-  console.log(session);
-  return (
-    <>
-      {
-        !session ? (<LogInPage/>) : null
-      }
-    </>
-);
+  return <>{!session ? <LogInPage /> : null}</>;
 };
 
-export default SignInPage;
+export default LoginPage;
 
 /* {
 

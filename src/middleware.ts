@@ -17,34 +17,20 @@ export default auth(async (req) => {
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
-  const session = await auth();
-  // console.log("SESSION : ", JSON.stringify(session))
-  const ProfileInfo = null;
 
   if (isApiAuthRoute) {
     return (null);
   }
-  // if (isAuthRoute) {
-  //   if (isLoggedIn) {
-  //     if (!ProfileInfo) {
-  //       return Response.redirect(new URL(onBoardingRoute, nextUrl));
-  //     }
-  //     else {
-  //       return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
-  //     }
-  //   }
-  //   return null;
-  // }
 
   if (isAuthRoute) {
     if (isLoggedIn) {
-            return Response.redirect(new URL(onBoardingRoute, nextUrl));
-          }
-        return null;
+      return Response.redirect(new URL(onBoardingRoute, nextUrl));
+    }
+    return null;
   }
 
   if (!isLoggedIn && !isPublicRoute) {
-    return Response.redirect(new URL("./login", nextUrl))
+    return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl))
   }
 
   return null;
