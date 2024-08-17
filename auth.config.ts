@@ -1,9 +1,9 @@
-import type { NextAuthConfig } from "next-auth"
-import Credentials from "next-auth/providers/credentials"
-import GithubProvider from "next-auth/providers/github"
-import GoogleProvider from "next-auth/providers/google";
-import { LoginSchema } from "./schema"
-import { getUserByEmail } from "./data/user"
+import type { NextAuthConfig } from "node_modules/next-auth"
+import Credentials from "node_modules/next-auth/providers/credentials"
+import GithubProvider from "node_modules/next-auth/providers/github"
+import GoogleProvider from "node_modules/next-auth/providers/google";
+import { LoginSchema } from "schema"
+import { getUserByEmail } from "data/user"
 import bcrypt from "bcryptjs"
 
 

@@ -1,4 +1,4 @@
-import NextAuth from "next-auth"
+import NextAuth from "node_modules/next-auth"
 import authConfig from "../auth.config"
 const { auth } = NextAuth(authConfig)
 import {
@@ -8,6 +8,7 @@ import {
   publicRoutes,
   onBoardingRoute
 } from "../routes"
+import { getUser } from "../actions/getUser"
 
 
 export default auth(async (req) => {
@@ -22,15 +23,19 @@ export default auth(async (req) => {
     return (null);
   }
 
-  if (isAuthRoute) {
-    if (isLoggedIn) {
+  const user = await getUser();
+  console.log("ROLE: ", user?.role);
+
+  if (isAuthRoute || isPublicRoute) {
+    if (isLoggedIn && user?.role === "OnBoarding") {
       return Response.redirect(new URL(onBoardingRoute, nextUrl));
     }
-    return null;
-  }
+    if (isLoggedIn && isAuthRoute) {
+      console.log("REDIREDTED")
+      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl))
+    }
 
-  if (!isLoggedIn && !isPublicRoute) {
-    return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl))
+    return null;
   }
 
   return null;

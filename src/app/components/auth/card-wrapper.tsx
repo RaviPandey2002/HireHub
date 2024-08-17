@@ -1,10 +1,4 @@
 "use client"
-import {
-    Card,
-    CardContent,
-    CardFooter,
-    CardHeader
-} from "../ui/card"
 
 interface CardWrapperProps {
     children: React.ReactNode;

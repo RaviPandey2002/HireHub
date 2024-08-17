@@ -1,26 +1,10 @@
-import { auth, signOut } from "../../../../auth";
-import { Button } from "../../../../components/ui/button";
-import { redirect } from "next/navigation"
+import { SignOutButton } from "@components/helper/signOutButton"
 
-
-const OnBoardingPage = async () => {
-  const session = await auth();
-  console.log("ONNNN: ",session);
+const OnBoardingPage =  () => {
   return (
     <>
       This is on board page !!!
-      <div></div>
-      {
-        session.user ? JSON.stringify(session.user): null
-      }
-      <form
-        action={async () => {
-          "use server";
-          await signOut();
-        }}
-      >
-        <Button className="bg-black text-white h-10 w-30">SignOut</Button>
-      </form>
+      <SignOutButton />
     </>
   );
 };

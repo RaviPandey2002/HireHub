@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "baseUrl": "./",
+    "paths": {
+      "@components/*": ["src/app/components/*"],
+      
+    },
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -22,12 +23,13 @@
       }
     ]
   },
+
   "include": [
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-, "components/auth/login-form.tsx"  ],
+, "src/app/components/auth/login-form.tsx"  ],
   "exclude": [
     "node_modules"
   ]

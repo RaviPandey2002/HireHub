@@ -2,7 +2,8 @@
 const CandidatePage = ()=>{
     return(
         <>
-            Cadidate
+            Cadidate Page WOW
+            <br/>
         </>
     )
 }

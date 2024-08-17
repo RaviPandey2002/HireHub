@@ -1,18 +1,19 @@
-"use client";
+"use client"
 
 import {
   Sheet,
   SheetTrigger,
   SheetContent,
-} from "./ui/sheet";
-import { Button } from "./ui/button";
+} from "../ui/sheet";
+import { SignOutButton } from "@components/helper/signOutButton"
 import { AlignJustify } from "lucide-react";
 import Link from "next/link";
+import { Button } from "src/app/components/ui/button"
+import { useCurrentUser } from "../../../../hooks/use-current-user"
 
-
-function Header({ user }: any) {
-  console.log("USERR: ", user);
-
+function Header() {
+  const user = useCurrentUser();
+  console.log(user);
   const menuItems = [
     {
       label: "Home",
@@ -78,7 +79,7 @@ function Header({ user }: any) {
             ) : null
           )}
         </nav>
-        
+        {(user) ? <SignOutButton /> : null}
       </header>
     </div>
   );

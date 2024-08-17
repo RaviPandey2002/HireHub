@@ -2,7 +2,7 @@
 
 import * as z from 'zod';
 import { LoginSchema } from '../schema';
-import { AuthError } from 'next-auth'
+import { AuthError } from 'node_modules/next-auth'
 import { signIn } from '../auth';
 import { onBoardingRoute } from "../routes"
 import { getUserByEmail } from '../data/user'
