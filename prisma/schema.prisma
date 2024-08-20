@@ -10,23 +10,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole{
-  Candidate
+enum UserRole {
+  Candidate 
   Recruiter
   OnBoarding
 }
 
 model User {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  name          String?
-  password      String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  role          UserRole @default(OnBoarding)
-  accounts      Account[]
+  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
+  name                String?
+  password            String?
+  email               String?        @unique
+  emailVerified       DateTime?
+  image               String?
+  role                UserRole       @default(OnBoarding)
+  isPremimumUser      Boolean?
+  memberShipType      String?
+  memberShipStartDate String?
+  memberShipEndDate   String?
+  recruiterInfo       Json?
+  candidateInfo       Json?
+  accounts Account[]
   // sessions      Session[]
 }
+
 
 model Account {
   id                String  @id @default(auto()) @map("_id") @db.ObjectId
@@ -57,11 +64,10 @@ model Account {
 //   @@unique([identifier, token])
 // }
 
-  // model Session {
-  //   id                 String @id @default(auto()) @map("_id") @db.ObjectId
-  //   sessionToken String   @unique
-  //   userId       String    @db.ObjectId
-  //   expires      DateTime
-  //   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  // }
-
+// model Session {
+//   id                 String @id @default(auto()) @map("_id") @db.ObjectId
+//   sessionToken String   @unique
+//   userId       String    @db.ObjectId
+//   expires      DateTime
+//   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+// }

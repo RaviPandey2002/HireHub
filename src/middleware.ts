@@ -1,5 +1,5 @@
 import NextAuth from "node_modules/next-auth"
-import authConfig from "../auth.config"
+import authConfig from "auth.config"
 const { auth } = NextAuth(authConfig)
 import {
   DEFAULT_LOGIN_REDIRECT,
@@ -7,8 +7,8 @@ import {
   authRoutes,
   publicRoutes,
   onBoardingRoute
-} from "../routes"
-import { getUser } from "../actions/getUser"
+} from "routes"
+import { getUser } from "actions/getUser"
 
 
 export default auth(async (req) => {

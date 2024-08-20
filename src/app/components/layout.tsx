@@ -4,9 +4,7 @@ import { getUser } from "actions/getUser"
 // import RecruiterPage from "../(protected)/recruiter/page"
 import OnBoardingPage from "../(protected)/onboard/page";
 
-
-
-async function CommonLayout() {
+async function CommonLayout({ children }) {
   const user = await getUser();
   console.log("USSSER", user);
   const userRole = "Candidate";
@@ -14,9 +12,11 @@ async function CommonLayout() {
     <>
       <div className="mx-auto max-w-7xl p-6 lg:px-8">
         <Header />
-        {
+        HEADER
+        <main>{children}</main>
+        {/* {
           (user) ? <OnBoardingPage /> : null
-        }
+        } */}
       </div>
     </>
   )

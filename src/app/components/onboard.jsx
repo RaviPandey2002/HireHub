@@ -7,6 +7,8 @@ import { useState } from "react";
 import {
   initialRecruiterFormData,
   recruiterOnboardFormControls,
+  candidateOnboardFormControls,
+  initialCandidateFormData,
 } from "lib/utils";
 
 export const OnBoarding = () => {
@@ -14,6 +16,8 @@ export const OnBoarding = () => {
   const [recruiterFormData, setRecruiterFormData] = useState(
     initialRecruiterFormData
   );
+  const [candidateFormData,setCandidateFormData] = useState(initialCandidateFormData);
+
 
   const handleTabChange = (value) => {
     setCurrentTab(value)
@@ -34,18 +38,17 @@ export const OnBoarding = () => {
             </TabsList>
           </div>
         </div>
-        {/* <TabsContent value="candidate">
+        <TabsContent value="candidate">
           <OnBoardForm
             formControls={candidateOnboardFormControls}
-            action={createProfile}
+            // action={createProfile}
             formData={candidateFormData}
             setFormData={setCandidateFormData}
             buttonText={"Onboard as candidate"}
-            handleFileChange={handleFileChange}
-            isBtnDisabled={!handleCandidateFormValid()}
+            // handleFileChange={handleFileChange}
+            // isBtnDisabled={!handleCandidateFormValid()}
           />
-        </TabsContent> */}
-        <TabsContent value="candidate">Candidate!!</TabsContent>
+        </TabsContent>
         <TabsContent value="recruiter">
           <OnBoardForm
             formControls={recruiterOnboardFormControls}
