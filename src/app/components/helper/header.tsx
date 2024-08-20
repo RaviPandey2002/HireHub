@@ -8,8 +8,10 @@ import {
 import { SignOutButton } from "@components/helper/signOutButton"
 import { AlignJustify } from "lucide-react";
 import Link from "next/link";
-import { Button } from "src/app/components/ui/button"
-import { useCurrentUser } from "../../../../hooks/use-current-user"
+import { Button } from "@components/ui/button"
+import { useCurrentUser } from "hooks/use-current-user"
+import { UserServerStatus } from "./userServerStatus";
+import { UserClientStatus } from "./userClientStatus";
 
 function Header() {
   const user = useCurrentUser();
@@ -33,7 +35,7 @@ function Header() {
   ];
 
   return (
-    <div>
+    <div className="border-separate">
       <header className="flex h-16 w-full shrink-0 items-center">
         <Sheet>
           <SheetTrigger asChild>
@@ -80,6 +82,8 @@ function Header() {
           )}
         </nav>
         {(user) ? <SignOutButton /> : null}
+        {/* <UserServerStatus/> */}
+        <UserClientStatus/>
       </header>
     </div>
   );

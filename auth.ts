@@ -1,9 +1,9 @@
 import NextAuth from "node_modules/next-auth"
 
 import { PrismaAdapter } from "@auth/prisma-adapter"
-import authConfig from "./auth.config"
-import { db } from "./lib/db"
-import { getUserById } from "./data/user"
+import authConfig from "auth.config"
+import { db } from "lib/db"
+import { getUserById } from "data/user"
 import { UserRole } from "@prisma/client"
 
 
@@ -26,8 +26,6 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
       if (token.role && session.user) {
         session.user.role = token.role as UserRole;
       }
-
-      console.log({ sessionUser: session.user })
       return session;
     },
 
@@ -37,7 +35,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
       const existingUser = await getUserById(token.sub)
       if (!existingUser) return token;
       token.role = existingUser.role;
-      console.log("token",token)
+
 
       // if (trigger === "update" && session?.name) {
       //   token.name = session.name

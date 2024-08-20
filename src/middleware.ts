@@ -24,14 +24,12 @@ export default auth(async (req) => {
   }
 
   const user = await getUser();
-  console.log("ROLE: ", user?.role);
-
+  console.log("MIDDLEWARE")
   if (isAuthRoute || isPublicRoute) {
     if (isLoggedIn && user?.role === "OnBoarding") {
       return Response.redirect(new URL(onBoardingRoute, nextUrl));
     }
     if (isLoggedIn && isAuthRoute) {
-      console.log("REDIREDTED")
       return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl))
     }
 

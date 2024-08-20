@@ -1,12 +1,10 @@
-
-const CandidatePage = ()=>{
-    return(
-        <>
-            Cadidate Page WOW
-            <br/>
-        </>
-    )
-}
-
+const CandidatePage = () => {
+  return (
+    <>
+      Cadidate Page WOW
+      <br></br>
+    </>
+  );
+};
 
 export default CandidatePage;

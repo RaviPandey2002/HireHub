@@ -2,7 +2,7 @@
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { LoginSchema } from '../../../../schema';
+import { LoginSchema } from 'schema';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button'
 import { FormError } from '../helper/form-error'
@@ -35,12 +35,6 @@ export const LoginForm = () => {
     setError("");
     setSuccess("");
     startTransition(async () => {
-      // OlD_Methord
-      // login(values)
-      //   .then((data) => {
-      //     setError(data.error);
-      //     setSuccess(data.success);
-      // })
       const response = await login(values);
       if (response && response.error) setError(response.error);
       if (response && response.success) setError(response.success);
@@ -98,8 +92,6 @@ export const LoginForm = () => {
           Login
         </Button>
       </form>
-
-
     </Form>
   );
 };

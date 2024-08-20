@@ -7,11 +7,10 @@ import { useRouter } from "next/navigation"
 export const SignOutButton = () => {
     const router = useRouter();
     const onClick = async () => {
-        console.log("REID: ");
         await signOut({redirect: false});
+        console.log("REDIRECTED");
         router.push('./login');
     }
-    console.log("Client signOut CLICKED");
     return (
         <Button
             onClick={onClick}
