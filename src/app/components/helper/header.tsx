@@ -82,8 +82,7 @@ function Header() {
           )}
         </nav>
         {(user) ? <SignOutButton /> : null}
-        {/* <UserServerStatus/> */}
-        <UserClientStatus/>
+        <UserClientStatus />
       </header>
     </div>
   );

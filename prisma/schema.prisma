@@ -24,7 +24,7 @@ model User {
   emailVerified       DateTime?
   image               String?
   role                UserRole       @default(OnBoarding)
-  isPremimumUser      Boolean?
+  isPremiumUser       Boolean?
   memberShipType      String?
   memberShipStartDate String?
   memberShipEndDate   String?

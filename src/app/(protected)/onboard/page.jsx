@@ -1,4 +1,3 @@
-"use client"
 import { OnBoarding } from "@components/onboard";
 
 const OnBoardingPage = () => {
