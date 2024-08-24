@@ -10,12 +10,25 @@ import { AlignJustify } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@components/ui/button"
 import { useCurrentUser } from "hooks/use-current-user"
-import { UserServerStatus } from "./userServerStatus";
-import { UserClientStatus } from "./userClientStatus";
+import { UserServerStatus } from "../helper/ServerStatusBtn";
+import { ClientStatusBtn } from "../helper/clientStatusBtn";
+import { useEffect, useState } from "react";
+import { getSession } from "next-auth/react";
+
 
 function Header() {
-  const user = useCurrentUser();
-  console.log(user);
+  const [currentUser, setCurrentUser] = useState(null); 
+  useEffect(() => {
+    const fetchSession = async () => {
+      const sessionData = await getSession();
+      setCurrentUser(sessionData?.user ?? null); // Update state with session data
+    };
+
+    fetchSession();
+  }, []);
+
+  console.log("currentUser: ",currentUser);
+
   const menuItems = [
     {
       label: "Home",
@@ -25,14 +38,15 @@ function Header() {
     {
       label: "Login",
       path: "/login",
-      show: !user,
+      show: !currentUser,
     },
     {
       label: "Register",
       path: "/register",
-      show: !user,
+      show: !currentUser,
     },
   ];
+
 
   return (
     <div className="border-separate">
@@ -81,11 +95,16 @@ function Header() {
             ) : null
           )}
         </nav>
-        {(user) ? <SignOutButton /> : null}
-        <UserClientStatus />
+        {(currentUser) ? <SignOutButton /> : null}
+        <ClientStatusBtn />
+        <UserServerStatus />
       </header>
+      <div>
+      </div>
     </div>
   );
 }
+
+
 
 export default Header;

@@ -1,6 +1,5 @@
 "use client";
 
-import { useSession } from "next-auth/react";
 import React from "react";
 import Link from "next/link"
 import { LoginForm } from "./login-form"
@@ -29,22 +28,3 @@ export const LogInPage = () => {
     </>
   );
 };
-{/* <Link className='text-blue-700 font-bold' href="/login">Log In</Link> */ }
-
-
-// export default LogInPage;
-
-{/* <div className="flex space-x-5 ">
-          <button
-            onClick={() => signIn("google")}
-            className="border border-black rounded-md p-[15px] [250px]"
-          >
-            Sign in with google
-          </button>
-          <button
-            onClick={() => signIn("github")}
-            className="border border-black rounded-md p-[15px] [250px]"
-          >
-            Sign in with github
-          </button>
-        </div> */}

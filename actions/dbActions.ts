@@ -11,8 +11,7 @@ export const createProfileAction = async (currentTab, formData, pathToRevalidate
   const userEmail = formData.email;
   console.log("FORM_DATA: ", formData);
   console.log(userID
-    ,userEmail)
-
+    , userEmail)
   if (currentTab === "recruiter") {
     try {
       if (!userID && !userEmail) {
@@ -33,15 +32,21 @@ export const createProfileAction = async (currentTab, formData, pathToRevalidate
       console.log("User profile updated successfully");
 
       // Revalidate the path to ensure fresh data
-      // revalidatePath('/onboard');
-      
+      console.log("DONE")
+      revalidatePath('/onboard');
+
       // Redirect after the successful update
-      redirect('/');
+      // redirect('/dashboard');
+
+      return { success: true }
+
     } catch (error) {
       console.error("Error updating user profile:", error.message);
+      return { success: false, message: error.message };
     }
   }
   else {
     console.log("No action for the current tab");
+    return { success: false, message: "No action for the current tab" };
   }
 }

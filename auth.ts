@@ -9,10 +9,13 @@ import { UserRole } from "@prisma/client"
 
 
 export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
+  pages: {
+    signIn: "/auth/login",
+    error: "/auth/error",
+  },
   callbacks: {
     async signIn({ user }) {
-      const existingUser = await getUserById(user.id);
-      console.log("existingUser : ",existingUser)
+      // const existingUser = await getUserById(user.id);
       // if (!existingUser || !existingUser.email) {
       //   return false;
       // }
@@ -26,21 +29,24 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
       if (token.role && session.user) {
         session.user.role = token.role as UserRole;
       }
+      if (token.user && session.user) {
+        //@ts-ignore
+        session.user = token.user;
+      }
+      
       return session;
     },
 
-    async jwt({ token, trigger, session }) {
+    async jwt({ token, trigger, session, user }) {
       if (!token.sub) return token;
 
       const existingUser = await getUserById(token.sub)
       if (!existingUser) return token;
       token.role = existingUser.role;
+      token.user = existingUser;
+      user = token.user;
 
-
-      // if (trigger === "update" && session?.name) {
-      //   token.name = session.name
-      // }
-
+      // console.log("token:: ",token);
       return token;
     }
   },
@@ -49,13 +55,3 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
   ...authConfig
 });
 
-
-
-// export const {
-//   handlers: { GET, POST },
-//   auth
-//  } = NextAuth({ 
-//   adapter: PrismaAdapter(db),
-//   session: { strategy: "jwt"},
-//   ...authConfig
-//   })

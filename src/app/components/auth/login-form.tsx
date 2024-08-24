@@ -7,7 +7,7 @@ import { Input } from '../ui/input';
 import { Button } from '../ui/button'
 import { FormError } from '../helper/form-error'
 import { FormSuccess } from '../helper/form-success'
-import { login } from '../../../../actions/login'
+import { login } from 'actions/login'
 import { useTransition, useState } from 'react'
 
 import {
@@ -18,6 +18,8 @@ import {
   FormLabel,
   FormMessage,
 } from '../ui/form'
+import { useRouter } from "next/navigation";
+import { getSession } from "next-auth/react";
 
 export const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
@@ -30,14 +32,21 @@ export const LoginForm = () => {
       password: "",
     },
   });
-
+  const router = useRouter();
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     setError("");
     setSuccess("");
     startTransition(async () => {
       const response = await login(values);
-      if (response && response.error) setError(response.error);
-      if (response && response.success) setError(response.success);
+      if (response && response.error) {
+        setError(response.error);
+      } else if (response && response.success) {
+        setSuccess(response.success);
+        const updatedSession = await getSession();
+        console.log("Updated session:", updatedSession);
+        router.push('/dashboard');
+      }
+
     })
   }
 

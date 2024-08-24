@@ -1,7 +1,11 @@
 import { OnBoarding } from "@components/onboard";
 
 const OnBoardingPage = () => {
-  return (<OnBoarding />);
- };
+  return (
+    <>
+      <OnBoarding />
+    </>
+  );
+};
 
 export default OnBoardingPage;

@@ -12,6 +12,7 @@ import {
 } from "lib/utils";
 import { createProfileAction } from "actions/dbActions";
 import { getUser } from "actions/getUser";
+import { useCurrentUser } from "hooks/use-current-user";
 
 export const OnBoarding = () => {
   const [currentTab, setCurrentTab] = useState("candidate");
@@ -24,7 +25,7 @@ export const OnBoarding = () => {
 
   const handleTabChange = (value) => {
     setCurrentTab(value);
-    console.log("Handled tab change!!");
+
   };
   function handleRecuiterFormValid() {
     return (
@@ -55,27 +56,36 @@ export const OnBoarding = () => {
     );
   }
 
+
   async function createProfile() {
     const currentUser = await getUser();
-    console.log("CURRNET_USER: ", currentUser);
+    console.log("currentUser",currentUser);
+    console.log("ONBOARD_user",currentUser)
     const data =
       currentTab === "candidate"
         ? {
             candidateInfo: candidateFormData,
             role: "Candidate",
             isPremiumUser: false,
-            id: currentUser.id,
-            email: currentUser.email,
+            id: currentUser?.id,
+            email: currentUser?.email,
           }
         : {
             recruiterInfo: recruiterFormData,
             role: "Recruiter",
             isPremiumUser: false,
-            id: currentUser.id,
-            email: currentUser.email,
+            id: currentUser?.id,
+            email: currentUser?.email,
           };
 
-    await createProfileAction(currentTab, data, "/onboard", "/settings");
+    const result = await createProfileAction(currentTab, data, "/onboard", "/dashboard");
+
+    if (result.success) {
+      // Redirect client-side
+      window.location.href = '/dashboard'; 
+    } else {
+      console.error(result.message);
+    }
   }
 
   return (

@@ -1,21 +1,11 @@
-"use client"
-import { Button } from "@components/ui/button"
-import { useCurrentUser } from "hooks/use-current-user"
+import { auth } from "auth";
 
-export const DisplayData = () => {
-
-    const userData = useCurrentUser();
-
-    let data = null;
-    const onClick = () => {
-        console.log("DDDN:DDN:", userData);
-    }
-    return (
-        <>
-            {
-                "Sonething" + JSON.stringify(data)
-            }
-            <Button onClick={onClick}>CLICK me</Button>
-        </>
+export const DisplayData = async () => {
+    const session = await auth();
+    console.log("SESSION: ", session.user);
+        return (
+        <div>
+            {JSON.parse(JSON.stringify(session))}
+        </div>
     )
 }

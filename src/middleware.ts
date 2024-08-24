@@ -24,28 +24,32 @@ export default auth(async (req) => {
     return (null);
   }
 
-  const user = await getUser();
-  console.log("MIDDLEWARE", user?.role)
 
-  if (isOnBoardingRoute && user?.role === "OnBoarding") return null;
+  const user = await getUser();
+
+  if (!isOnBoardingRoute && user?.role === "OnBoarding" && isLoggedIn) {
+
+    if (isOnBoardingRoute) return null;
+    return Response.redirect(new URL("/onboard", nextUrl));
+  }
+
   if (isOnBoardingRoute) {
     if (user?.role !== "OnBoarding") {
-      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+
+      return Response.redirect(new URL("/dashboard", nextUrl));
     }
-  }
-  if (isAuthRoute && isLoggedIn) {
-    return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
   }
 
-  if (isAuthRoute || publicRoutes) {
-    if (isLoggedIn && user?.role === "OnBoarding") {
-      console.log("DONE");
-      return Response.redirect(new URL("/onboard", nextUrl));
-    }
-    return null;
+  if(isAuthRoute)
+  {
+    if(!isLoggedIn) return null;
+  }
+
+  if (isLoggedIn && isAuthRoute) {
+    return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
   }
   if (!isLoggedIn && !isPublicRoute) {
-    return Response.redirect(new URL("./login", nextUrl))
+    return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl))
   }
 
   return null;

@@ -6,11 +6,12 @@ import { AuthError } from 'node_modules/next-auth'
 import { signIn } from '../auth';
 import { onBoardingRoute } from "../routes"
 import { getUserByEmail } from '../data/user'
+import { revalidatePath } from 'next/cache';
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
     const validatedFeilds = LoginSchema.safeParse(values);
 
-    if (!validatedFeilds) {
+    if (!validatedFeilds.success) {
         return { error: "Invalid fields" };
     }
 
@@ -20,26 +21,31 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     if (!existingUser) {
         return { error: "Email is not registered!!" }
     }
-    
+
     try {
-        await signIn("credentials", {
+        const response = await signIn("credentials", {
+            redirect: false,
             email,
             password,
-            redirectTo: onBoardingRoute,
         })
+        if (response.error) {
+            return { error: "Invalid Credentials" };
+        }
+        return { success: "Logged in successfully!" };
     }
+
     catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {
                 case "CredentialsSignin":
                     return { error: "Invalid Credentials" }
                 default:
-                    return { error: "Something went wrong!" };
+                    return { error: " Something went wrong!" };
 
             }
         }
         throw error;
     }
 
-    return { success: "Email Sent!" };
+
 };

@@ -1,8 +1,6 @@
-"use client"
-import { useSession } from 'next-auth/react'
+import { getSession } from 'next-auth/react'
 
-export const useCurrentUser = () => {
-    const session = useSession();
-    console.log("FROM CC: ",session.data);
-    return (session.data?.user);
+export const useCurrentUser = async () => {
+    const session = await getSession();
+    return (session?.user);
 }
