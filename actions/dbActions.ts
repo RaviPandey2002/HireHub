@@ -32,11 +32,12 @@ export const createProfileAction = async (currentTab, formData, pathToRevalidate
       console.log("User profile updated successfully");
 
       // Revalidate the path to ensure fresh data
-      console.log("DONE")
-      revalidatePath('/onboard');
-
       // Redirect after the successful update
       // redirect('/dashboard');
+
+      console.log("DONE")
+      revalidatePath('/dashboard');
+
 
       return { success: true }
 

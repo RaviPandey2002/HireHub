@@ -3,8 +3,7 @@
 import * as z from 'zod';
 import { LoginSchema } from '../schema';
 import { AuthError } from 'node_modules/next-auth'
-import { signIn } from '../auth';
-import { onBoardingRoute } from "../routes"
+import { signIn } from 'auth';
 import { getUserByEmail } from '../data/user'
 import { revalidatePath } from 'next/cache';
 
@@ -27,8 +26,10 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
             redirect: false,
             email,
             password,
+            // redirectTo: "/onboard"
         })
-        if (response.error) {
+        console.log("Login - done ");
+        if (!response) {
             return { error: "Invalid Credentials" };
         }
         return { success: "Logged in successfully!" };
@@ -43,7 +44,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
                     return { error: " Something went wrong!" };
 
             }
-        }
+        } 
         throw error;
     }
 

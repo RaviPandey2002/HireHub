@@ -3,7 +3,7 @@
     "lib": ["dom", "dom.iterable", "esnext"],
     "baseUrl": "./",
     "paths": {
-      "@components/*": ["src/app/components/*"],
+      "@/components/*": ["src/app/components/*"],
       
     },
     "allowJs": true,
@@ -29,7 +29,7 @@
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
-, "src/app/components/auth/login-form.tsx", "src/app/components/onboard.jsx"  ],
+, "src/app/components/auth/login-form.tsx", "src/app/components/onboard.tsx"  ],
   "exclude": [
     "node_modules"
   ]

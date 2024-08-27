@@ -26,23 +26,19 @@ export default auth(async (req) => {
 
 
   const user = await getUser();
-
-  if (!isOnBoardingRoute && user?.role === "OnBoarding" && isLoggedIn) {
-
+  if (!isOnBoardingRoute && isLoggedIn && user?.role === "OnBoarding") {
     if (isOnBoardingRoute) return null;
     return Response.redirect(new URL("/onboard", nextUrl));
   }
 
   if (isOnBoardingRoute) {
     if (user?.role !== "OnBoarding") {
-
       return Response.redirect(new URL("/dashboard", nextUrl));
     }
   }
 
-  if(isAuthRoute)
-  {
-    if(!isLoggedIn) return null;
+  if (isAuthRoute) {
+    if (!isLoggedIn) return null;
   }
 
   if (isLoggedIn && isAuthRoute) {

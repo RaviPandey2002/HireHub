@@ -1,11 +1,10 @@
 "use client"
 
-import { Button } from "@components/ui/button";
-import { Input } from "@components/ui/input";
-import { Label } from "@components/ui/label";
-import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-export const OnBoardForm = ({
+export const CommonForm = ({
   action,
   formControls,
   buttonText,
@@ -89,13 +88,13 @@ export const OnBoardForm = ({
     <form action={action}>
       {formControls.map((control) => renderInputByComponentType(control))}
       <div className="mt-6 w-full">
-          <Button
-            type={btnType || "submit"}
-            className="disabled:opacity-60 flex h-11 items-center justify-center px-5"
-            disabled={isBtnDisabled}
-          >
-            {buttonText}
-          </Button>
+        <Button
+          type={btnType || "submit"}
+          className="disabled:opacity-60 flex h-11 items-center justify-center px-5"
+          disabled={isBtnDisabled}
+        >
+          {buttonText}
+        </Button>
       </div>
     </form>
   );

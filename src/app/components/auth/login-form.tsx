@@ -19,7 +19,7 @@ import {
   FormMessage,
 } from '../ui/form'
 import { useRouter } from "next/navigation";
-import { getSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 
 export const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
@@ -33,6 +33,7 @@ export const LoginForm = () => {
     },
   });
   const router = useRouter();
+  const { data: session, status, update } = useSession();
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     setError("");
     setSuccess("");
@@ -42,6 +43,8 @@ export const LoginForm = () => {
         setError(response.error);
       } else if (response && response.success) {
         setSuccess(response.success);
+        console.log("useSession ",session?.user);
+
         const updatedSession = await getSession();
         console.log("Updated session:", updatedSession);
         router.push('/dashboard');

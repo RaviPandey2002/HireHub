@@ -1,20 +1,20 @@
 "use client";
-import { Tabs, TabsList, TabsTrigger } from "@components/ui/tabs";
-import { TabsContent } from "@radix-ui/react-tabs";
-import { OnBoardForm } from "@components/onboard-form";
 
-import { useState } from "react";
-import {
-  initialRecruiterFormData,
-  recruiterOnboardFormControls,
-  candidateOnboardFormControls,
-  initialCandidateFormData,
-} from "lib/utils";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TabsContent } from "@radix-ui/react-tabs";
+
 import { createProfileAction } from "actions/dbActions";
 import { getUser } from "actions/getUser";
-import { useCurrentUser } from "hooks/use-current-user";
+import {
+  candidateOnboardFormControls,
+  initialCandidateFormData,
+  initialRecruiterFormData,
+  recruiterOnboardFormControls,
+} from "lib/utils";
+import { useState } from "react";
+import { CommonForm } from "./common-form";
 
-export const OnBoarding = () => {
+export const OnBoarding = (currentUser) => {
   const [currentTab, setCurrentTab] = useState("candidate");
   const [recruiterFormData, setRecruiterFormData] = useState(
     initialRecruiterFormData
@@ -25,7 +25,6 @@ export const OnBoarding = () => {
 
   const handleTabChange = (value) => {
     setCurrentTab(value);
-
   };
   function handleRecuiterFormValid() {
     return (
@@ -56,11 +55,8 @@ export const OnBoarding = () => {
     );
   }
 
-
   async function createProfile() {
     const currentUser = await getUser();
-    console.log("currentUser",currentUser);
-    console.log("ONBOARD_user",currentUser)
     const data =
       currentTab === "candidate"
         ? {
@@ -78,11 +74,17 @@ export const OnBoarding = () => {
             email: currentUser?.email,
           };
 
-    const result = await createProfileAction(currentTab, data, "/onboard", "/dashboard");
+    const result = await createProfileAction(
+      currentTab,
+      data,
+      "/onboard",
+      "/dashboard"
+    );
 
-    if (result.success) {
+    if ({ result }) {
+      console.log("REsulT ", result);
       // Redirect client-side
-      window.location.href = '/dashboard'; 
+      // redirect('/settings')
     } else {
       console.error(result.message);
     }
@@ -103,25 +105,28 @@ export const OnBoarding = () => {
           </div>
         </div>
         <TabsContent value="candidate">
-          <OnBoardForm
+          <CommonForm
             formControls={candidateOnboardFormControls}
             action={createProfile}
             formData={candidateFormData}
             setFormData={setCandidateFormData}
             buttonText={"Onboard as candidate"}
             // handleFileChange={handleFileChange}
+            btnType={undefined}
+            handleFileChange={undefined} 
             isBtnDisabled={!handleCandidateFormValid()}
           />
         </TabsContent>
         <TabsContent value="recruiter">
-          <OnBoardForm
+          <CommonForm
             formControls={recruiterOnboardFormControls}
             action={createProfile}
             buttonText={"Onboard as recruiter"}
             formData={recruiterFormData}
             setFormData={setRecruiterFormData}
             isBtnDisabled={!handleRecuiterFormValid()}
-          />
+            btnType={undefined}
+            handleFileChange={undefined}          />
         </TabsContent>
       </Tabs>
     </div>

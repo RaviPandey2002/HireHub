@@ -1,55 +1,72 @@
 "use client"
 
-import {
-  Sheet,
-  SheetTrigger,
-  SheetContent,
-} from "../ui/sheet";
-import { SignOutButton } from "@components/helper/signOutButton"
+import { Button } from "@/components/ui/button";
 import { AlignJustify } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@components/ui/button"
-import { useCurrentUser } from "hooks/use-current-user"
-import { UserServerStatus } from "../helper/ServerStatusBtn";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+} from "../ui/sheet";
+import { UserInfoButton } from "./user-info-button";
+import { SignOutButton } from "../helper/signOutButton";
 import { ClientStatusBtn } from "../helper/clientStatusBtn";
-import { useEffect, useState } from "react";
-import { getSession } from "next-auth/react";
+import { UserServerStatus } from "../helper/ServerStatusBtn";
 
 
-function Header() {
-  const [currentUser, setCurrentUser] = useState(null); 
-  useEffect(() => {
-    const fetchSession = async () => {
-      const sessionData = await getSession();
-      setCurrentUser(sessionData?.user ?? null); // Update state with session data
-    };
-
-    fetchSession();
-  }, []);
-
-  console.log("currentUser: ",currentUser);
+function Header({ user, profileInfo }) {
 
   const menuItems = [
     {
       label: "Home",
       path: "/",
-      show: "true",
+      show: true,
+    },
+    {
+      label: "Feed",
+      path: "/feed",
+      show: profileInfo,
     },
     {
       label: "Login",
-      path: "/login",
-      show: !currentUser,
+      path: "/sign-in",
+      show: !user,
     },
     {
       label: "Register",
-      path: "/register",
-      show: !currentUser,
+      path: "/sign-up",
+      show: !user,
+    },
+    {
+      label: "Activity",
+      path: "/activity",
+      show: profileInfo?.role === "candidate",
+    },
+    {
+      label: "Companies",
+      path: "/companies",
+      show: profileInfo?.role === "candidate",
+    },
+    {
+      label: "Jobs",
+      path: "/jobs",
+      show: profileInfo,
+    },
+    {
+      label: "Membership",
+      path: "/membership",
+      show: profileInfo,
+    },
+    {
+      label: "Account",
+      path: "/account",
+      show: profileInfo,
     },
   ];
 
 
   return (
-    <div className="border-separate">
+    <div className="ml-5 mr-5 p-4">
       <header className="flex h-16 w-full shrink-0 items-center">
         <Sheet>
           <SheetTrigger asChild>
@@ -59,7 +76,7 @@ function Header() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left">
-            <Link className="mr-6 hidden lg:flex" href={"#"}>
+            <Link className="mr-6 hidden lg:flex" href='/'>
               <h3>HireHub</h3>
             </Link>
 
@@ -81,12 +98,11 @@ function Header() {
         <Link className="hidden font-bold text-3xl lg:flex mr-6" href={"/"}>
           HIREHUB
         </Link>
-        <nav className=" ml-auto hidden lg:flex gap-6 items-center">
+        <nav className=" ml-auto hidden lg:flex gap-6 items-center ">
           {menuItems.map((menuItem) =>
             menuItem.show ? (
               <Link
                 href={menuItem.path}
-                onClick={() => sessionStorage.removeItem("filterParams")}
                 className="group inline-flex h-9 w-max items-center rounded-md  px-4 py-2 text-sm font-medium"
                 key={menuItem.label}
               >
@@ -94,8 +110,10 @@ function Header() {
               </Link>
             ) : null
           )}
+          {(user)? <UserInfoButton />: null}
+
         </nav>
-        {(currentUser) ? <SignOutButton /> : null}
+        {(user) ? <SignOutButton /> : null}
         <ClientStatusBtn />
         <UserServerStatus />
       </header>

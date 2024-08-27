@@ -1,4 +1,4 @@
-import { Button } from "@components/ui/button"
+import { Button } from "@/components/ui/button"
 import { getUser } from "actions/getUser"
 
 export const UserServerStatus = () => {

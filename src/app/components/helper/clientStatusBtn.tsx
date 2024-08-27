@@ -1,13 +1,13 @@
 "use client"
 import { getSession, useSession } from "next-auth/react"
-import { Button } from "@components/ui/button"
+import { Button } from "@/components/ui/button"
 
 export const ClientStatusBtn = () => {
-    const session = useSession();
+    // const clientSession = useSession();
     const onClick = async () => {
-        const currentUser = await getSession();
-        console.log("Header session", session.data)
-        console.log("Header getSession", currentUser)
+        const session = await getSession();
+        console.log("ClientBTN",session?.user);
+        // clientSession.update();
     }
     return (
         <>

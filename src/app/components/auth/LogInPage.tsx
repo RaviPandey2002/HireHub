@@ -4,6 +4,7 @@ import React from "react";
 import Link from "next/link"
 import { LoginForm } from "./login-form"
 import { OtherProviders } from './other-providers'
+import { NewLoginForm } from "./new-login-form";
 
 export const LogInPage = () => {
   return (
@@ -14,7 +15,7 @@ export const LogInPage = () => {
             Sign in to your account
           </h2>
           <div className="mt-6">
-            <LoginForm/>
+            <NewLoginForm/>
             <OtherProviders/>
             </div>
               <span>
