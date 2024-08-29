@@ -1,22 +1,14 @@
-"use client"
-
-import { Button } from "@/components/ui/button";
-import { AlignJustify } from "lucide-react";
+import { auth } from "auth";
 import Link from "next/link";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-} from "../ui/sheet";
-import { UserInfoButton } from "./user-info-button";
-import { SignOutButton } from "../helper/signOutButton";
 import { ClientStatusBtn } from "../helper/clientStatusBtn";
 import { UserServerStatus } from "../helper/ServerStatusBtn";
-import { useSession } from "next-auth/react";
+import { SignOutButton } from "../helper/signOutButton";
+import { HeaderSheet } from "./header-sheet";
+import { UserInfoButton } from "./user-info-button";
 
 
-function Header({ user, profileInfo }) {
-  console.log("Header user ",user)
+async function Header({ user, profileInfo }) {
+  // console.log("header layoutUser ",user)
   const menuItems = [
     {
       label: "Home",
@@ -64,38 +56,10 @@ function Header({ user, profileInfo }) {
       show: profileInfo,
     },
   ];
-
-
   return (
     <div className="ml-5 mr-5 p-4">
       <header className="flex h-16 w-full shrink-0 items-center">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button className="lg:hidden">
-              <AlignJustify className="h-6 w-6" />
-              <span className="sr-only">Toggle Navigation Menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left">
-            <Link className="mr-6 hidden lg:flex" href='/'>
-              <h3>HireHub</h3>
-            </Link>
-
-            <div className="grid gap-2 py-6">
-              {menuItems.map((menuItem) =>
-                menuItem.show ? (
-                  <Link
-                    href={menuItem.path}
-                    className="flex w-full items-center py-2 text-lg font-semibold"
-                    key={menuItem.label}
-                  >
-                    {menuItem.label}
-                  </Link>
-                ) : null
-              )}
-            </div>
-          </SheetContent>
-        </Sheet>
+        <HeaderSheet menuItems={menuItems} />
         <Link className="hidden font-bold text-3xl lg:flex mr-6" href={"/"}>
           HIREHUB
         </Link>
@@ -111,7 +75,7 @@ function Header({ user, profileInfo }) {
               </Link>
             ) : null
           )}
-          {(user)? <UserInfoButton />: null}
+          {(user) ? <UserInfoButton /> : null}
 
         </nav>
         {(user) ? <SignOutButton /> : null}

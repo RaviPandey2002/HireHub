@@ -76,17 +76,14 @@ export const OnBoarding = ({ currentUser }) => {
         };
 
     const response = await createProfileAction(currentTab, formData);
-    console.log("onB data", formData)
-    if(response.success)
+    if(response && response.success)
     {
-      console.log("onBoard redirect");
       router.refresh();
       router.push(DEFAULT_LOGIN_REDIRECT);
     }
     else{
       console.error(response.message);
     }
-
   }
 
   return (

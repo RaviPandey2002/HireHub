@@ -10,9 +10,7 @@ export const createProfileAction = async (currentTab, formData) => {
   const { recruiterInfo, role, isPremiumUser } = formData;
   const userID = formData.id;
   const userEmail = formData.email;
-  console.log("FORM_DATA: ", formData);
-  console.log(userID
-    , userEmail)
+  console.log("DbAction formData ",formData);
   if (currentTab === "recruiter") {
     try {
       if (!userID && !userEmail) {
@@ -40,7 +38,8 @@ export const createProfileAction = async (currentTab, formData) => {
       return { success: true, message: "Profile updated successfully" };
 
     } catch (error) {
-      console.error("Error updating user profile:", error.message);
+      console.error("Error updating user profile:",
+        error.message);
       return { success: false, message: "Something went wrong" };
     }
   }

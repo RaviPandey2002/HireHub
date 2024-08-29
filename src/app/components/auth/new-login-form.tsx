@@ -59,9 +59,9 @@ export function NewLoginForm() {
         // router.push('/login');
         // update();
 
-        revalidatePath('/')
+        // revalidatePath('/')
         console.log("new login updated",response);
-        router.push('/')
+        window.location.reload();
       }
     })
   }

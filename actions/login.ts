@@ -28,7 +28,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
             password,
             // redirectTo: "/onboard"
         })
-        console.log("Login - done ",response);
+        console.log("Login - done ",response ,"response");
         if (!response) {
             return { error: "Invalid Credentials" };
         }
