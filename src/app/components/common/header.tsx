@@ -7,7 +7,7 @@ import { HeaderSheet } from "./header-sheet";
 import { UserInfoButton } from "./user-info-button";
 
 
-async function Header({ user, profileInfo }) {
+async function Header({ user}) {
   // console.log("header layoutUser ",user)
   const menuItems = [
     {
@@ -18,7 +18,7 @@ async function Header({ user, profileInfo }) {
     {
       label: "Feed",
       path: "/feed",
-      show: profileInfo,
+      show: user?.role,
     },
     {
       label: "Login",
@@ -33,27 +33,27 @@ async function Header({ user, profileInfo }) {
     {
       label: "Activity",
       path: "/activity",
-      show: profileInfo?.role === "candidate",
+      show: user?.role === "Candidate",
     },
     {
       label: "Companies",
       path: "/companies",
-      show: profileInfo?.role === "candidate",
+      show: user?.role === "Candidate",
     },
     {
       label: "Jobs",
       path: "/jobs",
-      show: profileInfo,
+      show: user?.role !== "Candidate",
     },
     {
       label: "Membership",
       path: "/membership",
-      show: profileInfo,
+      show: user?.role,
     },
     {
       label: "Account",
       path: "/account",
-      show: profileInfo,
+      show: user?.role,
     },
   ];
   return (

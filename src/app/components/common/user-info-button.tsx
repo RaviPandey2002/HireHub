@@ -36,12 +36,17 @@ import {
     AvatarImage,
 } from "@/components/ui/avatar"
 
-import { signOut } from "next-auth/react"
-import { logout } from "actions/logout"
+import { signOut, useSession } from "next-auth/react"
+import { auth } from "auth"
+import { getUser } from "actions/getUser"
 
 const handleLogoutClick = ()=>{
     console.log("userInfo logout");
     signOut();
+}
+const handleProfileInfoClick = async ()=>{
+    const user = await getUser();
+    console.log("header userInfo",user);
 }
 
 export function UserInfoButton() {
@@ -57,7 +62,7 @@ export function UserInfoButton() {
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleProfileInfoClick}>
                         <User className="mr-2 h-4 w-4" />
                         <span>Profile</span>
                         <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>

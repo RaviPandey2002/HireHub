@@ -6,18 +6,17 @@ import {
 import { postNewJobAction } from "actions/postNewJobAction";
 import { initialPostNewJobFormData, postNewJobFormControls } from "lib/utils";
 import { useState } from "react";
-import { CommonForm } from "@/components/common-form"
+import { CommonForm } from "@/components/common/common-form"
 import { toast } from "@/components/ui/use-toast";
 import { DialogDescription } from "@radix-ui/react-dialog";
 
 export const PostNewJob = ({ user, jobList }) => {
-  // console.log("postNewJob user ",user);
+
   const [showJobDialog, setShowJobDialog] = useState(false);
   const [jobFormData, setJobFormData] = useState({
     ...initialPostNewJobFormData,
     companyName: user?.recruiterInfo?.companyName,
   });
-
   function handlePostNewBtnValid() {
     return Object.keys(jobFormData).every(
       (control) => jobFormData[control].trim() !== ""

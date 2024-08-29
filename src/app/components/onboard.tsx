@@ -2,7 +2,6 @@
 
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
-
 import { createProfileAction } from "actions/dbActions";
 import {
   candidateOnboardFormControls,
@@ -11,9 +10,19 @@ import {
   recruiterOnboardFormControls,
 } from "lib/utils";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { DEFAULT_LOGIN_REDIRECT } from "routes";
-import { CommonForm } from "./common-form";
+import { useEffect, useState } from "react";
+import { DEFAULT_LOGIN_REDIRECT, SUPERBASE_URL } from "routes";
+import { CommonForm } from "./common/common-form";
+
+// SUPER-BASE-----------------------
+import { createClient } from "@supabase/supabase-js";
+
+const superbaseUrl = "https://mlrcuztzocwewzkujmtf.supabase.co";
+const superbaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1scmN1enR6b2N3ZXd6a3VqbXRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQ5MzA5MTIsImV4cCI6MjA0MDUwNjkxMn0.JGyDm2y1_m6e7zWVJs7IwpetN24Ybzm8bmjVxIwplpw"
+
+
+const superbaseClient = createClient(superbaseUrl,
+  superbaseKey)
 
 export const OnBoarding = ({ currentUser }) => {
   const [currentTab, setCurrentTab] = useState("candidate");
@@ -23,6 +32,8 @@ export const OnBoarding = ({ currentUser }) => {
   const [candidateFormData, setCandidateFormData] = useState(
     initialCandidateFormData
   );
+  const [file, setFile] = useState(null);
+
 
   const handleTabChange = (value) => {
     setCurrentTab(value);
@@ -48,13 +59,38 @@ export const OnBoarding = ({ currentUser }) => {
       candidateFormData.skills.trim() !== "" &&
       candidateFormData.previousCompanies.trim() !== "" &&
       candidateFormData.totalExperience.trim() !== "" &&
-      candidateFormData.college.trim() !== "" &&
-      candidateFormData.collegeLocation.trim() !== "" &&
+      candidateFormData.collage.trim() !== "" &&
+      candidateFormData.collageLocation.trim() !== "" &&
       candidateFormData.graduatedYear.trim() !== "" &&
       candidateFormData.linkedinProfile.trim() !== "" &&
       candidateFormData.githubProfile.trim()
     );
   }
+
+  function handleFileChange(e) {
+    e.preventDefault();
+    console.log("onboard file", e.target.files);
+    setFile(e.target.files[0]);
+  }
+
+  async function handleUploadPdfToSuperbase() {
+    const { data, error } = await superbaseClient.storage.from('job-board').upload(`/public/${file.name}`, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
+
+    if (data) {
+      setCandidateFormData({
+        ...candidateFormData,
+        resume: data.path
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (file) handleUploadPdfToSuperbase();
+  }, [file])
+
 
   const router = useRouter();
   async function createProfile() {
@@ -76,18 +112,17 @@ export const OnBoarding = ({ currentUser }) => {
         };
 
     const response = await createProfileAction(currentTab, formData);
-    if(response && response.success)
-    {
+    if (response && response.success) {
       router.refresh();
       router.push(DEFAULT_LOGIN_REDIRECT);
     }
-    else{
+    else {
       console.error(response.message);
     }
   }
 
   return (
-    <div className="bg-white">
+    <div className="bg-white ml-7 mr-7">
       <Tabs value={currentTab} onValueChange={handleTabChange}>
         <div className="w-full">
           <div className="flex items-baseline justify-between border-b pb-6 pt-24">
@@ -107,11 +142,9 @@ export const OnBoarding = ({ currentUser }) => {
             formData={candidateFormData}
             setFormData={setCandidateFormData}
             buttonText={"Onboard as candidate"}
-            // handleFileChange={handleFileChange}
-            btnType={undefined}
-            handleFileChange={undefined}
+            handleFileChange={handleFileChange}
             isBtnDisabled={!handleCandidateFormValid()}
-          />
+            btnType={"submit"} />
         </TabsContent>
         <TabsContent value="recruiter">
           <CommonForm

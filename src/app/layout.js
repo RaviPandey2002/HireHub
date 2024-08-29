@@ -21,8 +21,9 @@ export default async function RootLayout({ children }) {
       <html lang="en">
         <body className={inter.className}>
           <Suspense fallback={<Loading />}>
-          <Header user={session?.user} profileInfo={session?.user?.role}/>
-          {children}</Suspense>
+            <Header user={session?.user} />
+            {children}
+          </Suspense>
         </body>
       </html>
     </SessionProvider>

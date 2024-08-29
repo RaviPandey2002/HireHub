@@ -13,3 +13,5 @@ export const onBoardingRoute = [
 ]
 
 export const DEFAULT_LOGIN_REDIRECT = "/"
+
+export const SUPERBASE_URL = "https://mlrcuztzocwewzkujmtf.supabase.co"

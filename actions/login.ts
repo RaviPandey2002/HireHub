@@ -1,11 +1,10 @@
 "use server"
 
-import * as z from 'zod';
-import { LoginSchema } from '../schema';
-import { AuthError } from 'node_modules/next-auth'
 import { signIn } from 'auth';
-import { getUserByEmail } from '../data/user'
-import { revalidatePath } from 'next/cache';
+import { AuthError } from 'node_modules/next-auth';
+import * as z from 'zod';
+import { getUserByEmail } from '../data/user';
+import { LoginSchema } from '../schema';
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
     const validatedFeilds = LoginSchema.safeParse(values);
@@ -28,7 +27,6 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
             password,
             // redirectTo: "/onboard"
         })
-        console.log("Login - done ",response ,"response");
         if (!response) {
             return { error: "Invalid Credentials" };
         }
@@ -44,7 +42,7 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
                     return { error: " Something went wrong!" };
 
             }
-        } 
+        }
         throw error;
     }
 

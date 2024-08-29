@@ -85,7 +85,7 @@ export const CommonForm = ({
   }
 
   return (
-    <form action={action}>
+    <form action={action} className="m-6">
       {formControls.map((control) => (
         <div key={control.name}>
           {renderInputByComponentType(control)}

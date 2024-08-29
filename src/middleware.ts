@@ -1,14 +1,14 @@
-import NextAuth from "node_modules/next-auth"
+import { getUser } from "actions/getUser"
 import authConfig from "auth.config"
-const { auth } = NextAuth(authConfig)
+import NextAuth from "node_modules/next-auth"
 import {
   DEFAULT_LOGIN_REDIRECT,
   apiAuthPrefix,
   authRoutes,
-  publicRoutes,
-  onBoardingRoute
+  onBoardingRoute,
+  publicRoutes
 } from "routes"
-import { getUser } from "actions/getUser"
+const { auth } = NextAuth(authConfig)
 
 
 export default auth(async (req) => {
@@ -27,12 +27,13 @@ export default auth(async (req) => {
 
   const user = await getUser();
 
-  // if (!isOnBoardingRoute && isLoggedIn && user?.role === "OnBoarding") {
-  //   if (isOnBoardingRoute) return null;
-  //   console.log("MIDDLEWare REDIRECT to onboard page");
-  //   return Response.redirect(new URL("/onboard", nextUrl));
-  // }
 
+
+  if (!isOnBoardingRoute) {
+    if (user?.role === "OnBoarding" && isLoggedIn) {
+      return Response.redirect(new URL('/onboard', nextUrl));
+    }
+  }
   if (isOnBoardingRoute) {
     if (user?.role !== "OnBoarding") {
       return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));

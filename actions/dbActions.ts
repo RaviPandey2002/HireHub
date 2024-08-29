@@ -1,16 +1,13 @@
 "use server"
 
-import { db } from "lib/db"
-import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
-import { DEFAULT_LOGIN_REDIRECT } from "routes";
+import { db } from "lib/db";
 
 
 export const createProfileAction = async (currentTab, formData) => {
-  const { recruiterInfo, role, isPremiumUser } = formData;
+  const { recruiterInfo, role, isPremiumUser, candidateInfo } = formData;
   const userID = formData.id;
   const userEmail = formData.email;
-  console.log("DbAction formData ",formData);
+  console.log("DbAction formData ", formData);
   if (currentTab === "recruiter") {
     try {
       if (!userID && !userEmail) {
@@ -18,8 +15,8 @@ export const createProfileAction = async (currentTab, formData) => {
       }
       await db.user.update({
         where: {
-          id: userID || undefined,  // Prefer userId if available
-          email: userEmail || undefined, // Use email as fallback if id is not present
+          id: userID || undefined,
+          email: userEmail || undefined, // Use email as fallback
         },
         data: {
           recruiterInfo: recruiterInfo,
@@ -28,13 +25,7 @@ export const createProfileAction = async (currentTab, formData) => {
         }
       });
 
-      console.log("User profile updated successfully");
-      // revalidatePath("/");
-      // redirect(DEFAULT_LOGIN_REDIRECT);
-      // Revalidate the path to ensure fresh data
-      // Redirect after the successful update
-      console.log("Profile updated successfully");
-      console.log("DONE")
+      console.log("Recruiter profile updated successfully");
       return { success: true, message: "Profile updated successfully" };
 
     } catch (error) {
@@ -44,7 +35,28 @@ export const createProfileAction = async (currentTab, formData) => {
     }
   }
   else {
-    console.log("No action for the current tab");
-    return { success: false, message: "No action for the current tab" };
+    try {
+      if (!userID && !userEmail) {
+        throw new Error("User ID or email must be provided to update the profile.");
+      }
+      await db.user.update({
+        where: {
+          id: userID || undefined,
+          email: userEmail || undefined, // Use email as fallback
+        },
+        data: {
+          candidateInfo: candidateInfo,
+          role: role,
+          isPremiumUser: isPremiumUser,
+        }
+      });
+
+      console.log("Candidate profile updated successfully");
+      return { success: true, message: "Candidate Profile updated successfully" };
+    } catch (error) {
+      console.error("Error updating user profile:",
+        error.message);
+      return { success: false, message: "Something went wrong" };
+    }
   }
 }
