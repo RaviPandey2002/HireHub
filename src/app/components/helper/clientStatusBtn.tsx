@@ -11,11 +11,10 @@ export const ClientStatusBtn = () => {
     }
     return (
         <>
-            <Button onClick={onClick} className="ml-3 bg-blue-800 text-white h-10 w-30">
-                Get userClientStatus
+            <Button onClick={onClick} className="ml-3 bg-blue-800 text-white h-6">
+                client
             </Button>
         </>
     );
-
 
 }

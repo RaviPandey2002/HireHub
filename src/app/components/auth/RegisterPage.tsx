@@ -25,10 +25,10 @@ export const RegisterPage = () => {
     });
 
     if (signInResponse && !signInResponse.error) {
-      //Redirect to homepage (/timeline)
-      router.push("/timeline");
+      console.log("HERE")
+      router.push("/");
     } else {
-      console.log("Errorss: ", signInResponse);
+      console.log("Else HERE")
       setError("Your Email or Password is wrong!");
     }
   };

@@ -1,3 +1,4 @@
+"use client"
 import {
     Cloud,
     CreditCard,
@@ -14,7 +15,6 @@ import {
     Users,
 } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -36,8 +36,13 @@ import {
     AvatarImage,
 } from "@/components/ui/avatar"
 
+import { signOut } from "next-auth/react"
+import { logout } from "actions/logout"
 
-
+const handleLogoutClick = ()=>{
+    console.log("userInfo logout");
+    signOut();
+}
 
 export function UserInfoButton() {
     return (
@@ -118,7 +123,7 @@ export function UserInfoButton() {
                     <span>API</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>s
+                <DropdownMenuItem onClick={handleLogoutClick}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
                     <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>

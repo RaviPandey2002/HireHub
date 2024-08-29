@@ -41,9 +41,10 @@ export const LoginForm = () => {
       const response = await login(values);
       if (response && response.error) {
         setError(response.error);
+        console.log("loginForm errorResponse",response)
       } else if (response && response.success) {
         setSuccess(response.success);
-        console.log("useSession ",session?.user);
+        console.log("loginForm ",session?.user);
 
         const updatedSession = await getSession();
         console.log("Updated session:", updatedSession);

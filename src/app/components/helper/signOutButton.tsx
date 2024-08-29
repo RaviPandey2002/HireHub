@@ -8,7 +8,7 @@ export const SignOutButton =  () => {
         signOut();
     }
     return (
-       <Button onClick={onClick}>
+       <Button className="h-3 w-3 ml-9 mr-8" onClick={onClick}>
         SignOUT
        </Button>
     )

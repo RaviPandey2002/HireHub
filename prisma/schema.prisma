@@ -11,29 +11,51 @@ datasource db {
 }
 
 enum UserRole {
-  Candidate 
+  Candidate
   Recruiter
   OnBoarding
 }
 
 model User {
-  id                  String         @id @default(auto()) @map("_id") @db.ObjectId
+  id                  String    @id @default(auto()) @map("_id") @db.ObjectId
   name                String?
   password            String?
-  email               String?        @unique
+  email               String?   @unique
   emailVerified       DateTime?
   image               String?
-  role                UserRole       @default(OnBoarding)
+  role                UserRole  @default(OnBoarding)
   isPremiumUser       Boolean?
   memberShipType      String?
   memberShipStartDate String?
   memberShipEndDate   String?
   recruiterInfo       Json?
   candidateInfo       Json?
-  accounts Account[]
+  accounts            Account[]
   // sessions      Session[]
 }
 
+model Jobs {
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
+  companyName String
+  title       String
+  location    String
+  type        String
+  experience  String
+  description String
+  skills      String
+  recruiterId String
+  applicants  Applicant[]
+}
+
+model Applicant {
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  name   String
+  email  String
+  userId String
+  status String
+  jobId  String @db.ObjectId
+  job    Jobs   @relation(fields: [jobId], references: [id])
+}
 
 model Account {
   id                String  @id @default(auto()) @map("_id") @db.ObjectId

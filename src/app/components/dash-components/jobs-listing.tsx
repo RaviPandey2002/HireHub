@@ -1,6 +1,9 @@
 "use client";
 
-export const JobsListing = ({ user}) => {
+import { PostNewJob } from "./post-new-job";
+
+export const JobsListing = ({ user }) => {
+  // console.log("JobListing ", user)
   return (<div>
     <div className="mx-auto max-w-7xl">
       <div className="flex items-baseline dark:border-white justify-between border-b border-gray-200 pb-6 pt-24">
@@ -9,10 +12,11 @@ export const JobsListing = ({ user}) => {
             ? "Explore All Jobs"
             : "Jobs Dashboard"}
         </h1>
-            
-
-
+        <div className="flex items-center">
+          {user?.role === "candidate" ? <p>Filter</p> : (<PostNewJob user={user} jobList />)}
+        </div>
       </div>
+      <div>Jobs</div>
     </div>
   </div>
   )

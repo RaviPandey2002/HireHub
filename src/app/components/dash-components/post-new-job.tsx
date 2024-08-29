@@ -8,13 +8,13 @@ import { initialPostNewJobFormData, postNewJobFormControls } from "lib/utils";
 import { useState } from "react";
 import { CommonForm } from "@/components/common-form"
 import { toast } from "@/components/ui/use-toast";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
-export const PostNewJob = ({ profileInfo, user, jobList }) => {
-  console.log(jobList, "jobList");
+export const PostNewJob = ({ user, jobList }) => {
   const [showJobDialog, setShowJobDialog] = useState(false);
   const [jobFormData, setJobFormData] = useState({
     ...initialPostNewJobFormData,
-    companyName: profileInfo?.recruiterInfo?.companyName,
+    companyName: user?.recruiterInfo?.companyName,
   });
 
   function handlePostNewBtnValid() {
@@ -24,7 +24,7 @@ export const PostNewJob = ({ profileInfo, user, jobList }) => {
   }
 
   function handleAddNewJob() {
-    if (!profileInfo?.isPremiumUser && jobList.length >= 2) {
+    if (!user?.isPremiumUser && jobList.length >= 2) {
       toast({
         variant: "destructive",
         title: "You can post max 2 jobs.",
@@ -47,11 +47,11 @@ export const PostNewJob = ({ profileInfo, user, jobList }) => {
 
     setJobFormData({
       ...initialPostNewJobFormData,
-      companyName: profileInfo?.recruiterInfo?.companyName,
+      companyName: user?.recruiterInfo?.companyName,
     });
     setShowJobDialog(false);
   }
-
+  console.log("postNewJob initialPost", user?.recruiterInfo?.companyName)
   return (
     <div>
       <Button
@@ -66,13 +66,14 @@ export const PostNewJob = ({ profileInfo, user, jobList }) => {
           setShowJobDialog(false);
           setJobFormData({
             ...initialPostNewJobFormData,
-            companyName: profileInfo?.recruiterInfo?.companyName,
+            companyName: user.recruiterInfo.companyName,
           });
         }}
     >
         <DialogContent className="sm:max-w-screen-md h-[600px] overflow-auto">
           <DialogHeader>
             <DialogTitle>Post New Job</DialogTitle>
+            <DialogDescription/>
             <div className="grid gap-4 py-4">
               <CommonForm
                 buttonText={"Add"}

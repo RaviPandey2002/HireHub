@@ -86,7 +86,11 @@ export const CommonForm = ({
 
   return (
     <form action={action}>
-      {formControls.map((control) => renderInputByComponentType(control))}
+      {formControls.map((control) => (
+        <div key={control.name}>
+          {renderInputByComponentType(control)}
+        </div>
+      ))}
       <div className="mt-6 w-full">
         <Button
           type={btnType || "submit"}

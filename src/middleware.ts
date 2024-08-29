@@ -26,14 +26,16 @@ export default auth(async (req) => {
 
 
   const user = await getUser();
-  if (!isOnBoardingRoute && isLoggedIn && user?.role === "OnBoarding") {
-    if (isOnBoardingRoute) return null;
-    return Response.redirect(new URL("/onboard", nextUrl));
-  }
+
+  // if (!isOnBoardingRoute && isLoggedIn && user?.role === "OnBoarding") {
+  //   if (isOnBoardingRoute) return null;
+  //   console.log("MIDDLEWare REDIRECT to onboard page");
+  //   return Response.redirect(new URL("/onboard", nextUrl));
+  // }
 
   if (isOnBoardingRoute) {
     if (user?.role !== "OnBoarding") {
-      return Response.redirect(new URL("/dashboard", nextUrl));
+      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
     }
   }
 

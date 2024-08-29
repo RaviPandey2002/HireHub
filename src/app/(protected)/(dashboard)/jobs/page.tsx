@@ -4,9 +4,11 @@ import { getUser } from "actions/getUser";
 
 async function JobsPage() {
     const user = await getUser();
+    let profileInfo;
     console.log("JobPage user ",user)
+    user?.role === "Recruiter" ? profileInfo=user?.recruiterInfo : profileInfo=user?.candidateInfo;
     return (<>
-    <JobsListing user/>
+    <JobsListing user={user}/>
     </>);
 }
 

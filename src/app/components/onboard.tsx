@@ -4,17 +4,18 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
 
 import { createProfileAction } from "actions/dbActions";
-import { getUser } from "actions/getUser";
 import {
   candidateOnboardFormControls,
   initialCandidateFormData,
   initialRecruiterFormData,
   recruiterOnboardFormControls,
 } from "lib/utils";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { DEFAULT_LOGIN_REDIRECT } from "routes";
 import { CommonForm } from "./common-form";
 
-export const OnBoarding = (currentUser) => {
+export const OnBoarding = ({ currentUser }) => {
   const [currentTab, setCurrentTab] = useState("candidate");
   const [recruiterFormData, setRecruiterFormData] = useState(
     initialRecruiterFormData
@@ -55,39 +56,37 @@ export const OnBoarding = (currentUser) => {
     );
   }
 
+  const router = useRouter();
   async function createProfile() {
-    const currentUser = await getUser();
-    const data =
+    const formData =
       currentTab === "candidate"
         ? {
-            candidateInfo: candidateFormData,
-            role: "Candidate",
-            isPremiumUser: false,
-            id: currentUser?.id,
-            email: currentUser?.email,
-          }
+          candidateInfo: candidateFormData,
+          role: "Candidate",
+          isPremiumUser: false,
+          id: currentUser?.id,
+          email: currentUser?.email,
+        }
         : {
-            recruiterInfo: recruiterFormData,
-            role: "Recruiter",
-            isPremiumUser: false,
-            id: currentUser?.id,
-            email: currentUser?.email,
-          };
+          recruiterInfo: recruiterFormData,
+          role: "Recruiter",
+          isPremiumUser: false,
+          id: currentUser?.id,
+          email: currentUser?.email,
+        };
 
-    const result = await createProfileAction(
-      currentTab,
-      data,
-      "/onboard",
-      "/dashboard"
-    );
-
-    if ({ result }) {
-      console.log("REsulT ", result);
-      // Redirect client-side
-      // redirect('/settings')
-    } else {
-      console.error(result.message);
+    const response = await createProfileAction(currentTab, formData);
+    console.log("onB data", formData)
+    if(response.success)
+    {
+      console.log("onBoard redirect");
+      router.refresh();
+      router.push(DEFAULT_LOGIN_REDIRECT);
     }
+    else{
+      console.error(response.message);
+    }
+
   }
 
   return (
@@ -113,7 +112,7 @@ export const OnBoarding = (currentUser) => {
             buttonText={"Onboard as candidate"}
             // handleFileChange={handleFileChange}
             btnType={undefined}
-            handleFileChange={undefined} 
+            handleFileChange={undefined}
             isBtnDisabled={!handleCandidateFormValid()}
           />
         </TabsContent>
@@ -125,8 +124,8 @@ export const OnBoarding = (currentUser) => {
             formData={recruiterFormData}
             setFormData={setRecruiterFormData}
             isBtnDisabled={!handleRecuiterFormValid()}
-            btnType={undefined}
-            handleFileChange={undefined}          />
+            btnType="submit"
+            handleFileChange={undefined} />
         </TabsContent>
       </Tabs>
     </div>

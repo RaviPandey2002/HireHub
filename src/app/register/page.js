@@ -2,7 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import React from "react";
-import { RegisterPage } from "@components/auth/RegisterPage";
+import { RegisterPage } from "@/components/auth/RegisterPage";
 
 const Register = () => {
   const { data: session } = useSession();

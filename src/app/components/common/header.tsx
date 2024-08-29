@@ -12,10 +12,11 @@ import { UserInfoButton } from "./user-info-button";
 import { SignOutButton } from "../helper/signOutButton";
 import { ClientStatusBtn } from "../helper/clientStatusBtn";
 import { UserServerStatus } from "../helper/ServerStatusBtn";
+import { useSession } from "next-auth/react";
 
 
 function Header({ user, profileInfo }) {
-
+  console.log("Header user ",user)
   const menuItems = [
     {
       label: "Home",
@@ -29,12 +30,12 @@ function Header({ user, profileInfo }) {
     },
     {
       label: "Login",
-      path: "/sign-in",
+      path: "/login",
       show: !user,
     },
     {
       label: "Register",
-      path: "/sign-up",
+      path: "/register",
       show: !user,
     },
     {

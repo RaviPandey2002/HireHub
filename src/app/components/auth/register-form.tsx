@@ -18,6 +18,7 @@ import {
   FormLabel,
   FormMessage,
 } from '../ui/form'
+import { useRouter } from "next/navigation";
 
 export const RegisterForm = () => {
   const [isPending, startTransition] = useTransition();
@@ -31,7 +32,7 @@ export const RegisterForm = () => {
       name: ""
     },
   });
-
+  const router = useRouter();
   const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
     setError("");
     setSuccess("");
@@ -40,6 +41,10 @@ export const RegisterForm = () => {
         .then((data) => {
           setError(data.error);
           setSuccess(data.success);
+          if(data.success){
+            console.log("now here")
+            router.push("/login")
+          }
         })
     })
   }

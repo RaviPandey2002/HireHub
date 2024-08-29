@@ -3,9 +3,10 @@
 import { db } from "lib/db"
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { DEFAULT_LOGIN_REDIRECT } from "routes";
 
 
-export const createProfileAction = async (currentTab, formData, pathToRevalidate, redirectTo) => {
+export const createProfileAction = async (currentTab, formData) => {
   const { recruiterInfo, role, isPremiumUser } = formData;
   const userID = formData.id;
   const userEmail = formData.email;
@@ -30,20 +31,17 @@ export const createProfileAction = async (currentTab, formData, pathToRevalidate
       });
 
       console.log("User profile updated successfully");
-
+      // revalidatePath("/");
+      // redirect(DEFAULT_LOGIN_REDIRECT);
       // Revalidate the path to ensure fresh data
       // Redirect after the successful update
-      // redirect('/dashboard');
-
+      console.log("Profile updated successfully");
       console.log("DONE")
-      revalidatePath('/dashboard');
-
-
-      return { success: true }
+      return { success: true, message: "Profile updated successfully" };
 
     } catch (error) {
       console.error("Error updating user profile:", error.message);
-      return { success: false, message: error.message };
+      return { success: false, message: "Something went wrong" };
     }
   }
   else {
