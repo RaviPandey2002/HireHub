@@ -11,6 +11,7 @@ import { toast } from "@/components/ui/use-toast";
 import { DialogDescription } from "@radix-ui/react-dialog";
 
 export const PostNewJob = ({ user, jobList }) => {
+  // console.log("postNewJob user ",user);
   const [showJobDialog, setShowJobDialog] = useState(false);
   const [jobFormData, setJobFormData] = useState({
     ...initialPostNewJobFormData,
@@ -40,7 +41,6 @@ export const PostNewJob = ({ user, jobList }) => {
       {
         ...jobFormData,
         recruiterId: user?.id,
-        applicants: [],
       },
       "/jobs"
     );
@@ -51,7 +51,6 @@ export const PostNewJob = ({ user, jobList }) => {
     });
     setShowJobDialog(false);
   }
-  console.log("postNewJob initialPost", user?.recruiterInfo?.companyName)
   return (
     <div>
       <Button

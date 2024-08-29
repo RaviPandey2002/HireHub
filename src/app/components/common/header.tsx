@@ -78,9 +78,9 @@ async function Header({ user, profileInfo }) {
           {(user) ? <UserInfoButton /> : null}
 
         </nav>
-        {(user) ? <SignOutButton /> : null}
+        {/* {(user) ? <SignOutButton /> : null}
         <ClientStatusBtn />
-        <UserServerStatus />
+        <UserServerStatus /> */}
       </header>
       <div>
       </div>
