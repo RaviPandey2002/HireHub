@@ -1,5 +1,6 @@
 "use server"
 
+import { auth } from "auth";
 import { db } from "lib/db";
 
 
@@ -25,6 +26,8 @@ export const createProfileAction = async (currentTab, formData) => {
         }
       });
 
+      const session = await auth();
+      console.log("dbAction session",session?.user);
       console.log("Recruiter profile updated successfully");
       return { success: true, message: "Profile updated successfully" };
 

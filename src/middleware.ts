@@ -27,13 +27,6 @@ export default auth(async (req) => {
 
   const user = await getUser();
 
-
-
-  if (!isOnBoardingRoute) {
-    if (user?.role === "OnBoarding" && isLoggedIn) {
-      return Response.redirect(new URL('/onboard', nextUrl));
-    }
-  }
   if (isOnBoardingRoute) {
     if (user?.role !== "OnBoarding") {
       return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
