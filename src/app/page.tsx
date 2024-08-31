@@ -14,7 +14,7 @@ const Home = async () => {
           <Dashboard />
         )
       ) : (
-        <LandingPage />
+        <LandingPage user={user} profileInfo={user?.role} />
       )}
     </>
   );
