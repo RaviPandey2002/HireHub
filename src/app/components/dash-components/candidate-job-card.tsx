@@ -1,25 +1,26 @@
 "use client";
 
-import { Fragment, useState } from "react";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
+  DrawerTitle
 } from "@/components/ui/drawer";
+import { useState } from "react";
 
-import { JobIcon } from "./job-icon"; 
 import { Button } from "../ui/button";
- 
-import { useToast } from "../ui/use-toast";
-import { CommonCard } from "../common/common-card";
-import CreateJobApplicationAction from "actions/createJobApplicationAction";
+import { JobIcon } from "./job-icon";
 
-export const CandidateJobCard = ({ jobItem, user , jobApplications }) => {
+import CreateJobApplicationAction from "actions/createJobApplicationAction";
+import { CommonCard } from "../common/common-card";
+import { useToast } from "../ui/use-toast";
+
+export const CandidateJobCard = ({ jobItem, user, jobApplications }) => {
+  // console.log("candidateJobApplications jobApplications",jobApplications);
+  // console.log("cando jobItem ",jobItem)
+  // console.log("candidateJobCard user",user)
+  // console.log("candidateJobCard jobApplication", jobApplications)
   const [showJobDetailsDrawer, setShowJobDetailsDrawer] = useState(false);
   const { toast } = useToast();
 
@@ -34,18 +35,19 @@ export const CandidateJobCard = ({ jobItem, user , jobApplications }) => {
       return;
     }
 
-    // await CreateJobApplicationAction(
-    //   {
-    //     recruiterUserID: jobItem?.recruiterId,
-    //     name: user?.candidateInfo?.name,
-    //     email: user?.email,
-    //     candidateUserID: user?.userId,
-    //     status: ["Applied"],
-    //     jobID: jobItem?._id,
-    //     jobAppliedDate: new Date().toLocaleDateString(),
-    //   },
-    //   "/jobs"
-    // );
+    await CreateJobApplicationAction(
+      {
+        recruiterId: jobItem.recruiterId,
+        name: user?.name,
+        email: user?.email,
+        candidateId: user?.id,
+        status: ["Applied"],
+        jobId: jobItem?.id,
+        jobApplicationDate: new Date("2024-08-31T00:00:00Z")
+        ,
+      },
+      "/jobs"
+    );
     setShowJobDetailsDrawer(false);
   }
 
@@ -77,22 +79,19 @@ export const CandidateJobCard = ({ jobItem, user , jobApplications }) => {
               <div className="flex gap-3">
                 <Button
                   onClick={handlejobApply}
-                  disabled={
-                    false
-                    // jobApplications.findIndex(
-                    //   (item) => item.jobID === jobItem?._id
-                    // ) > -1
-                    //   ? true
-                    //   : false
+                  disabled={jobApplications?.findIndex(
+                    (item) => item.jobID === jobItem?._id
+                  ) > -1
+                    ? true
+                    : false
                   }
                   className="disabled:opacity-65 flex h-11 items-center justify-center px-5"
                 >
-                  {/* {jobApplications.findIndex(
+                  {jobApplications?.findIndex(
                     (item) => item.jobID === jobItem?._id
                   ) > -1
                     ? "Applied"
-                    : "Apply"} */}
-                    Apply
+                    : "Apply"}
                 </Button>
                 <Button
                   className=" flex h-11 items-center justify-center px-5"
@@ -130,7 +129,7 @@ export const CandidateJobCard = ({ jobItem, user , jobApplications }) => {
             ))}
           </div>
         </DrawerContent>
-      </Drawer>
+      </Drawer >
     </>
   );
 };

@@ -39,3 +39,16 @@ export async function fetchJobsForCandidate() {
         return null;
     }
 }
+
+export async function fetchJobApplicationsForCandidate(candidateId) {
+    const result = await db.application.findMany({ where: { candidateId } });
+    return JSON.parse(JSON.stringify(result));
+}
+
+//fetch job applications - recruiter
+
+export async function fetchJobApplicationsForRecruiter(recruiterID) {
+    const result = await db.application.findMany({ where: { recruiterId: recruiterID } });
+
+    return JSON.parse(JSON.stringify(result));
+}

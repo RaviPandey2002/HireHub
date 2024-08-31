@@ -26,7 +26,7 @@ export default auth(async (req) => {
 
 
   const user = await getUser();
-
+  // console.log("middleware user ",user)
   if (isOnBoardingRoute) {
     if (user?.role !== "OnBoarding") {
       return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));

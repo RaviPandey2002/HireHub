@@ -6,6 +6,7 @@ import { auth } from "auth";
 // import SessionWrapper from "@components/SessionWrapper";
 import { SessionProvider } from "next-auth/react";
 import Header from "@/components/common/header";
+import SessionWrapper from "./components/SessionWrapper";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -17,7 +18,7 @@ export default async function RootLayout({ children }) {
   const session = await auth();
   // console.log("layout sesssion", session);
   return (
-    <SessionProvider session={session}>
+    <SessionWrapper session={session}>
       <html lang="en">
         <body className={inter.className}>
           <Suspense fallback={<Loading />}>
@@ -26,6 +27,6 @@ export default async function RootLayout({ children }) {
           </Suspense>
         </body>
       </html>
-    </SessionProvider>
+    </SessionWrapper>
   );
 }

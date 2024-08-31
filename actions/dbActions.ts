@@ -1,14 +1,13 @@
 "use server"
 
-import { auth } from "auth";
 import { db } from "lib/db";
+import { revalidatePath } from "next/cache";
 
 
 export const createProfileAction = async (currentTab, formData) => {
   const { recruiterInfo, role, isPremiumUser, candidateInfo } = formData;
   const userID = formData.id;
   const userEmail = formData.email;
-  console.log("DbAction formData ", formData);
   if (currentTab === "recruiter") {
     try {
       if (!userID && !userEmail) {
@@ -26,9 +25,7 @@ export const createProfileAction = async (currentTab, formData) => {
         }
       });
 
-      const session = await auth();
-      console.log("dbAction session",session?.user);
-      console.log("Recruiter profile updated successfully");
+      revalidatePath('/');
       return { success: true, message: "Profile updated successfully" };
 
     } catch (error) {

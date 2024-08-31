@@ -4,8 +4,8 @@ import { PostNewJob } from "./post-new-job";
 import { RecruiterJobCard } from "./recruiter-job-card";
 import { CandidateJobCard } from "./candidate-job-card";
 
-export const JobsListing = ({ user, jobList }) => {
-  // console.log("JobListing ", user)
+export const JobsListing = ({ user, jobList, jobApplications }) => {
+  // console.log("joblisting JA ",jobApplications);
   return (<div>
     <div className="mx-auto max-w-7xl ml-5 mr-5">
       <div className="flex items-baseline dark:border-white justify-between border-b border-gray-200 pb-6 pt-24">
@@ -33,16 +33,15 @@ export const JobsListing = ({ user, jobList }) => {
                           <CandidateJobCard
                             jobItem={jobItem}
                             user={user}
-                            jobApplications={undefined}
+                            jobApplications={jobApplications}
                           />
                         </div>
 
                       ) : (
                         <div key={jobItem?.id}>
                           <RecruiterJobCard
-                            // profileInfo={user?.role}
                             jobItem={jobItem}
-                          // jobApplications={jobApplications}
+                            jobApplications={jobApplications}
                           />
                         </div>
                       )

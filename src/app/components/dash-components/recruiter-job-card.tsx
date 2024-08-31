@@ -4,17 +4,18 @@ import { JobIcon } from "./job-icon";
 
 
 
-export const RecruiterJobCard = ({ jobItem }) => {
+export const RecruiterJobCard = ({ jobItem, jobApplications }) => {
+  console.log("recruiterJobCard JA",jobApplications);
   return (<div>
     <CommonCard
-    icon={<JobIcon/>}
-    title={jobItem?.title}
-    footerContent={
-      <Button className="flex h-11 items-center justify-center px-5">
-        10 Applicants
-      </Button>
-    }
-    description={""}
+      icon={<JobIcon />}
+      title={jobItem?.title}
+      footerContent={
+        <Button className="flex h-11 items-center justify-center px-5">
+          10 Applicants
+        </Button>
+      }
+      description={""}
     />
   </div>)
 };
