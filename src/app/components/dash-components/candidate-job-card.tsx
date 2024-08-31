@@ -17,10 +17,6 @@ import { CommonCard } from "../common/common-card";
 import { useToast } from "../ui/use-toast";
 
 export const CandidateJobCard = ({ jobItem, user, jobApplications }) => {
-  // console.log("candidateJobApplications jobApplications",jobApplications);
-  // console.log("cando jobItem ",jobItem)
-  // console.log("candidateJobCard user",user)
-  // console.log("candidateJobCard jobApplication", jobApplications)
   const [showJobDetailsDrawer, setShowJobDetailsDrawer] = useState(false);
   const { toast } = useToast();
 
@@ -51,6 +47,8 @@ export const CandidateJobCard = ({ jobItem, user, jobApplications }) => {
     setShowJobDetailsDrawer(false);
   }
 
+  console.log(" candidate_card jobApplications",jobApplications);
+  console.log(" candidate_card jobItem",jobItem);
   return (
     <>
       <Drawer
@@ -80,7 +78,7 @@ export const CandidateJobCard = ({ jobItem, user, jobApplications }) => {
                 <Button
                   onClick={handlejobApply}
                   disabled={jobApplications?.findIndex(
-                    (item) => item.jobID === jobItem?._id
+                    (item) => item.jobId === jobItem?.id
                   ) > -1
                     ? true
                     : false
@@ -88,7 +86,7 @@ export const CandidateJobCard = ({ jobItem, user, jobApplications }) => {
                   className="disabled:opacity-65 flex h-11 items-center justify-center px-5"
                 >
                   {jobApplications?.findIndex(
-                    (item) => item.jobID === jobItem?._id
+                    (item) => item?.jobId === jobItem?.id
                   ) > -1
                     ? "Applied"
                     : "Apply"}

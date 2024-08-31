@@ -27,7 +27,7 @@ const superbaseClient = createClient(superbaseUrl,
 
 export const OnBoarding = ({ currentUser }) => {
   const { data: session, update, status } = useSession();
-  console.log("session update status", session,status)
+  // console.log("session update status", session,status)
   // console.log("onboard current user",currentUser);
   const [currentTab, setCurrentTab] = useState("candidate");
   const [recruiterFormData, setRecruiterFormData] = useState(
