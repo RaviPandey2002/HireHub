@@ -5,8 +5,6 @@ import { JobIcon } from "./job-icon";
 
 
 export const RecruiterJobCard = ({ jobItem, jobApplications }) => {
-  console.log("recruiter_card jobItem", jobItem)
-  console.log("recruiterJobCard JA", jobApplications);
   return (<div>
     <CommonCard
       icon={<JobIcon />}

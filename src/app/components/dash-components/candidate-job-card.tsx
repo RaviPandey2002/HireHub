@@ -47,8 +47,6 @@ export const CandidateJobCard = ({ jobItem, user, jobApplications }) => {
     setShowJobDetailsDrawer(false);
   }
 
-  console.log(" candidate_card jobApplications",jobApplications);
-  console.log(" candidate_card jobItem",jobItem);
   return (
     <>
       <Drawer

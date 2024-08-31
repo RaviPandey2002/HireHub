@@ -1,5 +1,5 @@
+import { Button } from "@/components/ui/button";
 import { auth, signOut } from "auth";
-import { Button } from "@components/ui/button"
 
 
 const SettingsPage = async () => {

@@ -5,7 +5,6 @@ import { RecruiterJobCard } from "./recruiter-job-card";
 import { CandidateJobCard } from "./candidate-job-card";
 
 export const JobsListing = ({ user, jobList, jobApplications }) => {
-  // console.log("joblisting JA ",jobApplications);
   return (<div>
     <div className="mx-auto max-w-7xl ml-5 mr-5">
       <div className="flex items-baseline dark:border-white justify-between border-b border-gray-200 pb-6 pt-24">

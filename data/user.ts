@@ -1,4 +1,4 @@
-import { db } from "lib/db"
+import { db } from "lib/db";
 export const getUserByEmail = async (email: string) => {
     try {
         const user = await db.user.findUnique({ where: { email } })
@@ -45,10 +45,8 @@ export async function fetchJobApplicationsForCandidate(candidateId) {
     return JSON.parse(JSON.stringify(result));
 }
 
-//fetch job applications - recruiter
-
 export async function fetchJobApplicationsForRecruiter(recruiterID) {
     const result = await db.application.findMany({ where: { recruiterId: recruiterID } });
-    console.log("user result",result)
+    console.log("user result", result)
     return JSON.parse(JSON.stringify(result));
 }

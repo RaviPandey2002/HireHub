@@ -18,7 +18,7 @@ export default async function RootLayout({ children }) {
   const session = await auth();
   // console.log("layout sesssion", session);
   return (
-    <SessionWrapper session={session}>
+    <SessionWrapper>
       <html lang="en">
         <body className={inter.className}>
           <Suspense fallback={<Loading />}>

@@ -38,7 +38,6 @@ export const OnBoarding = ({ currentUser }) => {
   );
   const [file, setFile] = useState(null);
 
-
   const handleTabChange = (value) => {
     setCurrentTab(value);
   };
@@ -73,12 +72,12 @@ export const OnBoarding = ({ currentUser }) => {
 
   function handleFileChange(e) {
     e.preventDefault();
-    console.log("onboard file", e.target.files);
+    // console.log("onboard file", e.target.files);
     setFile(e.target.files[0]);
   }
 
   async function handleUploadPdfToSuperbase() {
-    const { data, error } = await superbaseClient.storage.from('job-board').upload(`/public/${file.name}`, file, {
+    const { data, error } = await superbaseClient.storage.from('job-board').upload(`/public/${currentUser?.name}/${file.name}`, file, {
       cacheControl: "3600",
       upsert: false,
     });
@@ -89,7 +88,15 @@ export const OnBoarding = ({ currentUser }) => {
         resume: data.path
       })
     }
+    if(error && error?.message === "The resource already exists")
+    {
+      setCandidateFormData({
+        ...candidateFormData,
+        resume: `/public/${currentUser?.name}/${file.name}`
+      })
+    }
   }
+  // console.log("onboard FormData",candidateFormData);
 
   useEffect(() => {
     if (file) handleUploadPdfToSuperbase();
@@ -124,7 +131,6 @@ export const OnBoarding = ({ currentUser }) => {
       console.error(response.message);
     }
   }
-
 
   return (
     <div className="bg-white ml-7 mr-7">
