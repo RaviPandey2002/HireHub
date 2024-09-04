@@ -5,6 +5,7 @@ import { UserServerStatus } from "../helper/ServerStatusBtn";
 import { SignOutButton } from "../helper/signOutButton";
 import { HeaderSheet } from "./header-sheet";
 import { UserInfoButton } from "./user-info-button";
+import { Button } from "../ui/button";
 
 
 async function Header({ user }) {
@@ -58,11 +59,11 @@ async function Header({ user }) {
   ];
   return (
     <div className="ml-5 mr-5 p-4">
-      <header className="flex h-16 w-full shrink-0 items-center">
-        <HeaderSheet menuItems={menuItems} />
-        <Link className="hidden font-bold text-3xl lg:flex mr-6" href={"/"}>
+      <header className="flex h-16 w-full shrink-0 justify-between items-center">
+        <Link className="font-bold text-3xl lg:flex mr-6" href={"/"}>
           HIREHUB
         </Link>
+        <HeaderSheet menuItems={menuItems} user={user}/>
         <nav className=" ml-auto hidden lg:flex gap-6 items-center ">
           {menuItems.map((menuItem) =>
             menuItem.show ? (

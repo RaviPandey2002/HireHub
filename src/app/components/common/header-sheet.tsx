@@ -6,8 +6,13 @@ import {
     SheetContent,
     SheetTrigger,
 } from "../ui/sheet";
-export const HeaderSheet = ({ menuItems }) => {
-    
+import { signOut } from "auth";
+export const HeaderSheet = ({ menuItems, user }) => {
+    const handleSubmit = async () => {
+        "use server"
+        await signOut();
+    }
+
     return (
         <>
             <Sheet>
@@ -17,11 +22,7 @@ export const HeaderSheet = ({ menuItems }) => {
                         <span className="sr-only">Toggle Navigation Menu</span>
                     </Button>
                 </SheetTrigger>
-                <SheetContent side="left">
-                    <Link className="mr-6 hidden lg:flex" href='/'>
-                        <h3>HireHub</h3>
-                    </Link>
-
+                <SheetContent side="left" className="w-2/3 ">
                     <div className="grid gap-2 py-6">
                         {menuItems.map((menuItem) =>
                             menuItem.show ? (
@@ -35,6 +36,13 @@ export const HeaderSheet = ({ menuItems }) => {
                             ) : null
                         )}
                     </div>
+                    {
+                        user ? <form action={handleSubmit} >
+                            <Button type="submit" className="w-full">
+                                Logout
+                            </Button>
+                        </form> : null
+                    }
                 </SheetContent>
             </Sheet>
         </>
