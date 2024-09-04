@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { NewLoginForm } from "./new-login-form";
 import { OtherProviders } from './other-providers';
-import { logout } from "actions/logout";
-import { Button } from "../ui/button";
 
 
 export const LogInPage = () => {

@@ -26,10 +26,9 @@ export default auth(async (req) => {
 
 
   const user = await getUser();
-  // console.log("middleware user ",user)
   if (isOnBoardingRoute) {
     if (user?.role !== "OnBoarding") {
-      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+      return Response.redirect(new URL(process.env.NEXTAUTH_URL, nextUrl));
     }
   }
 
@@ -38,10 +37,19 @@ export default auth(async (req) => {
   }
 
   if (isLoggedIn && isAuthRoute) {
-    return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+    console.log("yaha se");
+    return Response.redirect(new URL(process.env.NEXTAUTH_URL, nextUrl));
   }
+  
+
   if (!isLoggedIn && !isPublicRoute) {
-    return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl))
+    let callbackUrl = nextUrl.pathname;
+    if(nextUrl.search )
+    {
+      callbackUrl += nextUrl.search;
+    }
+    const encodedCallbackUrl = encodeURIComponent(callbackUrl);
+    return Response.redirect(new URL(process.env.NEXTAUTH_URL, nextUrl))
   }
 
   return null;
