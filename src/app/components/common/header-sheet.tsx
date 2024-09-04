@@ -1,3 +1,4 @@
+"use client"
 import { AlignJustify } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
@@ -6,18 +7,22 @@ import {
     SheetContent,
     SheetTrigger,
 } from "../ui/sheet";
-import { signOut } from "auth";
+import { useState } from "react";
+import { signOut } from "next-auth/react";
 export const HeaderSheet = ({ menuItems, user }) => {
-    const handleSubmit = async () => {
-        "use server"
-        await signOut();
+    const handleSubmit =() => {
+        signOut();
     }
+    const [isOpen, setIsOpen]= useState(false);
+    const handleLinkClick = ()=>{
+        setIsOpen(false);
+    } 
 
     return (
         <>
-            <Sheet>
+            <Sheet open={isOpen} onOpenChange={setIsOpen}>
                 <SheetTrigger asChild>
-                    <Button className="lg:hidden">
+                    <Button className="lg:hidden" onClick={()=>{setIsOpen(true)}} >
                         <AlignJustify className="h-6 w-6" />
                         <span className="sr-only">Toggle Navigation Menu</span>
                     </Button>
@@ -30,6 +35,7 @@ export const HeaderSheet = ({ menuItems, user }) => {
                                     href={menuItem.path}
                                     className="flex w-full items-center py-2 text-lg font-semibold"
                                     key={menuItem.label}
+                                    onClick={handleLinkClick}
                                 >
                                     {menuItem.label}
                                 </Link>
