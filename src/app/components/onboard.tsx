@@ -77,7 +77,7 @@ export const OnBoarding = ({ currentUser }) => {
   }
 
   async function handleUploadPdfToSuperbase() {
-    const { data, error } = await superbaseClient.storage.from('job-board').upload(`/public/${currentUser?.name}/${file.name}`, file, {
+    const { data, error } = await superbaseClient.storage.from('hirehub-bucket-public').upload(`/public/${currentUser?.name}/${file.name}`, file, {
       cacheControl: "3600",
       upsert: false,
     });
