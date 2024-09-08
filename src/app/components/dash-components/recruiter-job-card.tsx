@@ -15,14 +15,17 @@ export const RecruiterJobCard = ({ jobItem, jobApplications }) => {
     showCurrentCandidateDetailsModal,
     setShowCurrentCandidateDetailsModal,
   ] = useState(false);
-
+  // console.log("recruiterJobCard jobApplications ", jobApplications)
+  // console.log("recruiterJobCard jobItem", jobItem)
   return (
     <div>
       <CommonCard
         icon={<JobIcon />}
         title={jobItem?.title}
         footerContent={
-          <Button className="flex h-11 items-center justify-center px-5">
+          <Button className="flex h-11 items-center justify-center px-5"
+            onClick={() => { setShowApplicantsDrawer(true) }}
+          >
             {
               jobApplications.filter((item) => item?.jobId === jobItem?.id).length > 1 ? `${jobApplications.filter((item) => item?.jobId === jobItem?.id).length} Applicants` :
                 `${jobApplications.filter((item) => item?.jobId === jobItem?.id).length} Applicant`
@@ -41,10 +44,10 @@ export const RecruiterJobCard = ({ jobItem, jobApplications }) => {
         }
         currentCandidateDetails={currentCandidateDetails}
         setCurrentCandidateDetails={setCurrentCandidateDetails}
-        jobItem={jobApplications.filter(
-          (jobApplicationsItem) => jobApplicationsItem?.id === jobItem?.id
+        jobItem={jobItem}
+        jobApplications={jobApplications.filter(
+          (jobApplicationsItem) => jobApplicationsItem?.jobId === jobItem?.id
         )}
-        jobApplications={jobApplications}
       />
     </div>)
 };
