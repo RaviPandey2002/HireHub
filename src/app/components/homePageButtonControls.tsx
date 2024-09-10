@@ -19,7 +19,7 @@ export const HomepageButtonControls = ({ user, profileInfo }) => {
                 className="flex h-11 items-center justify-center px-5"
             >
                 {user
-                    ? profileInfo?.role === "candidate"
+                    ? profileInfo === "Candidate"
                         ? "Browse Jobs"
                         : "Jobs Dasboard"
                     : "Find Jobs"}
@@ -28,18 +28,18 @@ export const HomepageButtonControls = ({ user, profileInfo }) => {
                 onClick={() =>
                     router.push(
                         user
-                            ? profileInfo?.role === "candidate"
+                            ? profileInfo === "Candidate"
                                 ? "/activity"
-                                : "/jobs"
+                                : "/feed"
                             : "/jobs"
                     )
                 }
                 className="flex h-11 items-center justify-center px-5"
             >
                 {user
-                    ? profileInfo?.role === "candidate"
+                    ? profileInfo === "Candidate"
                         ? "Your Activity"
-                        : "Post New Job"
+                        : "News feed"
                     : "Post New Job"}
             </Button>
         </div>

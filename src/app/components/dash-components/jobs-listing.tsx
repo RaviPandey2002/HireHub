@@ -21,7 +21,7 @@ export const JobsListing = ({ user, jobList, jobApplications }) => {
           </div>
         </div>
         <div>
-          <div className="pb-24">
+          <div className="pt-6 pb-24">
             <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-3">
               <div className="lg:col-span-4">
                 <div className="container mx-auto p-0 space-y-8">
