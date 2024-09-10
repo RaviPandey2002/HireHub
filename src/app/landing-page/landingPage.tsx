@@ -15,7 +15,7 @@ const LandingPage = ({ user, profileInfo }) => {
                     One Stop Solution to Find Jobs & Candidates.
                   </span>
                     : profileInfo === "Candidate" ? <span className="font-medium dark:text-white text-gray-600">
-                      One Stop Solution to Find Jobs.
+                      One Stop Solution to Find Jobs for you.
                     </span> : <span className="font-medium dark:text-white text-gray-600">
                       One Stop Solution to Find Best Candidates for your jobs.
                     </span>

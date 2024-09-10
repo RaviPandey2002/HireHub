@@ -11,10 +11,9 @@ const Home = async () => {
       {user ? (
         user?.role === "OnBoarding" ? (
           <OnBoardingPage />
-        ) : (
-          <LandingPage user={user} profileInfo={user?.role} />
-        )
-      ) : redirect("/login")}
+        ) : null
+      ) : null}
+      <LandingPage user={user} profileInfo={user?.role} />
     </div >
   );
 };

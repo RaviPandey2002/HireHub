@@ -15,7 +15,14 @@ export const HomepageButtonControls = ({ user, profileInfo }) => {
     return (
         <div className="flex space-x-4">
             <Button
-                onClick={() => router.push("/jobs")}
+                onClick={() => {
+                    if(user) {
+                        router.push("/jobs")
+                    }
+                    else {
+                        router.push("/login")
+                    }
+                }}
                 className="flex h-11 items-center justify-center px-5"
             >
                 {user
@@ -25,14 +32,14 @@ export const HomepageButtonControls = ({ user, profileInfo }) => {
                     : "Find Jobs"}
             </Button>
             <Button
-                onClick={() =>
+                onClick={() =>{
                     router.push(
                         user
                             ? profileInfo === "Candidate"
                                 ? "/activity"
                                 : "/feed"
-                            : "/jobs"
-                    )
+                            : user ? "/jobs" : "/login"
+                    )}
                 }
                 className="flex h-11 items-center justify-center px-5"
             >
