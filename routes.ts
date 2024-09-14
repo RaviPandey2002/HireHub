@@ -1,5 +1,6 @@
 export const publicRoutes = [
     "/",
+    "/images/HireHubLandingPageImage.png"
 ]
 
 export const authRoutes = [

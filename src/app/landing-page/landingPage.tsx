@@ -1,12 +1,13 @@
 import { HomepageButtonControls } from "@/components/homePageButtonControls";
-
+import Image from "next/image";
+import HeroImage from "../../../public/HireHubLandingPageImage.png"
 
 const LandingPage = ({ user, profileInfo }) => {
   return (
     <>
       <section className="relative w-full h-full min-h-screen pb-10">
         <div className="w-full h-full relative">
-          <div className="flex flex-col-reverse lg:flex-row gap-10 mt-16">
+          <div className="flex flex-col-reverse lg:flex-row gap-10 mt-8">
             <section className="w-full lg:w-[50%] flex flex-col md:px-2 lg:px-0 p-5 lg:p-10">
               <div className="w-full flex justify-start flex-col h-auto lg:pt-7">
                 <span className="flex space-x-2">
@@ -32,11 +33,13 @@ const LandingPage = ({ user, profileInfo }) => {
                 </div>
               </div>
             </section>
-            <section className="relative w-full lg:w-[50%] flex items-center justify-end">
-              <img
-                src="https://utfs.io/f/4c9f7186-8ad0-4680-aece-a5abea608705-k6t10e.png"
-                alt="Hero"
-                className="h-full w-full object-contain z-10"
+            <section className="w-full lg:w-[50%] flex flex-col md:px-2 lg:px-0 p-5 lg:p-10">
+              <Image
+                height={800}
+                width={800}
+                src="/images/HireHubLandingPageImage.png"
+                alt="Hero Image Here"
+                className="h-[88%] object-contain z-10"
               />
             </section>
           </div>

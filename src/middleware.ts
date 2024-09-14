@@ -23,7 +23,7 @@ export default auth(async (req) => {
   if (isApiAuthRoute) {
     return (null);
   }
-
+  if(isPublicRoute) return (null);
 
   const user = await getUser();
   if (isOnBoardingRoute) {

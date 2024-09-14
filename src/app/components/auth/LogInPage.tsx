@@ -10,12 +10,12 @@ export const LogInPage = () => {
   return (
     <>
 
-      <div className="min-h-screen flex justify-center lg:items-center bg-gray-50">
+      <div className="min-h-[90vh] flex justify-center lg:items-center bg-gray-50">
         <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-lg">
           <h2 className="text-center text-3xl font-extrabold text-gray-900">
             Sign in to your account
           </h2>
-          <div className="mt-6">
+          <div >
             <NewLoginForm />
             <OtherProviders />
           </div>
