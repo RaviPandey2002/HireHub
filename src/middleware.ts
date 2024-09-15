@@ -1,5 +1,6 @@
 import { getUser } from "actions/getUser"
 import authConfig from "auth.config"
+import { NextResponse } from "next/server"
 import NextAuth from "node_modules/next-auth"
 import {
   DEFAULT_LOGIN_REDIRECT,
@@ -23,33 +24,41 @@ export default auth(async (req) => {
   if (isApiAuthRoute) {
     return (null);
   }
-  if(isPublicRoute) return (null);
-
-  const user = await getUser();
-  if (isOnBoardingRoute) {
-    if (user?.role !== "OnBoarding") {
-      return Response.redirect(new URL(process.env.NEXTAUTH_URL, nextUrl));
-    }
-  }
+  if (isPublicRoute) return (null);
 
   if (isAuthRoute) {
     if (!isLoggedIn) return null;
   }
 
+  const user = await getUser();
+  console.log("middleware user",user);
+  
+  if (isOnBoardingRoute) {
+    if (user?.role !== "OnBoarding") {
+      console.log("from here")
+      return NextResponse.redirect(new URL(process.env.NEXTAUTH_URL, nextUrl));
+    }
+  }
+  if (!isOnBoardingRoute) {
+    if (user?.role === "OnBoarding") {
+      console.log("from here")
+      return NextResponse.redirect(new URL("/onboard", nextUrl));
+    }
+  }
+
   if (isLoggedIn && isAuthRoute) {
     console.log("yaha se");
-    return Response.redirect(new URL(process.env.NEXTAUTH_URL, nextUrl));
+    return NextResponse.redirect(new URL(process.env.NEXTAUTH_URL, nextUrl));
   }
-  
+
 
   if (!isLoggedIn && !isPublicRoute) {
     let callbackUrl = nextUrl.pathname;
-    if(nextUrl.search )
-    {
+    if (nextUrl.search) {
       callbackUrl += nextUrl.search;
     }
     const encodedCallbackUrl = encodeURIComponent(callbackUrl);
-    return Response.redirect(new URL(process.env.NEXTAUTH_URL, nextUrl))
+    return NextResponse.redirect(new URL(process.env.NEXTAUTH_URL, nextUrl))
   }
 
   return null;

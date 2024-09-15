@@ -16,7 +16,8 @@ import { CommonForm } from "./common/common-form";
 
 // SUPER-BASE-----------------------
 import { createClient } from "@supabase/supabase-js";
-import { useSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
+import { revalidatePath } from "next/cache";
 
 const superbaseUrl = "https://mlrcuztzocwewzkujmtf.supabase.co";
 const superbaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1scmN1enR6b2N3ZXd6a3VqbXRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQ5MzA5MTIsImV4cCI6MjA0MDUwNjkxMn0.JGyDm2y1_m6e7zWVJs7IwpetN24Ybzm8bmjVxIwplpw"
@@ -125,7 +126,9 @@ export const OnBoarding = ({ currentUser }) => {
     const response = await createProfileAction(currentTab, formData);
     if (response && response.success) {
       router.refresh();
+      await getSession();
       router.push(DEFAULT_LOGIN_REDIRECT);
+
     }
     else {
       console.error(response.message);
@@ -136,7 +139,7 @@ export const OnBoarding = ({ currentUser }) => {
     <div className="bg-white ml-7 mr-7">
       <Tabs value={currentTab} onValueChange={handleTabChange}>
         <div className="w-full">
-          <div className="flex items-baseline justify-between border-b pb-6 pt-24">
+          <div className="flex items-baseline justify-between border-b pb-6 pt-12 ">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900">
               Welcome to On-Board Page
             </h1>

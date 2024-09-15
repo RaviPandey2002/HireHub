@@ -46,8 +46,10 @@ export const CandidateJobCard = ({ jobItem, user, jobApplications }) => {
     );
     setShowJobDetailsDrawer(false);
   }
+  // console.log("jobListing jobList", jobItem)
 
   return (
+
     <>
       <Drawer
         open={showJobDetailsDrawer}
@@ -67,6 +69,7 @@ export const CandidateJobCard = ({ jobItem, user, jobApplications }) => {
           }
         />
         <DrawerContent className="p-6">
+          <DrawerTitle>Candidate List</DrawerTitle>
           <DrawerHeader className="px-0">
             <div className="flex justify-between">
               <DrawerTitle className="text-4xl dark:text-white font-extrabold text-gray-800">
@@ -113,9 +116,10 @@ export const CandidateJobCard = ({ jobItem, user, jobApplications }) => {
             Experience: {jobItem?.experience} year
           </h3>
           <div className="flex gap-4 mt-6">
-            {jobItem?.skills.split(",").map((skillItem) => (
+            {jobItem?.skills.split(",").map((skillItem, index) => (
+
               <div
-                key={jobItem?.id}
+                key={index}
                 className="w-[100px] flex justify-center items-center h-[35px] dark:bg-white  bg-black rounded-[4px]"
               >
                 <h2 className="text-[13px] font-medium text-white dark:text-black ">

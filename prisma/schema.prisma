@@ -16,12 +16,12 @@ enum UserRole {
   OnBoarding
 }
 
-enum ApplicationStatus {
-  Applied
-  Interviewed
-  Offered
-  Rejected
-}
+// enum ApplicationStatus {
+//   Applied
+//   Interviewed
+//   Offered
+//   Rejected
+// }
 
 model User {
   id                  String    @id @default(auto()) @map("_id") @db.ObjectId
@@ -73,10 +73,10 @@ model Application {
   candidateId        String              @db.ObjectId
   name               String
   email              String
-  status             ApplicationStatus[]
-  stutus             String[]
+  status             String[]
   jobId              String
   jobApplicationDate DateTime
+  // status             ApplicationStatus[]
 }
 
 // model Account {

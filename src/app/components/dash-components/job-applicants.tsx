@@ -1,4 +1,4 @@
-import { Drawer, DrawerContent, DrawerDescription } from "../ui/drawer"
+import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "../ui/drawer"
 import { ScrollArea } from "../ui/scroll-area"
 import { CandidateList } from "./candidate-list"
 
@@ -16,6 +16,7 @@ export const JobApplicants = ({ showApplicantsDrawer,
   return (
     <Drawer open={showApplicantsDrawer} onOpenChange={setShowApplicantsDrawer}>
       <DrawerContent className="max-h-[50vh]">
+      <DrawerTitle/>
         <DrawerDescription />
         <ScrollArea className="h-auto overflow-y-auto">
           <CandidateList

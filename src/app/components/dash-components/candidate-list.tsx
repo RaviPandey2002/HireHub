@@ -1,9 +1,8 @@
-
-import { createClient } from "@supabase/supabase-js";
 import { getCandidateDetailsByIDAction } from "actions/getCandidateDetailsByIDAction";
 import { updateJobApplicationAction } from "actions/updateJobApplicationAction";
+import supabaseClient from "lib/supabaseClient";
 import { Button } from "../ui/button";
-import { Dialog, DialogContent } from "../ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { DrawerDescription } from "../ui/drawer";
 
 export const CandidateList = ({
@@ -14,12 +13,6 @@ export const CandidateList = ({
     setShowCurrentCandidateDetailsModal
 }) => {
 
-
-    const superbaseUrl = "https://mlrcuztzocwewzkujmtf.supabase.co";
-    const superbaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1scmN1enR6b2N3ZXd6a3VqbXRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQ5MzA5MTIsImV4cCI6MjA0MDUwNjkxMn0.JGyDm2y1_m6e7zWVJs7IwpetN24Ybzm8bmjVxIwplpw"
-
-    const superbaseClient = createClient(superbaseUrl, superbaseKey)
-
     async function handleFetchCandidateDetails(candidateId) {
         const data = await getCandidateDetailsByIDAction(candidateId);
         if (data) {
@@ -28,10 +21,10 @@ export const CandidateList = ({
         }
     }
 
-    console.log("currentCandidateDetails?.candidateInfo?.resume ",currentCandidateDetails?.candidateInfo?.resume);
+    // console.log("currentCandidateDetails?.candidateInfo?.resume ", currentCandidateDetails?.candidateInfo?.resume);
 
     function handlePreviewResume() {
-        const { data } = superbaseClient.storage
+        const { data } = supabaseClient.storage
             .from("hirehub-bucket-public")
             .getPublicUrl(currentCandidateDetails?.candidateInfo?.resume);
 
@@ -43,24 +36,22 @@ export const CandidateList = ({
         a.click();
         document.body.removeChild(a);
     }
-
     async function handleUpdateJobStatus(getCurrentStatus) {
         let cpyJobApplicants = [...jobApplications];
         const indexOfCurrentJobApplicant = cpyJobApplicants.findIndex(
-            (item) => item.candidateUserID === currentCandidateDetails?.userId
+            (item) => item.candidateId
+                === currentCandidateDetails?.id
         );
         const jobApplicantsToUpdate = {
             ...cpyJobApplicants[indexOfCurrentJobApplicant],
-            status:
-                cpyJobApplicants[indexOfCurrentJobApplicant].status.concat(
-                    getCurrentStatus
-                ),
-        };
+            status: ["Applied", getCurrentStatus]
+        }
+        console.log("jobApplicantsToUpdate", jobApplicantsToUpdate)
 
         await updateJobApplicationAction(jobApplicantsToUpdate, "/jobs");
     }
 
-    console.log("jobApplications",jobApplications);
+    console.log("candidateList jobApplications", jobApplications);
 
     return (
         <>
@@ -96,8 +87,9 @@ export const CandidateList = ({
                     setShowCurrentCandidateDetailsModal(false);
                 }}
             >
-            <DrawerDescription/>
+                <DrawerDescription />
                 <DialogContent>
+                    <DialogTitle />
                     <div>
                         <h1 className="text-2xl font-bold dark:text-white text-black">
                             {currentCandidateDetails?.candidateInfo?.name},{" "}
@@ -126,8 +118,8 @@ export const CandidateList = ({
                             <div className="flex flex-wrap items-center gap-4 mt-6">
                                 {currentCandidateDetails?.candidateInfo?.previousCompanies
                                     .split(",")
-                                    .map((skillItem) => (
-                                        <div key={skillItem.id} className="w-[100px] dark:bg-white flex justify-center items-center h-[35px] bg-black rounded-[4px]">
+                                    .map((skillItem, index) => (
+                                        <div key={index} className="w-[100px] dark:bg-white flex justify-center items-center h-[35px] bg-black rounded-[4px]">
                                             <h2 className="text-[13px]  dark:text-black font-medium text-white">
                                                 {skillItem}
                                             </h2>
@@ -138,8 +130,8 @@ export const CandidateList = ({
                         <div className="flex flex-wrap gap-4 mt-6">
                             {currentCandidateDetails?.candidateInfo?.skills
                                 .split(",")
-                                .map((skillItem) => (
-                                    <div key={skillItem.id} className="w-[100px] dark:bg-white flex justify-center items-center h-[35px] bg-black rounded-[4px]">
+                                .map((skillItem, index) => (
+                                    <div key={index} className="w-[100px] dark:bg-white flex justify-center items-center h-[35px] bg-black rounded-[4px]">
                                         <h2 className="text-[13px] dark:text-black font-medium text-white">
                                             {skillItem}
                                         </h2>
@@ -155,21 +147,15 @@ export const CandidateList = ({
                             Resume
                         </Button>
                         <Button
-                            onClick={() => handleUpdateJobStatus("selected")}
+                            onClick={() => handleUpdateJobStatus("Selected")}
                             className=" disabled:opacity-65 flex h-11 items-center justify-center px-5"
                             disabled={
                                 jobApplications
                                     .find(
                                         (item) =>
-                                            item.candidateUserID === currentCandidateDetails?.userId
+                                            item.candidateId === currentCandidateDetails?.id
                                     )
-                                    ?.status.includes("selected") ||
-                                    jobApplications
-                                        .find(
-                                            (item) =>
-                                                item.candidateUserID === currentCandidateDetails?.userId
-                                        )
-                                        ?.status.includes("rejected")
+                                    ?.status.includes("Selected")
                                     ? true
                                     : false
                             }
@@ -177,28 +163,22 @@ export const CandidateList = ({
                             {jobApplications
                                 .find(
                                     (item) =>
-                                        item.candidateUserID === currentCandidateDetails?.userId
+                                        item.candidateId === currentCandidateDetails?.id
                                 )
-                                ?.status.includes("selected")
+                                ?.status.includes("Selected")
                                 ? "Selected"
                                 : "Select"}
                         </Button>
                         <Button
-                            onClick={() => handleUpdateJobStatus("rejected")}
+                            onClick={() => handleUpdateJobStatus("Rejected")}
                             className=" disabled:opacity-65 flex h-11 items-center justify-center px-5"
                             disabled={
                                 jobApplications
                                     .find(
                                         (item) =>
-                                            item.candidateUserID === currentCandidateDetails?.userId
+                                            item.candidateId === currentCandidateDetails?.id
                                     )
-                                    ?.status.includes("selected") ||
-                                    jobApplications
-                                        .find(
-                                            (item) =>
-                                                item.candidateUserID === currentCandidateDetails?.userId
-                                        )
-                                        ?.status.includes("rejected")
+                                    ?.status.includes("Rejected")
                                     ? true
                                     : false
                             }
@@ -206,9 +186,9 @@ export const CandidateList = ({
                             {jobApplications
                                 .find(
                                     (item) =>
-                                        item.candidateUserID === currentCandidateDetails?.userId
+                                        item.candidateId === currentCandidateDetails?.id
                                 )
-                                ?.status.includes("rejected")
+                                ?.status.includes("Rejected")
                                 ? "Rejected"
                                 : "Reject"}
                         </Button>

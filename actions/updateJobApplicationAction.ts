@@ -5,12 +5,13 @@ import { revalidatePath } from "next/cache";
 
 export async function updateJobApplicationAction(jobApplicantsToUpdate, pathToRevalidate) {
     try {
+        console.log("server jobApplicantsToUpdate",jobApplicantsToUpdate)
         await db.application.update({
             where: {
                 id: jobApplicantsToUpdate.id
             },
             data: {
-                ...jobApplicantsToUpdate
+                status: jobApplicantsToUpdate?.status
             }
         })
     }
