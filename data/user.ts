@@ -42,6 +42,7 @@ export async function fetchJobsForCandidate() {
 
 export async function fetchJobApplicationsForCandidate(candidateId) {
     const result = await db.application.findMany({ where: { candidateId } });
+    console.log("result ",result)
     return JSON.parse(JSON.stringify(result));
 }
 

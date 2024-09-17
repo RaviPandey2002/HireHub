@@ -31,23 +31,19 @@ export default auth(async (req) => {
   }
 
   const user = await getUser();
-  console.log("middleware user",user);
   
   if (isOnBoardingRoute) {
     if (user?.role !== "OnBoarding") {
-      console.log("from here")
       return NextResponse.redirect(new URL(process.env.NEXTAUTH_URL, nextUrl));
     }
   }
   if (!isOnBoardingRoute) {
     if (user?.role === "OnBoarding") {
-      console.log("from here")
       return NextResponse.redirect(new URL("/onboard", nextUrl));
     }
   }
 
   if (isLoggedIn && isAuthRoute) {
-    console.log("yaha se");
     return NextResponse.redirect(new URL(process.env.NEXTAUTH_URL, nextUrl));
   }
 

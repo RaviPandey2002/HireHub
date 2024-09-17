@@ -115,7 +115,7 @@ export const CandidateList = ({
                         </p>
                         <div className="flex items-center gap-4 mt-6">
                             <h1 className="dark:text-white">Previous Companies</h1>
-                            <div className="flex flex-wrap items-center gap-4 mt-6">
+                            <div className="flex flex-wrap items-center gap-4">
                                 {currentCandidateDetails?.candidateInfo?.previousCompanies
                                     .split(",")
                                     .map((skillItem, index) => (

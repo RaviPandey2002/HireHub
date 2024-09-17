@@ -1,5 +1,5 @@
 function Membership() {
-    return ( <>Membership Page here!!</>);
+    return ( <>Membership Page here biro!!</>);
 }
 
 export default Membership;
