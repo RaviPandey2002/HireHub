@@ -7,6 +7,7 @@ import { auth } from "auth";
 import { SessionProvider } from "next-auth/react";
 import Header from "@/components/common/header";
 import SessionWrapper from "./components/SessionWrapper";
+import { Toaster } from "./components/ui/toaster";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -25,6 +26,7 @@ export default async function RootLayout({ children }) {
             <Header user={session?.user} />
             {children}
           </Suspense>
+          <Toaster/>
         </body>
       </html>
     </SessionWrapper>

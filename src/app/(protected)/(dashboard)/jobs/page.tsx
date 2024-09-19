@@ -1,6 +1,6 @@
 import { JobsListing } from "@/components/dash-components/jobs-listing";
 import { getUser } from "actions/getUser";
-import { fetchJobApplicationsForCandidate, fetchJobApplicationsForRecruiter, fetchJobsForCandidate, fetchJobsForRecruiter } from "data/user";
+import { createFilterCategoriesAction, fetchJobApplicationsForCandidate, fetchJobApplicationsForRecruiter, fetchJobsForCandidate, fetchJobsForRecruiter } from "data/user";
 
 
 async function JobsPage() {
@@ -18,8 +18,10 @@ async function JobsPage() {
         ? await fetchJobApplicationsForRecruiter(user?.id)
         : await fetchJobApplicationsForCandidate(user?.id)
 
+    const filterCategories = await createFilterCategoriesAction();
+    
     return (<>
-        <JobsListing user={user} jobList={jobList} jobApplications={jobApplications} />
+        <JobsListing user={user} jobList={jobList} jobApplications={jobApplications} filterCategories={filterCategories}/>
     </>);
 }
 export default JobsPage;

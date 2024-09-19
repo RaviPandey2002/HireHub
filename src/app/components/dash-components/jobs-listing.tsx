@@ -1,10 +1,26 @@
 "use client";
 
+import { filterMenuDataArray } from "lib/utils";
 import { CandidateJobCard } from "./candidate-job-card";
 import { PostNewJob } from "./post-new-job";
 import { RecruiterJobCard } from "./recruiter-job-card";
 
-export const JobsListing = ({ user, jobList, jobApplications }) => {
+export const JobsListing = ({ user, jobList, jobApplications, filterCategories }) => {
+  // console.log("jobListing filterCategories",filterCategories);
+
+  const filterMenus = filterMenuDataArray.map(item =>
+  ({
+    id: item.id,
+    name: item.label,
+    options: [
+      ...new Set(filterCategories.map(listItem => listItem[item.id]))
+    ]
+  })
+
+  )
+
+  console.log("jobList filterMenus", filterMenus);
+
   return (
     <div>
       <div className="mx-auto max-w-7xl ml-5 mr-5">

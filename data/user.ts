@@ -42,11 +42,15 @@ export async function fetchJobsForCandidate() {
 
 export async function fetchJobApplicationsForCandidate(candidateId) {
     const result = await db.application.findMany({ where: { candidateId } });
-    console.log("result ",result)
     return JSON.parse(JSON.stringify(result));
 }
 
 export async function fetchJobApplicationsForRecruiter(recruiterID) {
     const result = await db.application.findMany({ where: { recruiterId: recruiterID } });
+    return JSON.parse(JSON.stringify(result));
+}
+
+export async function createFilterCategoriesAction (){
+    const result = await db.jobs.findMany({});
     return JSON.parse(JSON.stringify(result));
 }
