@@ -4,7 +4,6 @@ import LandingPage from "./landing-page/landingPage";
 
 const Home = async () => {
   const user = await getUser();
-  console.log("page user",user);
   return (
     <div className="ml-5 mr-5">
       {

@@ -1,29 +1,19 @@
 "use client";
 
 import { filterMenuDataArray } from "lib/utils";
+import { Menubar, MenubarContent, MenubarItem, MenubarMenu, MenubarSeparator, MenubarTrigger } from "../ui/menubar";
 import { CandidateJobCard } from "./candidate-job-card";
 import { PostNewJob } from "./post-new-job";
 import { RecruiterJobCard } from "./recruiter-job-card";
+import { JobFilter } from "./job-filter";
+import { useState } from "react";
 
-export const JobsListing = ({ user, jobList, jobApplications, filterCategories }) => {
-  // console.log("jobListing filterCategories",filterCategories);
-
-  const filterMenus = filterMenuDataArray.map(item =>
-  ({
-    id: item.id,
-    name: item.label,
-    options: [
-      ...new Set(filterCategories.map(listItem => listItem[item.id]))
-    ]
-  })
-
-  )
-
-  console.log("jobList filterMenus", filterMenus);
-
+export const JobsListing = ({ user, allJobs , jobApplications}) => {
+  // console.log("jobApplications ",jobApplications)
+  // console.log("filterCategories ",allJobs)
+  const [jobList, setJobList] = useState(allJobs);
   return (
-    <div>
-      <div className="mx-auto max-w-7xl ml-5 mr-5">
+      <div className="mx-auto max-w-7xl">
         <div className="flex items-center dark:border-white justify-between border-b border-gray-200 pt-6 pb-6">
           <h1 className="text-4xl dark:text-white font-bold tracking-tight text-gray-900">
             {user?.role === "Candidate"
@@ -32,7 +22,7 @@ export const JobsListing = ({ user, jobList, jobApplications, filterCategories }
           </h1>
           <div className="flex items-center">
             {user?.role === "Candidate"
-              ? <p>Filter</p>
+              ? <JobFilter allJobs={allJobs} jobList={jobList} setJobList={setJobList}/>
               : (<PostNewJob user={user} jobList />)}
           </div>
         </div>
@@ -50,6 +40,7 @@ export const JobsListing = ({ user, jobList, jobApplications, filterCategories }
                               jobItem={jobItem}
                               user={user}
                               jobApplications={jobApplications}
+                              
                             />
                           </div>
 
@@ -70,6 +61,5 @@ export const JobsListing = ({ user, jobList, jobApplications, filterCategories }
           </div>
         </div>
       </div>
-    </div>
   )
 }

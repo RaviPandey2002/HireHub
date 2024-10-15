@@ -9,8 +9,8 @@ async function JobsPage() {
     user?.role === "Recruiter"
         ? profileInfo = user?.recruiterInfo
         : profileInfo = user?.candidateInfo;
-        
-    const jobList = user?.role === "Recruiter"
+
+    const allJobs = user?.role === "Recruiter"
         ? await fetchJobsForRecruiter(user?.id)
         : await fetchJobsForCandidate();
 
@@ -18,10 +18,10 @@ async function JobsPage() {
         ? await fetchJobApplicationsForRecruiter(user?.id)
         : await fetchJobApplicationsForCandidate(user?.id)
 
-    const filterCategories = await createFilterCategoriesAction();
-    
-    return (<>
-        <JobsListing user={user} jobList={jobList} jobApplications={jobApplications} filterCategories={filterCategories}/>
-    </>);
+    // const allJobs = await createFilterCategoriesAction();
+
+    return (
+        <JobsListing user={user} allJobs={allJobs} jobApplications={jobApplications} />
+    );
 }
 export default JobsPage;
