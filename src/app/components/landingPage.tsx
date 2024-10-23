@@ -1,8 +1,7 @@
 import { HomepageButtonControls } from "@/components/homePageButtonControls";
 import Image from "next/image";
-import HeroImage from "../../../public/HireHubLandingPageImage.png"
 
-const LandingPage = ({ user, profileInfo }) => {
+export const LandingPage = ({ user, profileInfo }) => {
   return (
     <>
       <section className="relative w-full h-full min-h-screen pb-10">
@@ -50,5 +49,3 @@ const LandingPage = ({ user, profileInfo }) => {
     </>
   );
 }
-
-export default LandingPage;

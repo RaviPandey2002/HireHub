@@ -1,6 +1,8 @@
 import { getUser } from "actions/getUser";
 import { redirect } from "next/navigation";
-import LandingPage from "./landing-page/landingPage";
+import { LandingPage } from "./components/landingPage";
+
+
 
 const Home = async () => {
   const user = await getUser();

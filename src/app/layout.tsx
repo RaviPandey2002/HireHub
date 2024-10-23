@@ -1,12 +1,12 @@
 import { Inter } from "next/font/google";
 import { Suspense } from "react";
-import Loading from "./components/Loading";
+import Loading from "./components/loading";
 import "./globals.css";
 import { auth } from "auth";
 // import SessionWrapper from "@components/SessionWrapper";
 import { SessionProvider } from "next-auth/react";
 import Header from "@/components/common/header";
-import SessionWrapper from "./components/SessionWrapper";
+import SessionWrapper from "./components/sessionWrapper";
 import { Toaster } from "./components/ui/toaster";
 const inter = Inter({ subsets: ["latin"] });
 

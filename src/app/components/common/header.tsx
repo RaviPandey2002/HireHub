@@ -60,7 +60,7 @@ async function Header({ user }) {
   return (
     <div className="ml-5 mr-5 p-4">
       <header className="flex h-16 w-full shrink-0 justify-between items-center">
-        <Link className="font-bold text-3xl lg:flex mr-6" href={"/"}>
+        <Link className="font-bold text-4xl lg:flex mr-6" href={"/"}>
           HIREHUB
         </Link>
         <HeaderSheet menuItems={menuItems} user={user}/>
