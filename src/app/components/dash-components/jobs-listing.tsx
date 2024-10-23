@@ -23,7 +23,7 @@ export const JobsListing = ({ user, allJobs , jobApplications}) => {
           <div className="flex items-center">
             {user?.role === "Candidate"
               ? <JobFilter allJobs={allJobs} jobList={jobList} setJobList={setJobList}/>
-              : (<PostNewJob user={user} jobList />)}
+              : (<PostNewJob user={user} jobList={jobList} />)}
           </div>
         </div>
         <div>
