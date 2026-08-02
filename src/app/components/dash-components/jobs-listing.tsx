@@ -7,27 +7,32 @@ import { PostNewJob } from "./post-new-job";
 import { RecruiterJobCard } from "./recruiter-job-card";
 import { JobFilter } from "./job-filter";
 import { useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { AlertCircle } from "lucide-react";
+import Link from "next/link";
+import { Button } from "../ui/button";
 
-export const JobsListing = ({ user, allJobs , jobApplications}) => {
+export const JobsListing = ({ user, allJobs, jobApplications }) => {
   // console.log("jobApplications ",jobApplications)
   // console.log("filterCategories ",allJobs)
   const [jobList, setJobList] = useState(allJobs);
   return (
-      <div className="mx-auto max-w-7xl">
-        <div className="flex items-center dark:border-white justify-between border-b border-gray-200 pt-6 pb-6">
-          <h1 className="text-4xl dark:text-white font-bold tracking-tight text-gray-900">
-            {user?.role === "Candidate"
-              ? "Explore All Jobs"
-              : "Jobs Dashboard"}
-          </h1>
-          <div className="flex items-center">
-            {user?.role === "Candidate"
-              ? <JobFilter allJobs={allJobs} jobList={jobList} setJobList={setJobList}/>
-              : (<PostNewJob user={user} jobList={jobList} />)}
-          </div>
+    <div className="mx-auto max-w-7xl">
+      <div className="flex items-center dark:border-white justify-between border-b border-gray-200 pt-6 pb-6">
+        <h1 className="text-4xl dark:text-white font-bold tracking-tight text-gray-900">
+          {user?.role === "Candidate"
+            ? "Explore All Jobs"
+            : "Jobs Dashboard"}
+        </h1>
+        <div className="flex items-center">
+          {user?.role === "Candidate"
+            ? <JobFilter allJobs={allJobs} jobList={jobList} setJobList={setJobList} />
+            : (<PostNewJob user={user} jobList={jobList} />)}
         </div>
-        <div>
-          <div className="pt-6 pb-24">
+      </div>
+      <div className="mt-24">
+        {
+          (jobList && jobList.length > 0 ? <div className="pt-6 pb-24">
             <div className="grid grid-cols-1 gap-x-8 gap-y-10 lg:grid-cols-3">
               <div className="lg:col-span-4">
                 <div className="container mx-auto p-0 space-y-8">
@@ -40,7 +45,6 @@ export const JobsListing = ({ user, allJobs , jobApplications}) => {
                               jobItem={jobItem}
                               user={user}
                               jobApplications={jobApplications}
-                              
                             />
                           </div>
 
@@ -58,8 +62,36 @@ export const JobsListing = ({ user, allJobs , jobApplications}) => {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
+          </div> : user?.role == "Candidate" ? <>
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>No Jobs applications yet</AlertTitle>
+              <AlertDescription>
+                Recruiters haven&apos;t posted any jobs yet. Start exploring opportunities and apply to some jobs to see them here.
+              </AlertDescription>
+              <Link href="/jobs">
+                <Button className="mt-4" variant="outline">
+                  Explore Jobs
+                </Button>
+              </Link>
+            </Alert>
+          </> : <>
+            <Alert>
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>No applications yet</AlertTitle>
+              <AlertDescription>
+                You haven&apos;t applied to any jobs. Start exploring opportunities and apply to some jobs to see them here.
+              </AlertDescription>
+              <Link href="/jobs">
+                <Button className="mt-4" variant="outline">
+                  Explore Jobs
+                </Button>
+              </Link>
+            </Alert>
+          </>)
+        }
+
       </div>
+    </div>
   )
 }

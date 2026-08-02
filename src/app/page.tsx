@@ -7,7 +7,7 @@ import { LandingPage } from "./components/landingPage";
 const Home = async () => {
   const user = await getUser();
   return (
-    <div className="ml-5 mr-5">
+    <div className="w-full px-3 sm:px-5">
       {
         user && user?.role === "OnBoarding" 
         ? redirect('/onboard') 

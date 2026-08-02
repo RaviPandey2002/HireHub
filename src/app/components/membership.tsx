@@ -4,9 +4,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
-const stripePromise = loadStripe(
-    "pk_test_51QD56O09tjoAAPeC5hwzj1oCoPZigFRzrvC3LNk5iHvonLDTjdsbGp28yoZPO7SP8lcMMD6VBtbcQXkpc2zxuZRc00rXVaxXzy"
-);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 import { Button } from "./ui/button";
 import { membershipPlans } from "lib/utils";
 import { CommonCard } from "./common/common-card";

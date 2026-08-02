@@ -6,7 +6,6 @@ import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import { JobIcon } from "./job-icon";
 import { Button } from "../ui/button";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 
 interface Job {
@@ -33,26 +32,17 @@ export const CandidateActivity = ({ jobList, jobApplicants }: CandidateActivityP
         ),
     ];
 
-    // const getStatusBadge = (status) => {
-    //     switch (status) {
-    //         case "pending": return <Badge variant="outline" className="bg-yellow-100 text-yellow-800">Pending</Badge>
-    //         case "interview": return <Badge variant="outline" className="bg-blue-100 text-blue-800">Interview</Badge>
-    //         case "rejected": return <Badge variant="outline" className="bg-red-100 text-red-800">Rejected</Badge>
-    //         case "accepted": return <Badge variant="outline" className="bg-green-100 text-green-800">Accepted</Badge>
-    //         default: return null
-    //     }
+    // Precompute jobs by status
+    const jobsByStatus = uniqueStatusArray.reduce((acc, status) => {
+        acc[status] = jobList.filter((jobItem) =>
+            jobApplicants.some((jobApplication) =>
+                jobApplication.status.includes(status) && jobItem.id === jobApplication.jobId
+            )
+        );
+        return acc;
+    }, {} as Record<string, Job[]>);
 
-        // Precompute jobs by status
-        const jobsByStatus = uniqueStatusArray.reduce((acc, status) => {
-            acc[status] = jobList.filter((jobItem) =>
-                jobApplicants.some((jobApplication) =>
-                    jobApplication.status.includes(status) && jobItem.id === jobApplication.jobId
-                )
-            );
-            return acc;
-        }, {} as Record<string, Job[]>);
-
-        return (
+    return (
             <div className="mx-auto max-w-7xl">
                 <Tabs defaultValue="Applied" className="w-full">
                     <div className="flex items-baseline dark:border-white justify-between border-b pb-6 pt-10">

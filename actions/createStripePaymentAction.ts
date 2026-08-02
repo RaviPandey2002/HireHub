@@ -1,6 +1,6 @@
 "use server"
 
-const stripe = require('stripe')("sk_test_51QD56O09tjoAAPeCrS1UoMaCjgSgjPb1x4Pw9zItGo9RYP67ZzN5cQEFNDyMScvOyv1oghi1Ub4A6IoN9dQVgbcz00hyvZlxVp")
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 export async function createStripePaymentAction(data) {
     const session = await stripe.checkout.sessions.create({

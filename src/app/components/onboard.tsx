@@ -10,17 +10,16 @@ import {
   recruiterOnboardFormControls,
 } from "lib/utils";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DEFAULT_LOGIN_REDIRECT, SUPERBASE_URL } from "routes";
 import { CommonForm } from "./common/common-form";
 
 // SUPER-BASE-----------------------
 import { createClient } from "@supabase/supabase-js";
-import { getSession, useSession } from "next-auth/react";
-import { revalidatePath } from "next/cache";
+import { useSession } from "next-auth/react";
 
-const superbaseUrl = "https://mlrcuztzocwewzkujmtf.supabase.co";
-const superbaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1scmN1enR6b2N3ZXd6a3VqbXRmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQ5MzA5MTIsImV4cCI6MjA0MDUwNjkxMn0.JGyDm2y1_m6e7zWVJs7IwpetN24Ybzm8bmjVxIwplpw"
+const superbaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const superbaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
 
 const superbaseClient = createClient(superbaseUrl,
@@ -73,43 +72,71 @@ export const OnBoarding = ({ currentUser }) => {
 
   function handleFileChange(e) {
     e.preventDefault();
-    // console.log("onboard file", e.target.files);
-    setFile(e.target.files[0]);
+    const selectedFile = e.target.files[0];
+    console.log("selectedFile", selectedFile);
+
+    if (!selectedFile) return;
+
+    const allowedTypes = ["application/pdf"];
+    const maxSize = 5 * 1024 * 1024; // 5MB limit
+
+    if (!allowedTypes.includes(selectedFile.type)) {
+      alert("Please upload a PDF file.");
+      return;
+    }
+
+    if (selectedFile.size > maxSize) {
+      alert("File size exceeds 5MB.");
+      return;
+    }
+
+    setFile(selectedFile);
   }
 
-  async function handleUploadPdfToSuperbase() {
+  async function uploadPdfToSupabase() {
+    console.log("uploadPdfToSupabase currentUser", currentUser);
+
+    const filePath = `public/${currentUser.name}/${Date.now()}_${file.name}`;
+
     const { data, error } = await superbaseClient.storage.from('hirehub-bucket-public').upload(`/public/${currentUser?.name}/${file.name}`, file, {
       cacheControl: "3600",
       upsert: false,
     });
 
+    console.log("data ", data)
     if (data) {
-      setCandidateFormData({
-        ...candidateFormData,
-        resume: data.path
-      })
+      return filePath;
     }
-    if(error && error?.message === "The resource already exists")
-    {
-      setCandidateFormData({
-        ...candidateFormData,
-        resume: `/public/${currentUser?.name}/${file.name}`
-      })
+
+    if (error?.message === "The resource already exists") {
+      return filePath;
     }
+
+    console.error("File upload error:", error);
+    return null;
   }
   // console.log("onboard FormData",candidateFormData);
-
-  useEffect(() => {
-    if (file) handleUploadPdfToSuperbase();
-  }, [file])
 
 
   const router = useRouter();
   async function createProfile() {
+
+    let resumePath = candidateFormData.resume;
+
+    if (currentTab === "candidate" && file) {
+      const uploadedPath = await uploadPdfToSupabase();
+
+      if (uploadedPath) {
+        resumePath = uploadedPath;
+      } else {
+        alert("Failed to upload resume.");
+        return;
+      }
+    }
     const formData =
       currentTab === "candidate"
         ? {
-          candidateInfo: candidateFormData,
+          candidateInfo: { ...candidateFormData, resume: resumePath },
           role: "Candidate",
           isPremiumUser: false,
           id: currentUser?.id,
@@ -126,11 +153,8 @@ export const OnBoarding = ({ currentUser }) => {
     const response = await createProfileAction(currentTab, formData);
     if (response && response.success) {
       router.refresh();
-      await getSession();
       router.push(DEFAULT_LOGIN_REDIRECT);
-
-    }
-    else {
+    } else {
       console.error(response.message);
     }
   }

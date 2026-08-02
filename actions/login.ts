@@ -1,7 +1,7 @@
 "use server"
 
 import { signIn } from 'auth';
-import { AuthError } from 'node_modules/next-auth';
+import { AuthError } from 'next-auth';
 import * as z from 'zod';
 import { getUserByEmail } from '../data/user';
 import { LoginSchema } from '../schema';

@@ -36,22 +36,21 @@ export const RegisterForm = () => {
   const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
     setError("");
     setSuccess("");
-    startTransition(() => {
-      register(values)
-        .then((data) => {
-          setError(data.error);
-          setSuccess(data.success);
-          if(data.success){
-            console.log("now here")
-            router.push("/login")
-          }
-        })
-    })
+    startTransition(async () => {
+      const data = await register(values);
+      if (data?.error) {
+        setError(data.error);
+      }
+      if (data?.success) {
+        setSuccess(data.success);
+        setTimeout(() => router.push("/login"), 1000);
+      }
+    });
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form method="post" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
           {/* Name Field */}
           <FormField

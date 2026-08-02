@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "target": "es2015", // or higher
-    "lib": ["es2015", "dom"],
-    "downlevelIteration": true,
+    "target": "es2015",
     "lib": ["dom", "dom.iterable", "esnext"],
+    "downlevelIteration": true,
     "baseUrl": "./",
     "paths": {
       "@/components/*": ["src/app/components/*"]
     },
+    "typeRoots": ["./types", "./node_modules/@types"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -25,9 +25,9 @@
       }
     ]
   },
-
   "include": [
     "next-env.d.ts",
+    "types/**/*.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx",

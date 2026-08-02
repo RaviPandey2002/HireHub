@@ -19,7 +19,7 @@ import {
   FormMessage,
 } from '../ui/form'
 import { useRouter } from "next/navigation";
-import { getSession, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 
 export const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
@@ -33,30 +33,26 @@ export const LoginForm = () => {
     },
   });
   const router = useRouter();
-  const { data: session, status, update } = useSession();
+  const { update } = useSession();
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     setError("");
     setSuccess("");
     startTransition(async () => {
       const response = await login(values);
-      if (response && response.error) {
+      if (response?.error) {
         setError(response.error);
-        console.log("loginForm errorResponse",response)
-      } else if (response && response.success) {
+      } else if (response?.success) {
         setSuccess(response.success);
-        console.log("loginForm ",session?.user);
-
-        const updatedSession = await getSession();
-        console.log("Updated session:", updatedSession);
-        router.push('/dashboard');
+        await update(); // refresh the client-side session
+        router.refresh(); // re-render server components with new session
+        router.push('/');
       }
-
-    })
+    });
   }
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form method="post" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
           {/* Email Field */}
           <FormField

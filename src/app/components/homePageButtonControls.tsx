@@ -10,10 +10,10 @@ export const HomepageButtonControls = ({ user, profileInfo }) => {
 
     useEffect(() => {
         router.refresh();
-    }, []);
+    }, [router]);
 
     return (
-        <div className="flex space-x-4">
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
             <Button
                 onClick={() => {
                     if(user) {
@@ -23,12 +23,12 @@ export const HomepageButtonControls = ({ user, profileInfo }) => {
                         router.push("/login")
                     }
                 }}
-                className="flex h-11 items-center justify-center px-5"
+                className="flex h-11 w-full items-center justify-center px-5 sm:w-auto"
             >
                 {user
                     ? profileInfo === "Candidate"
                         ? "Browse Jobs"
-                        : "Jobs Dasboard"
+                        : "Jobs Dashboard"
                     : "Find Jobs"}
             </Button>
             <Button
@@ -41,7 +41,7 @@ export const HomepageButtonControls = ({ user, profileInfo }) => {
                             : user ? "/jobs" : "/login"
                     )}
                 }
-                className="flex h-11 items-center justify-center px-5"
+                className="flex h-11 w-full items-center justify-center px-5 sm:w-auto"
             >
                 {user
                     ? profileInfo === "Candidate"
@@ -52,4 +52,3 @@ export const HomepageButtonControls = ({ user, profileInfo }) => {
         </div>
     );
 }
-

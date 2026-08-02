@@ -1,46 +1,70 @@
-import NextAuth from "node_modules/next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
+import NextAuth from "next-auth"
+import Credentials from "next-auth/providers/credentials"
 import authConfig from "auth.config"
-import { db } from "lib/db"
-import { getUserById } from "data/user"
-import { UserRole } from "@prisma/client"
-
+import { getUserById, getUserByEmail } from "data/user"
+import { LoginSchema } from "schema"
+import bcrypt from "bcryptjs"
+import { ZodError } from "zod"
 
 export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
   pages: {
-    signIn: "/auth/login",
-    error: "/auth/error",
+    signIn: "/login",
+    error: "/error",
   },
+  providers: [
+    Credentials({
+      async authorize(credentials) {
+        try {
+          const validatedFields = LoginSchema.safeParse(credentials);
+          if (!validatedFields.success) return null;
+          const { email, password } = validatedFields.data;
+          const user = await getUserByEmail(email);
+          if (!user || !user.password) return null;
+          const passwordsMatch = await bcrypt.compare(password, user.password);
+          if (passwordsMatch) return user;
+          return null;
+        } catch (error) {
+          if (error instanceof ZodError) return null;
+          throw error;
+        }
+      }
+    }),
+    ...authConfig.providers,
+  ],
   callbacks: {
-     async session({ token, session, user }) {
-      if(token.sub && session.user )
-      {
+    async session({ token, session }) {
+      // Populate session.user from the JWT token on every request
+      if (token.sub && session.user) {
         session.user.id = token.sub;
-        session.user.role = token.role as UserRole;
-
+        session.user.name = token.name as string;
+        session.user.email = token.email as string;
+        session.user.role = token.role as any;
+        session.user.image = token.picture as string;
       }
-      if (token.user && session.user) {
-        //@ts-ignore
-        session.user = {...token.user};
-      }
-      // console.log("auth session",session?.user);
       return session;
     },
 
-    async jwt({ token, trigger, session, user }) {
-      if (!token.sub) return token;
-      const existingUser = await getUserById(token.sub)
-      if (!existingUser) return token;
-      token.role = existingUser.role;
-      token.user = existingUser;
-      user = token.user;
-
-      // console.log("token:: ",token);
+    async jwt({ token, user, trigger }) {
+      // On first sign-in, `user` is the object returned from authorize()
+      if (user) {
+        token.sub = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.role = (user as any).role;
+        token.picture = (user as any).image ?? null;
+        return token;
+      }
+      // On session update() call (e.g. after onboarding role change), re-fetch from DB
+      if (trigger === "update" && token.sub) {
+        const existingUser = await getUserById(token.sub);
+        if (existingUser) {
+          token.role = existingUser.role;
+          token.name = existingUser.name;
+        }
+        return token;
+      }
       return token;
     }
   },
-  adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
-  ...authConfig
 });
-

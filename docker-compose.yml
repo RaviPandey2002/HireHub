@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  nextjs-app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    environment:
+      - MONGODB_URI=mongodb://mongo:27027/docker-hirehub?replicaSet=rs0
+
+  mongo:
+    image: mongo:7
+    command: ["--replSet", "rs0"]
+    container_name: mongo
+    ports:
+      - "27027:27017"  # Host port 27027 maps to container port 27017
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
