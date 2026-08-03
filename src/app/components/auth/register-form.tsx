@@ -1,15 +1,13 @@
-"use client";
-import * as z from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { RegisterSchema } from '../../../../schema';
-import { Input } from '../ui/input';
-import { Button } from '../ui/button'
-import { FormError } from '../helper/form-error'
-import { FormSuccess } from '../helper/form-success'
-import { register } from '../../../../actions/register'
-import { useTransition, useState } from 'react'
+"use client"
 
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { useState, useTransition } from "react"
+import { useRouter } from "next/navigation"
+import { Eye, EyeOff } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
@@ -17,42 +15,46 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '../ui/form'
-import { useRouter } from "next/navigation";
+} from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { FormError } from "@/components/helper/form-error"
+import { FormSuccess } from "@/components/helper/form-success"
+import { register } from "actions/register"
+import { RegisterSchema } from "schema"
 
 export const RegisterForm = () => {
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | undefined>("");
-  const [success, setSuccess] = useState<string | undefined>("");
+  const [isPending, startTransition] = useTransition()
+  const [error, setError] = useState<string | undefined>("")
+  const [success, setSuccess] = useState<string | undefined>("")
+  const [showPassword, setShowPassword] = useState(false)
+
   const form = useForm<z.infer<typeof RegisterSchema>>({
     resolver: zodResolver(RegisterSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-      name: ""
-    },
-  });
-  const router = useRouter();
+    defaultValues: { name: "", email: "", password: "" },
+  })
+
+  const router = useRouter()
+
   const onSubmit = (values: z.infer<typeof RegisterSchema>) => {
-    setError("");
-    setSuccess("");
+    setError("")
+    setSuccess("")
     startTransition(async () => {
-      const data = await register(values);
+      const data = await register(values)
       if (data?.error) {
-        setError(data.error);
+        setError(data.error)
+      } else if (data?.success) {
+        setSuccess(data.success)
+        form.reset()
+        // replace so the user can't hit Back and re-submit the form
+        router.replace("/login")
       }
-      if (data?.success) {
-        setSuccess(data.success);
-        setTimeout(() => router.push("/login"), 1000);
-      }
-    });
+    })
   }
 
   return (
     <Form {...form}>
-      <form method="post" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <div className="space-y-4">
-          {/* Name Field */}
           <FormField
             control={form.control}
             name="name"
@@ -64,14 +66,15 @@ export const RegisterForm = () => {
                     {...field}
                     disabled={isPending}
                     placeholder="John Doe"
-                    type="name"
+                    type="text"
+                    autoComplete="name"
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-          {/* Email Field */}
+
           <FormField
             control={form.control}
             name="email"
@@ -79,12 +82,12 @@ export const RegisterForm = () => {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-
                   <Input
                     {...field}
                     disabled={isPending}
-                    placeholder="Johndoe@example.com"
+                    placeholder="johndoe@example.com"
                     type="email"
+                    autoComplete="email"
                   />
                 </FormControl>
                 <FormMessage />
@@ -92,7 +95,6 @@ export const RegisterForm = () => {
             )}
           />
 
-          {/* Password Field */}
           <FormField
             control={form.control}
             name="password"
@@ -100,26 +102,43 @@ export const RegisterForm = () => {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input
-                    disabled={isPending}
-                    {...field}
-                    placeholder="********"
-                    type="password"
-                  />
+                  <div className="relative">
+                    <Input
+                      {...field}
+                      disabled={isPending}
+                      placeholder="••••••••"
+                      type={showPassword ? "text" : "password"}
+                      autoComplete="new-password"
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      tabIndex={-1}
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
-          ></FormField>
+          />
         </div>
+
         <FormError message={error} />
         <FormSuccess message={success} />
-        <Button disabled={isPending} type="submit" className="w-full bg-black text-white border rounded-lg " >
-          SignIn
+
+        <Button
+          disabled={isPending}
+          type="submit"
+          className="w-full"
+        >
+          {isPending ? "Creating account…" : "Create account"}
         </Button>
       </form>
-
-
     </Form>
-  );
-};
+  )
+}

@@ -3,10 +3,9 @@
 import { signIn } from 'auth';
 import { AuthError } from 'next-auth';
 import * as z from 'zod';
-import { getUserByEmail } from '../data/user';
 import { LoginSchema } from '../schema';
 
-export const login = async (values: z.infer<typeof LoginSchema>) => {
+export const login = async (values: z.input<typeof LoginSchema>) => {
     const validatedFeilds = LoginSchema.safeParse(values);
 
     if (!validatedFeilds.success) {
@@ -14,37 +13,26 @@ export const login = async (values: z.infer<typeof LoginSchema>) => {
     }
 
     const { email, password } = validatedFeilds.data;
-    const existingUser = await getUserByEmail(email);
-
-    if (!existingUser) {
-        return { error: "Email is not registered!!" }
-    }
 
     try {
         const response = await signIn("credentials", {
             redirect: false,
             email,
             password,
-            // redirectTo: "/onboard"
-        })
+        });
         if (!response) {
-            return { error: "Invalid Credentials" };
+            return { error: "Invalid credentials" };
         }
         return { success: "Logged in successfully!" };
-    }
-
-    catch (error) {
+    } catch (error) {
         if (error instanceof AuthError) {
             switch (error.type) {
                 case "CredentialsSignin":
-                    return { error: "Invalid Credentials" }
+                    return { error: "Invalid credentials" };
                 default:
-                    return { error: " Something went wrong!" };
-
+                    return { error: "Something went wrong" };
             }
         }
         throw error;
     }
-
-
 };

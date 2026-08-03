@@ -13,6 +13,11 @@ import {
 export default auth((req: NextRequest & { auth: any }) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
+  // In NextAuth v5 the JWT token fields are merged directly onto req.auth.user.
+  // Depending on the version, role may live at req.auth.user.role OR at the
+  // token level via req.auth.user (which IS the token).  Read both paths.
+  const role = (req.auth?.user?.role ?? (req.auth as any)?.token?.role) as string | undefined;
+  const isOnboarding = role === "OnBoarding";
 
   // Server actions POST to the page URL with a Next-Action header —
   // never redirect them, let Next.js handle the action.
@@ -28,15 +33,16 @@ export default auth((req: NextRequest & { auth: any }) => {
   // Always allow NextAuth API routes and webhooks
   if (isApiAuthRoute || isApiWebhookRoute) return NextResponse.next();
 
-  // Logged-in users hitting /login or /register → send home
+  // Logged-in users hitting /login or /register → send to onboard (if needed) or home
   if (isAuthRoute) {
     if (isLoggedIn) {
-      return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+      const dest = isOnboarding ? "/onboard" : DEFAULT_LOGIN_REDIRECT;
+      return NextResponse.redirect(new URL(dest, nextUrl));
     }
     return NextResponse.next();
   }
 
-  // Allow onboarding only for authenticated OnBoarding-role users
+  // Onboarding route — must be logged in
   if (isOnboardingRoute) {
     if (!isLoggedIn) {
       return NextResponse.redirect(new URL("/login", nextUrl));
@@ -45,11 +51,22 @@ export default auth((req: NextRequest & { auth: any }) => {
   }
 
   // Public routes are always accessible
-  if (isPublicRoute) return NextResponse.next();
+  if (isPublicRoute) {
+    // If a logged-in OnBoarding user hits "/" redirect them to /onboard
+    if (isLoggedIn && isOnboarding) {
+      return NextResponse.redirect(new URL("/onboard", nextUrl));
+    }
+    return NextResponse.next();
+  }
 
   // Everything else requires authentication
   if (!isLoggedIn) {
     return NextResponse.redirect(new URL("/login", nextUrl));
+  }
+
+  // Authenticated OnBoarding-role users can only access /onboard
+  if (isOnboarding) {
+    return NextResponse.redirect(new URL("/onboard", nextUrl));
   }
 
   return NextResponse.next();

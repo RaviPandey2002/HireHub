@@ -4,10 +4,10 @@ import { redirect } from "next/navigation";
 
 const OnBoardingPage = async () => {
   const user = await getUser();
-  if(!user){
-    redirect('/')
-  }
-  if (user?.role === "OnBoarding"){ return <>{<OnBoarding currentUser={user} />}</>;}
+
+  if (!user) redirect("/login");
+
+  return <OnBoarding currentUser={user} />;
 };
 
 export default OnBoardingPage;

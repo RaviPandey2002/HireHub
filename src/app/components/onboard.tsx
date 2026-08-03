@@ -9,7 +9,6 @@ import {
   initialRecruiterFormData,
   recruiterOnboardFormControls,
 } from "lib/utils";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { DEFAULT_LOGIN_REDIRECT, SUPERBASE_URL } from "routes";
 import { CommonForm } from "./common/common-form";
@@ -118,7 +117,6 @@ export const OnBoarding = ({ currentUser }) => {
   // console.log("onboard FormData",candidateFormData);
 
 
-  const router = useRouter();
   async function createProfile() {
 
     let resumePath = candidateFormData.resume;
@@ -152,8 +150,11 @@ export const OnBoarding = ({ currentUser }) => {
 
     const response = await createProfileAction(currentTab, formData);
     if (response && response.success) {
-      router.refresh();
-      router.push(DEFAULT_LOGIN_REDIRECT);
+      // Refresh the JWT cookie so the new role (Candidate/Recruiter) is
+      // written before we navigate. Use a full HTTP navigation so middleware
+      // reads the updated cookie instead of bouncing back to /onboard.
+      await update();
+      window.location.href = DEFAULT_LOGIN_REDIRECT;
     } else {
       console.error(response.message);
     }

@@ -1,9 +1,9 @@
 import { LogInPage } from "../components/auth/LogInPage";
-import { getUser } from "actions/getUser";
-import { redirect } from 'next/navigation';
-const LoginPage = async () => {
-  const session = await getUser();
-  return <>{!session ? <LogInPage /> :  redirect(process.env.NEXTAUTH_URL) }</>;
+
+// Middleware already redirects authenticated users away from /login.
+// No DB call needed here.
+const LoginPage = () => {
+  return <LogInPage />;
 };
 
 export default LoginPage;

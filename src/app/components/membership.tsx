@@ -2,7 +2,7 @@
 
 import { loadStripe } from "@stripe/stripe-js";
 import { useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 import { Button } from "./ui/button";
@@ -41,7 +41,7 @@ export const Membership = ({ user }) => {
 
     }
 
-    async function updateProfile() {
+    const updateProfile = useCallback(async () => {
         const fetchCurrentPlanFromSessionStroage = JSON.parse(
             sessionStorage.getItem("currentPlan")
         );
@@ -66,11 +66,11 @@ export const Membership = ({ user }) => {
             },
             "/membership"
         );
-    }
+    }, [user]);
 
     useEffect(() => {
         if (pathName.get("status") === "success") updateProfile();
-    }, [pathName]);
+    }, [pathName, updateProfile]);
 
 
 

@@ -6,34 +6,26 @@ import bcrypt from "bcryptjs"
 import { db } from '../lib/db'
 import { getUserByEmail } from '../data/user'
 
-
-export const register = async (values: z.infer<typeof RegisterSchema>) => {
-
-    console.log("inside register")
-    const validatedFeilds = RegisterSchema.safeParse(values);
-    if (!validatedFeilds.success) {
-        return { error: "Invalid fields" };
+export const register = async (values: z.input<typeof RegisterSchema>) => {
+    const validatedFields = RegisterSchema.safeParse(values)
+    if (!validatedFields.success) {
+        return { error: "Invalid fields" }
     }
 
-    const { name, email, password } = validatedFeilds.data;
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const { name, email, password } = validatedFields.data
+    // email is already lowercased+trimmed by the schema transform
 
-    const existingUser = await getUserByEmail(email);
-
+    // Check for duplicate before hashing — avoids wasting CPU on bcrypt
+    const existingUser = await getUserByEmail(email)
     if (existingUser) {
-        return { error: "Email is already taken!!" }
+        return { error: "An account with that email already exists" }
     }
 
-    await db.user.create(
-        {
-            data: {
-                name,
-                email,
-                password: hashedPassword
-            }
-        }
-    )
+    const hashedPassword = await bcrypt.hash(password, 10)
 
-    return { success: "User Created!" }
+    await db.user.create({
+        data: { name, email, password: hashedPassword },
+    })
 
+    return { success: "Account created! Redirecting to sign in…" }
 }

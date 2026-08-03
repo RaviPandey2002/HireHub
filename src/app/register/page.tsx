@@ -1,13 +1,9 @@
-"use client";
-
-import { useSession } from "next-auth/react";
-import React from "react";
 import { RegisterPage } from "@/components/auth/RegisterPage";
 
+// Middleware already redirects authenticated users away from /register.
+// This is a server component — no client-side session check needed.
 const Register = () => {
-  const { data: session } = useSession();
-  return <>{!session ? <RegisterPage /> : null}</>;
+  return <RegisterPage />;
 };
 
 export default Register;
-

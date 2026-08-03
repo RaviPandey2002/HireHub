@@ -1,137 +1,67 @@
 "use client"
-import {
-    Cloud,
-    CreditCard,
-    Keyboard,
-    LifeBuoy,
-    LogOut,
-    Mail,
-    MessageSquare,
-    Plus,
-    PlusCircle,
-    Settings,
-    User,
-    UserPlus,
-    Users,
-} from "lucide-react"
 
+import { LogOut, Settings, User } from "lucide-react"
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
-    DropdownMenuPortal,
     DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
-import {
-    Avatar,
-    AvatarFallback,
-    AvatarImage,
-} from "@/components/ui/avatar"
-
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { signOut, useSession } from "next-auth/react"
-import { auth } from "auth"
-import { getUser } from "actions/getUser"
-
-const handleLogoutClick = ()=>{
-    console.log("userInfo logout");
-    signOut();
-}
-const handleProfileInfoClick = async ()=>{
-    const user = await getUser();
-    console.log("header userInfo",user);
-}
+import Link from "next/link"
 
 export function UserInfoButton() {
+    const { data: session } = useSession()
+    const user = session?.user
+
+    // Build initials from the user's name, e.g. "John Doe" → "JD"
+    const initials = user?.name
+        ? user.name
+            .split(" ")
+            .slice(0, 2)
+            .map((n) => n[0])
+            .join("")
+            .toUpperCase()
+        : "?"
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Avatar>
-                    <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-                    <AvatarFallback>CN</AvatarFallback>
+                <Avatar className="cursor-pointer">
+                    <AvatarImage src={user?.image ?? undefined} alt={user?.name ?? "User"} />
+                    <AvatarFallback>{initials}</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuContent className="w-56" align="end">
+                <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user?.name}</p>
+                        <p className="text-xs leading-none text-muted-foreground">{user?.email}</p>
+                    </div>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                    <DropdownMenuItem onClick={handleProfileInfoClick}>
-                        <User className="mr-2 h-4 w-4" />
-                        <span>Profile</span>
-                        <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+                    <DropdownMenuItem asChild>
+                        <Link href="/account">
+                            <User className="mr-2 h-4 w-4" />
+                            <span>Account</span>
+                        </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <CreditCard className="mr-2 h-4 w-4" />
-                        <span>Billing</span>
-                        <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <Settings className="mr-2 h-4 w-4" />
-                        <span>Settings</span>
-                        <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                        <Keyboard className="mr-2 h-4 w-4" />
-                        <span>Keyboard shortcuts</span>
-                        <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
+                    <DropdownMenuItem asChild>
+                        <Link href="/membership">
+                            <Settings className="mr-2 h-4 w-4" />
+                            <span>Membership</span>
+                        </Link>
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                    <DropdownMenuItem>
-                        <Users className="mr-2 h-4 w-4" />
-                        <span>Team</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSub>
-                        <DropdownMenuSubTrigger>
-                            <UserPlus className="mr-2 h-4 w-4" />
-                            <span>Invite users</span>
-                        </DropdownMenuSubTrigger>
-                        <DropdownMenuPortal>
-                            <DropdownMenuSubContent>
-                                <DropdownMenuItem>
-                                    <Mail className="mr-2 h-4 w-4" />
-                                    <span>Email</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                    <MessageSquare className="mr-2 h-4 w-4" />
-                                    <span>Message</span>
-                                </DropdownMenuItem>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem>
-                                    <PlusCircle className="mr-2 h-4 w-4" />
-                                    <span>More...</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuSubContent>
-                        </DropdownMenuPortal>
-                    </DropdownMenuSub>
-                    <DropdownMenuItem>
-                        <Plus className="mr-2 h-4 w-4" />
-                        <span>New Team</span>
-                        <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
-                    </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                    <LifeBuoy className="mr-2 h-4 w-4" />
-                    <span>Support</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem disabled>
-                    <Cloud className="mr-2 h-4 w-4" />
-                    <span>API</span>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogoutClick}>
+                <DropdownMenuItem onClick={() => signOut({ callbackUrl: "/" })}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Log out</span>
-                    <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

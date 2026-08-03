@@ -46,7 +46,7 @@ export function JobFilter({ allJobs, jobList, setJobList }) {
       options: [...new Set(filteredJobs.map(listItem => listItem[item.id as keyof typeof listItem]))] as string[], // Type assertion to enforce string[]
     }));
     setFilterMenus(generatedFilterMenus);
-  }, []);
+  }, [filteredJobs]);
 
 
   const handleFilterChange = (key: string, value: string) => {
