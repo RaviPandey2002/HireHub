@@ -56,7 +56,6 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    console.log(`Membership updated for ${customerEmail} → ${memberShipType}`);
   }
 
   return NextResponse.json({ received: true });

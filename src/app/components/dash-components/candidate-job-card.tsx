@@ -39,8 +39,7 @@ export const CandidateJobCard = ({ jobItem, user, jobApplications }) => {
         candidateId: user?.id,
         status: ["Applied"],
         jobId: jobItem?.id,
-        jobApplicationDate: new Date("2024-08-31T00:00:00Z")
-        ,
+        jobApplicationDate: new Date(),
       },
       "/jobs"
     );

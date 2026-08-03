@@ -72,7 +72,6 @@ export const OnBoarding = ({ currentUser }) => {
   function handleFileChange(e) {
     e.preventDefault();
     const selectedFile = e.target.files[0];
-    console.log("selectedFile", selectedFile);
 
     if (!selectedFile) return;
 
@@ -93,16 +92,16 @@ export const OnBoarding = ({ currentUser }) => {
   }
 
   async function uploadPdfToSupabase() {
-    console.log("uploadPdfToSupabase currentUser", currentUser);
+    const fileName = `${Date.now()}_${file.name}`;
+    const filePath = `public/${currentUser.name}/${fileName}`;
 
-    const filePath = `public/${currentUser.name}/${Date.now()}_${file.name}`;
+    const { data, error } = await superbaseClient.storage
+      .from("hirehub-bucket-public")
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
 
-    const { data, error } = await superbaseClient.storage.from('hirehub-bucket-public').upload(`/public/${currentUser?.name}/${file.name}`, file, {
-      cacheControl: "3600",
-      upsert: false,
-    });
-
-    console.log("data ", data)
     if (data) {
       return filePath;
     }

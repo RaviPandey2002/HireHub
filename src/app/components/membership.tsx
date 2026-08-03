@@ -46,23 +46,19 @@ export const Membership = ({ user }) => {
             sessionStorage.getItem("currentPlan")
         );
 
+        const planType = fetchCurrentPlanFromSessionStroage?.type;
+        const yearsToAdd = planType === "basic" ? 1 : planType === "teams" ? 2 : 5;
+        const memberShipEndDate = new Date(
+            new Date().setFullYear(new Date().getFullYear() + yearsToAdd)
+        ).toString();
+
         await updateProfileAction(
             {
                 ...user,
                 isPremiumUser: true,
-                memberShipType: fetchCurrentPlanFromSessionStroage?.type,
+                memberShipType: planType,
                 memberShipStartDate: new Date().toString(),
-                memberShipEndDate: new Date(
-                    new Date().getFullYear() +
-                        fetchCurrentPlanFromSessionStroage?.type ===
-                        "basic"
-                        ? 1
-                        : fetchCurrentPlanFromSessionStroage?.plan === "teams"
-                            ? 2
-                            : 5,
-                    new Date().getMonth(),
-                    new Date().getDay()
-                ).toString(),
+                memberShipEndDate,
             },
             "/membership"
         );
@@ -90,7 +86,7 @@ export const Membership = ({ user }) => {
                             {
                                 membershipPlans.find(
                                     (planItem) => planItem.type === user?.memberShipType
-                                ).heading
+                                )?.heading
                             }
                         </Button>
                     ) : null}

@@ -46,12 +46,8 @@ export const CandidateList = ({
             ...cpyJobApplicants[indexOfCurrentJobApplicant],
             status: ["Applied", getCurrentStatus]
         }
-        console.log("jobApplicantsToUpdate", jobApplicantsToUpdate)
-
         await updateJobApplicationAction(jobApplicantsToUpdate, "/jobs");
     }
-
-    console.log("candidateList jobApplications", jobApplications);
 
     return (
         <>

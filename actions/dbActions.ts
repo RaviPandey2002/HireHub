@@ -1,62 +1,66 @@
 "use server"
 
+import { auth } from "auth";
 import { db } from "lib/db";
 import { revalidatePath } from "next/cache";
+import { CandidateProfileSchema, RecruiterProfileSchema } from "schema";
 
-
-export const createProfileAction = async (currentTab, formData) => {
-  const { recruiterInfo, role, isPremiumUser, candidateInfo } = formData;
-  const userID = formData.id;
-  const userEmail = formData.email;
-  if (currentTab === "recruiter") {
-    try {
-      if (!userID && !userEmail) {
-        throw new Error("User ID or email must be provided to update the profile.");
-      }
-      await db.user.update({
-        where: {
-          id: userID || undefined,
-          email: userEmail || undefined, // Use email as fallback
-        },
-        data: {
-          recruiterInfo: recruiterInfo,
-          role: role,
-          isPremiumUser: isPremiumUser,
-        }
-      });
-
-      revalidatePath('/');
-      return { success: true, message: "Profile updated successfully" };
-
-    } catch (error) {
-      console.error("Error updating user profile:",
-        error.message);
-      return { success: false, message: "Something went wrong" };
+export const createProfileAction = async (currentTab: string, formData: {
+    id?: string;
+    email?: string;
+    role: string;
+    isPremiumUser: boolean;
+    recruiterInfo?: unknown;
+    candidateInfo?: unknown;
+}) => {
+    const session = await auth();
+    if (!session?.user) {
+        return { success: false, message: "Unauthorised" };
     }
-  }
-  else {
-    try {
-      if (!userID && !userEmail) {
-        throw new Error("User ID or email must be provided to update the profile.");
-      }
-      await db.user.update({
-        where: {
-          id: userID || undefined,
-          email: userEmail || undefined, // Use email as fallback
-        },
-        data: {
-          candidateInfo: candidateInfo,
-          role: role,
-          isPremiumUser: isPremiumUser,
-        }
-      });
 
-      console.log("Candidate profile updated successfully");
-      return { success: true, message: "Candidate Profile updated successfully" };
-    } catch (error) {
-      console.error("Error updating user profile:",
-        error.message);
-      return { success: false, message: "Something went wrong" };
+    // Only allow users to update their own profile
+    const userId = formData.id ?? session.user.id;
+    if (userId !== session.user.id) {
+        return { success: false, message: "Unauthorised" };
     }
-  }
-}
+
+    if (currentTab === "recruiter") {
+        const parsed = RecruiterProfileSchema.safeParse(formData.recruiterInfo);
+        if (!parsed.success) {
+            return { success: false, message: "Invalid recruiter profile data" };
+        }
+        try {
+            await db.user.update({
+                where: { id: userId },
+                data: {
+                    recruiterInfo: parsed.data,
+                    role: "Recruiter",
+                    isPremiumUser: false,
+                },
+            });
+            revalidatePath("/");
+            return { success: true, message: "Profile updated successfully" };
+        } catch {
+            return { success: false, message: "Something went wrong" };
+        }
+    } else {
+        const parsed = CandidateProfileSchema.safeParse(formData.candidateInfo);
+        if (!parsed.success) {
+            return { success: false, message: "Invalid candidate profile data" };
+        }
+        try {
+            await db.user.update({
+                where: { id: userId },
+                data: {
+                    candidateInfo: parsed.data,
+                    role: "Candidate",
+                    isPremiumUser: false,
+                },
+            });
+            revalidatePath("/");
+            return { success: true, message: "Candidate Profile updated successfully" };
+        } catch {
+            return { success: false, message: "Something went wrong" };
+        }
+    }
+};
