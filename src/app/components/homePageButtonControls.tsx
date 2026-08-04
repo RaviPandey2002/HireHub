@@ -34,12 +34,12 @@ export const HomepageButtonControls = ({ user, profileInfo }) => {
             <Button
                 onClick={() =>{
                     router.push(
-                        user
-                            ? profileInfo === "Candidate"
-                                ? "/activity"
-                                : "/feed"
-                            : user ? "/jobs" : "/login"
-                    )}
+                                user
+                                    ? profileInfo === "Candidate"
+                                        ? "/activity"
+                                        : "/dashboard"
+                                    : "/login"
+                            )}
                 }
                 className="flex h-11 w-full items-center justify-center px-5 sm:w-auto"
             >

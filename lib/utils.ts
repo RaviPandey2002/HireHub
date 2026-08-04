@@ -1,12 +1,19 @@
-import { clsx } from "clsx"
+import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
-export function cn(...inputs) {
+export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+interface FormControl {
+  label: string;
+  name: string;
+  placeholder?: string;
+  componentType: "input" | "file";
+  disabled?: boolean;
+}
 
-export const recruiterOnboardFormControls = [
+export const recruiterOnboardFormControls: FormControl[] = [
   {
     label: "Name",
     name: "name",
@@ -33,7 +40,7 @@ export const initialRecruiterFormData = {
   companyRole: "",
 };
 
-export const candidateOnboardFormControls = [
+export const candidateOnboardFormControls: FormControl[] = [
   {
     label: "Resume",
     name: "resume",
@@ -160,7 +167,7 @@ export const initialCandidateAccountFormData = {
   githubProfile: "",
 };
 
-export const postNewJobFormControls = [
+export const postNewJobFormControls: FormControl[] = [
   {
     label: "Company Name",
     name: "companyName",
@@ -206,7 +213,6 @@ export const postNewJobFormControls = [
   },
 ];
 
-
 export const initialPostNewJobFormData = {
   companyName: "",
   title: "",
@@ -217,7 +223,7 @@ export const initialPostNewJobFormData = {
   skills: "",
 };
 
-export const filterMenuDataArray = [
+export const filterMenuDataArray: { id: string; label: string }[] = [
   {
     id: "companyName",
     label: "Company Name",
@@ -236,13 +242,17 @@ export const filterMenuDataArray = [
   },
 ];
 
-
-export function formUrlQuery(){
-
+export function formUrlQuery() {
+  // placeholder – implement URL query building when needed
 }
 
+export interface MembershipPlan {
+  heading: string;
+  price: number;
+  type: "basic" | "teams" | "enterprise";
+}
 
-export const membershipPlans = [
+export const membershipPlans: MembershipPlan[] = [
   {
     heading: "Tier 1",
     price: 100,

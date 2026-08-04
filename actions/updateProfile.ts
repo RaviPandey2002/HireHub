@@ -1,31 +1,32 @@
 "use server"
 
+import { auth } from "auth";
 import { db } from "lib/db";
 import { revalidatePath } from "next/cache";
 
 export async function updateProfile(user, profileInfo, pathToRevalidate) {
-    console.log("updateProfile ", profileInfo);
-    var { candidateData, recruiterData } = user;
-    if(user?.role === "Candidate")
-    {
-        candidateData = profileInfo;
+    const session = await auth();
+    if (!session?.user) {
+        return { success: false, message: "Unauthorised" };
     }
-    else{
-        recruiterData = profileInfo;
+    // Only allow users to update their own profile
+    if (user?.id !== session.user.id) {
+        return { success: false, message: "Unauthorised" };
     }
-    try { 
+
+    const updateData = user?.role === "Candidate"
+        ? { candidateInfo: profileInfo }
+        : { recruiterInfo: profileInfo };
+
+    try {
         await db.user.update({
-            where: {
-                id: user?.id
-            },
-            data: {
-                candidateInfo: candidateData,
-                recruiterInfo: recruiterData
-            }
-        })
-    }
-    catch (err) {
-        console.error("Error updating User Profile- ", err)
+            where: { id: user?.id },
+            data: updateData,
+        });
+    } catch (err) {
+        console.error("Error updating User Profile:", err);
+        return { success: false, message: "Something went wrong" };
     }
     revalidatePath(pathToRevalidate);
+    return { success: true };
 }

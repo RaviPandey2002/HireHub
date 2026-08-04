@@ -1,20 +1,16 @@
 "use client";
 
 import { loadStripe } from "@stripe/stripe-js";
-import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect } from "react";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 import { Button } from "./ui/button";
 import { membershipPlans } from "lib/utils";
 import { CommonCard } from "./common/common-card";
 import { JobIcon } from "./dash-components/job-icon";
-import { updateProfileAction } from "actions/updateProfileAction";
 import { createStripePaymentAction } from "actions/createStripePaymentAction";
 import { createPriceIdAction } from "actions/createPriceIdAction";
 
 export const Membership = ({ user }) => {
-    const pathName = useSearchParams();
 
     async function handlePayment(getCurrentPlan) {
         const stripe = await stripePromise;
@@ -23,7 +19,6 @@ export const Membership = ({ user }) => {
         });
 
         if (extractPriceId) {
-            sessionStorage.setItem("currentPlan", JSON.stringify(getCurrentPlan));
             const result = await createStripePaymentAction({
                 lineItems: [
                     {
@@ -33,43 +28,11 @@ export const Membership = ({ user }) => {
                 ],
             });
 
-
             await stripe.redirectToCheckout({
                 sessionId: result?.id,
             });
         }
-
     }
-
-    const updateProfile = useCallback(async () => {
-        const fetchCurrentPlanFromSessionStroage = JSON.parse(
-            sessionStorage.getItem("currentPlan")
-        );
-
-        const planType = fetchCurrentPlanFromSessionStroage?.type;
-        const yearsToAdd = planType === "basic" ? 1 : planType === "teams" ? 2 : 5;
-        const memberShipEndDate = new Date(
-            new Date().setFullYear(new Date().getFullYear() + yearsToAdd)
-        ).toString();
-
-        await updateProfileAction(
-            {
-                ...user,
-                isPremiumUser: true,
-                memberShipType: planType,
-                memberShipStartDate: new Date().toString(),
-                memberShipEndDate,
-            },
-            "/membership"
-        );
-    }, [user]);
-
-    useEffect(() => {
-        if (pathName.get("status") === "success") updateProfile();
-    }, [pathName, updateProfile]);
-
-
-
 
 
     return (<>

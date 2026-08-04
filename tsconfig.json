@@ -33,7 +33,7 @@
     "**/*.tsx",
     "src/app/components/auth/login-form.tsx",
     "src/app/components/onboard.tsx",
-    "lib/utils.js"
+    "lib/utils.ts"
   ],
   "exclude": ["node_modules"]
 }

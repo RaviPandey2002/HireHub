@@ -17,6 +17,11 @@ async function Header({ user }) {
       show: true,
     },
     {
+      label: "Dashboard",
+      path: "/dashboard",
+      show: user?.role,
+    },
+    {
       label: "Feed",
       path: "/feed",
       show: user?.role,
@@ -44,7 +49,7 @@ async function Header({ user }) {
     {
       label: "Jobs",
       path: "/jobs",
-      show: user
+      show: user,
     },
     {
       label: "Membership",

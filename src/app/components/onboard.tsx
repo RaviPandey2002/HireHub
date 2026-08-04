@@ -10,7 +10,7 @@ import {
   recruiterOnboardFormControls,
 } from "lib/utils";
 import { useState } from "react";
-import { DEFAULT_LOGIN_REDIRECT, SUPERBASE_URL } from "routes";
+import { DEFAULT_LOGIN_REDIRECT } from "routes";
 import { CommonForm } from "./common/common-form";
 
 // SUPER-BASE-----------------------
