@@ -2,14 +2,10 @@
 import { Button } from "../ui/button";
 import { signOut } from "next-auth/react";
 
-export const SignOutButton =  () => {
-    const onClick = () => {
-        console.log("Logout using client SignOut");
-        signOut();
-    }
+export const SignOutButton = () => {
     return (
-       <Button className="h-3 w-3 ml-9 mr-8" onClick={onClick}>
-        SignOUT
-       </Button>
-    )
+        <Button className="h-10 px-5 ml-3" onClick={() => signOut()}>
+            Sign Out
+        </Button>
+    );
 }

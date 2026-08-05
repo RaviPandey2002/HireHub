@@ -43,7 +43,7 @@ export const HeaderSheet = ({ menuItems, user }) => {
                         )}
                     </div>
                     {
-                        user ? <form action={handleSubmit} >
+                        user ? <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
                             <Button type="submit" className="w-full">
                                 Logout
                             </Button>

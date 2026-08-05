@@ -1,20 +1,15 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { getUser } from "actions/getUser"
+import { Button } from "@/components/ui/button"
 
 export const UserServerStatus = () => {
     const handleClick = async () => {
-        const user = await getUser();
-        console.log("Server-Side Btn:", user);
+        await getUser();
     }
     return (
-        <Button className="ml-5 bg-blue-800 text-white h-10 w-30" onClick={handleClick}
-            type="button"
-        >
+        <Button className="ml-5 bg-blue-800 text-white h-10 w-30" onClick={handleClick} type="button">
             server
         </Button>
     );
-
-
 }
