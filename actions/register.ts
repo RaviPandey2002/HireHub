@@ -5,6 +5,7 @@ import { RegisterSchema } from '../schema'
 import bcrypt from "bcryptjs"
 import { db } from '../lib/db'
 import { getUserByEmail } from '../data/user'
+import { sendWelcomeEmail } from '../lib/email'
 
 export const register = async (values: z.input<typeof RegisterSchema>) => {
     const validatedFields = RegisterSchema.safeParse(values)
@@ -26,6 +27,9 @@ export const register = async (values: z.input<typeof RegisterSchema>) => {
     await db.user.create({
         data: { name, email, password: hashedPassword },
     })
+
+    // Fire-and-forget — a send failure must never break account creation
+    sendWelcomeEmail(name, email).catch(() => {});
 
     return { success: "Account created! Redirecting to sign in…" }
 }
