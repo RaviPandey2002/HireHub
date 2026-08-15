@@ -13,16 +13,8 @@ import { useState } from "react";
 import { DEFAULT_LOGIN_REDIRECT } from "routes";
 import { CommonForm } from "./common/common-form";
 
-// SUPER-BASE-----------------------
-import { createClient } from "@supabase/supabase-js";
+import supabaseClient from "lib/supabaseClient";
 import { useSession } from "next-auth/react";
-
-const superbaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-const superbaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-
-const superbaseClient = createClient(superbaseUrl,
-  superbaseKey)
 
 export const OnBoarding = ({ currentUser }) => {
   const { data: session, update, status } = useSession();
@@ -95,7 +87,7 @@ export const OnBoarding = ({ currentUser }) => {
     const fileName = `${Date.now()}_${file.name}`;
     const filePath = `public/${currentUser.name}/${fileName}`;
 
-    const { data, error } = await superbaseClient.storage
+    const { data, error } = await supabaseClient.storage
       .from("hirehub-bucket-public")
       .upload(filePath, file, {
         cacheControl: "3600",

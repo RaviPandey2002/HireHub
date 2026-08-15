@@ -22,11 +22,10 @@ export const CandidateJobCard = ({ jobItem, user, jobApplications }) => {
 
   async function handlejobApply() {
     if (!user?.isPremiumUser && jobApplications.length >= 2) {
-      setShowJobDetailsDrawer(false);
       toast({
         variant: "destructive",
-        title: "You can apply max 2 jobs.",
-        description: "Please opt for membership to apply for more jobs",
+        title: "Application limit reached",
+        description: "Free accounts can apply to 2 jobs. Upgrade your membership to apply to more.",
       });
       return;
     }

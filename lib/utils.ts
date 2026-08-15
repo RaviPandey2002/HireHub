@@ -101,15 +101,15 @@ export const candidateOnboardFormControls: FormControl[] = [
     componentType: "input",
   },
   {
-    label: "Collage",
+    label: "College",
     name: "collage",
-    placeholder: "Enter your Collage",
+    placeholder: "Enter your college",
     componentType: "input",
   },
   {
-    label: "Collage Location",
+    label: "College Location",
     name: "collageLocation",
-    placeholder: "Enter your Collage location",
+    placeholder: "Enter your college location",
     componentType: "input",
   },
   {

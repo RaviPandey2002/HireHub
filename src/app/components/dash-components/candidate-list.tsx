@@ -1,3 +1,5 @@
+"use client";
+
 import { getCandidateDetailsByIDAction } from "actions/getCandidateDetailsByIDAction";
 import { updateJobApplicationAction } from "actions/updateJobApplicationAction";
 import supabaseClient from "lib/supabaseClient";

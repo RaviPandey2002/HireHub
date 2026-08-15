@@ -1,4 +1,5 @@
 import { db } from "lib/db";
+
 export const getUserByEmail = async (email: string) => {
     try {
         const user = await db.user.findUnique({ where: { email } })
@@ -20,7 +21,7 @@ export const getUserById = async (id: string) => {
 }
 
 
-export async function fetchJobsForRecruiter(recruiterId) {
+export async function fetchJobsForRecruiter(recruiterId: string) {
     try {
         const result = await db.jobs.findMany({ where: { recruiterId } })
         return JSON.parse(JSON.stringify(result));
@@ -40,12 +41,12 @@ export async function fetchJobsForCandidate() {
     }
 }
 
-export async function fetchJobApplicationsForCandidate(candidateId) {
+export async function fetchJobApplicationsForCandidate(candidateId: string) {
     const result = await db.application.findMany({ where: { candidateId } });
     return JSON.parse(JSON.stringify(result));
 }
 
-export async function fetchJobApplicationsForRecruiter(recruiterID) {
+export async function fetchJobApplicationsForRecruiter(recruiterID: string) {
     const result = await db.application.findMany({ where: { recruiterId: recruiterID } });
     return JSON.parse(JSON.stringify(result));
 }

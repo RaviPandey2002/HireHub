@@ -1,27 +1,32 @@
+import { Suspense } from "react";
 import { JobsListing } from "@/components/dash-components/jobs-listing";
 import { getUser } from "actions/getUser";
-import { createFilterCategoriesAction, fetchJobApplicationsForCandidate, fetchJobApplicationsForRecruiter, fetchJobsForCandidate, fetchJobsForRecruiter } from "data/user";
-
+import {
+  fetchJobApplicationsForCandidate,
+  fetchJobApplicationsForRecruiter,
+  fetchJobsForCandidate,
+  fetchJobsForRecruiter,
+} from "data/user";
+import Loading from "@/components/loading";
 
 async function JobsPage() {
-    const user = await getUser();
-    let profileInfo;
+  const user = await getUser();
+
+  const allJobs =
     user?.role === "Recruiter"
-        ? profileInfo = user?.recruiterInfo
-        : profileInfo = user?.candidateInfo;
+      ? await fetchJobsForRecruiter(user?.id)
+      : await fetchJobsForCandidate();
 
-    const allJobs = user?.role === "Recruiter"
-        ? await fetchJobsForRecruiter(user?.id)
-        : await fetchJobsForCandidate();
+  const jobApplications =
+    user?.role === "Recruiter"
+      ? await fetchJobApplicationsForRecruiter(user?.id)
+      : await fetchJobApplicationsForCandidate(user?.id);
 
-    const jobApplications = user?.role === "Recruiter"
-        ? await fetchJobApplicationsForRecruiter(user?.id)
-        : await fetchJobApplicationsForCandidate(user?.id)
-
-    // const allJobs = await createFilterCategoriesAction();
-
-    return (
-        <JobsListing user={user} allJobs={allJobs} jobApplications={jobApplications} />
-    );
+  return (
+    <Suspense fallback={<Loading />}>
+      <JobsListing user={user} allJobs={allJobs} jobApplications={jobApplications} />
+    </Suspense>
+  );
 }
+
 export default JobsPage;

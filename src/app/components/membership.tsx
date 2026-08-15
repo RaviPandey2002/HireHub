@@ -72,21 +72,27 @@ export const Membership = ({ user }) => {
                                 title={`$ ${plan.price} /yr`}
                                 description={plan.type}
                                 footerContent={
-                                    user?.memberShipType === "enterprise" ||
-                                    (user?.memberShipType === "basic" && index === 0) ||
-                                    (user?.memberShipType === "teams" &&
-                                        index >= 0 &&
-                                        index < 2 ? null : (
-                                        <Button
-                                            onClick={() => handlePayment(plan)}
-                                            className="disabled:opacity-65 dark:bg-[#fffa27] flex h-11 items-center justify-center px-5"
-                                        >
-                                            {user?.memberShipType === "basic" ||
-                                                user?.memberShipType === "teams"
-                                                ? "Update Plan"
-                                                : "Get Premium"}
-                                        </Button>
-                                    ))
+                                    (() => {
+                                        const { memberShipType } = user ?? {};
+                                        // Hide button for plans the user already owns or has superseded
+                                        const isHidden =
+                                            memberShipType === "enterprise" ||
+                                            (memberShipType === "basic" && index === 0) ||
+                                            (memberShipType === "teams" && index < 2);
+
+                                        if (isHidden) return null;
+
+                                        return (
+                                            <Button
+                                                onClick={() => handlePayment(plan)}
+                                                className="disabled:opacity-65 dark:bg-[#fffa27] flex h-11 items-center justify-center px-5"
+                                            >
+                                                {memberShipType === "basic" || memberShipType === "teams"
+                                                    ? "Update Plan"
+                                                    : "Get Premium"}
+                                            </Button>
+                                        );
+                                    })()
                                 }
                             />
                         ))}
