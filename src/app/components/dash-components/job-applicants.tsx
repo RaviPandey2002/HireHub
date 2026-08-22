@@ -15,10 +15,10 @@ export const JobApplicants = ({ showApplicantsDrawer,
 
   return (
     <Drawer open={showApplicantsDrawer} onOpenChange={setShowApplicantsDrawer}>
-      <DrawerContent className="max-h-[50vh]">
-      <DrawerTitle/>
-        <DrawerDescription />
-        <ScrollArea className="h-auto overflow-y-auto">
+      <DrawerContent className="max-h-[70vh]">
+        <DrawerTitle className="sr-only">Job Applicants</DrawerTitle>
+        <DrawerDescription className="sr-only">List of candidates who applied to this job</DrawerDescription>
+        <ScrollArea className="h-full overflow-y-auto">
           <CandidateList
             currentCandidateDetails={currentCandidateDetails}
             setCurrentCandidateDetails={setCurrentCandidateDetails}

@@ -1,99 +1,58 @@
 import { auth } from "auth";
 import Link from "next/link";
-import { ClientStatusBtn } from "../helper/clientStatusBtn";
-import { UserServerStatus } from "../helper/ServerStatusBtn";
-import { SignOutButton } from "../helper/signOutButton";
 import { HeaderSheet } from "./header-sheet";
 import { UserInfoButton } from "./user-info-button";
-import { Button } from "../ui/button";
-
+import { NavLink } from "./nav-link";
 
 async function Header({ user }) {
-  // console.log("header layoutUser ",user)
   const menuItems = [
-    {
-      label: "Home",
-      path: "/",
-      show: true,
-    },
-    {
-      label: "Dashboard",
-      path: "/dashboard",
-      show: user?.role,
-    },
-    {
-      label: "Feed",
-      path: "/feed",
-      show: user?.role,
-    },
-    {
-      label: "Login",
-      path: "/login",
-      show: !user,
-    },
-    {
-      label: "Register",
-      path: "/register",
-      show: !user,
-    },
-    {
-      label: "Activity",
-      path: "/activity",
-      show: user?.role === "Candidate",
-    },
-    {
-      label: "Companies",
-      path: "/companies",
-      show: user?.role === "Candidate",
-    },
-    {
-      label: "Jobs",
-      path: "/jobs",
-      show: user,
-    },
-    {
-      label: "Membership",
-      path: "/membership",
-      show: user?.role,
-    },
-    {
-      label: "Account",
-      path: "/account",
-      show: user?.role,
-    },
+    { label: "Home",       path: "/",          show: true },
+    { label: "Dashboard",  path: "/dashboard", show: user?.role },
+    { label: "Feed",       path: "/feed",      show: user?.role },
+    { label: "Login",      path: "/login",     show: !user },
+    { label: "Register",   path: "/register",  show: !user },
+    { label: "Activity",   path: "/activity",  show: user?.role === "Candidate" },
+    { label: "Companies",  path: "/companies", show: user?.role === "Candidate" },
+    { label: "Jobs",       path: "/jobs",      show: user },
+    { label: "Membership", path: "/membership",show: user?.role },
+    { label: "Account",    path: "/account",   show: user?.role },
   ];
+
   return (
-    <div className="ml-5 mr-5 p-4">
-      <header className="flex h-16 w-full shrink-0 justify-between items-center">
-        <Link className="font-bold text-4xl lg:flex mr-6" href={"/"}>
-          HIREHUB
+    <header className="sticky top-0 z-40 w-full border-b border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-gray-950/90 backdrop-blur-sm">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        {/* Logo */}
+        <Link
+          href="/"
+          className="flex items-center gap-2 font-extrabold text-xl tracking-tight text-gray-900 dark:text-white select-none"
+        >
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-black">
+            H
+          </span>
+          HireHub
         </Link>
-        <HeaderSheet menuItems={menuItems} user={user}/>
-        <nav className=" ml-auto hidden lg:flex gap-6 items-center ">
-          {menuItems.map((menuItem) =>
-            menuItem.show ? (
-              <Link
-                href={menuItem.path}
-                className="group inline-flex h-9 w-max items-center rounded-md  px-4 py-2 text-sm font-medium"
-                key={menuItem.label}
-              >
-                {menuItem.label}
-              </Link>
+
+        {/* Desktop nav */}
+        <nav className="hidden lg:flex items-center gap-1">
+          {menuItems.map((item) =>
+            item.show ? (
+              <NavLink key={item.label} href={item.path}>
+                {item.label}
+              </NavLink>
             ) : null
           )}
-          {(user) ? <UserInfoButton /> : null}
-
+          {user ? (
+            <span className="ml-2">
+              <UserInfoButton />
+            </span>
+          ) : null}
         </nav>
-        {/* {(user) ? <SignOutButton /> : null}
-        <ClientStatusBtn />
-        <UserServerStatus /> */}
-      </header>
-      <div>
+
+        {/* Mobile menu */}
+        <HeaderSheet menuItems={menuItems} user={user} />
       </div>
-    </div>
+    </header>
   );
 }
-
-
 
 export default Header;

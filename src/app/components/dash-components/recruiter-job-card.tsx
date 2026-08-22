@@ -36,7 +36,7 @@ export const RecruiterJobCard = ({ jobItem, jobApplications }) => {
         footerContent={
           <div className="flex gap-2 w-full">
             <Button
-              className="flex h-11 flex-1 items-center justify-center px-5"
+              className="flex-1"
               onClick={() => setShowApplicantsDrawer(true)}
             >
               {applicantCount === 1 ? "1 Applicant" : `${applicantCount} Applicants`}

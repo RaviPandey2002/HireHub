@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export const LandingPage = ({ user, profileInfo }) => {
   return (
-    <section className="relative flex min-h-[calc(100vh-6rem)] w-full items-center overflow-hidden py-6 sm:py-10 lg:py-12 xl:py-16">
+    <section className="relative flex min-h-[calc(100vh-4rem)] w-full items-center overflow-hidden py-6 sm:py-10 lg:py-12 xl:py-16">
       <div className="mx-auto w-full max-w-7xl 2xl:max-w-[1500px]">
         <div className="flex flex-col-reverse items-center gap-8 lg:flex-row lg:gap-12 xl:gap-16">
           <section className="flex w-full flex-col px-4 sm:px-6 lg:w-[48%] lg:px-10 xl:px-12">

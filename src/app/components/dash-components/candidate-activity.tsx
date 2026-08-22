@@ -43,42 +43,16 @@ export const CandidateActivity = ({ jobList, jobApplicants }: CandidateActivityP
     }, {} as Record<string, Job[]>);
 
     return (
-            <div className="mx-auto max-w-7xl">
-                <Tabs defaultValue="Applied" className="w-full">
-                    <div className="flex items-baseline dark:border-white justify-between border-b pb-6 pt-10">
-                        <h1 className="text-4xl font-bold dark:text-white tracking-tight text-gray-950">
-                            Your Activity
-                        </h1>
-                        <TabsList>
-                            {uniqueStatusArray.map((val) => (
-                                <TabsTrigger key={val} value={val}>
-                                    {val}
-                                </TabsTrigger>
-                            ))}
-                        </TabsList>
-                    </div>
-                    <div className="pb-24 pt-6">
-                        <div className="container mx-auto p-0 space-y-8">
-                            <div className="flex flex-col gap-4">
-                                {uniqueStatusArray.map((status) => (
-                                    <TabsContent key={status} value={status}>
-                                        {jobsByStatus[status].map((finalFilteredItem) => (
-                                            <CommonCard
-                                                key={finalFilteredItem.id}
-                                                icon={<JobIcon />}
-                                                title={finalFilteredItem.title}
-                                                description={finalFilteredItem.companyName}
-                                                footerContent={undefined}
-                                            />
-                                        ))}
-                                    </TabsContent>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-                </Tabs>
-                {!jobApplicants.length
-                    ? <Alert>
+        <div className="mx-auto max-w-7xl">
+            <div className="border-b dark:border-gray-700 pb-6 pt-10">
+                <h1 className="text-4xl font-bold dark:text-white tracking-tight text-gray-950">
+                    Your Activity
+                </h1>
+            </div>
+
+            {!jobApplicants.length ? (
+                <div className="pt-10">
+                    <Alert>
                         <AlertCircle className="h-4 w-4" />
                         <AlertTitle>No applications yet</AlertTitle>
                         <AlertDescription>
@@ -90,7 +64,35 @@ export const CandidateActivity = ({ jobList, jobApplicants }: CandidateActivityP
                             </Button>
                         </Link>
                     </Alert>
-                    : null}
-            </div>
-        );
+                </div>
+            ) : (
+                <Tabs defaultValue={uniqueStatusArray[0]} className="w-full mt-6">
+                    <TabsList className="flex-wrap h-auto gap-1">
+                        {uniqueStatusArray.map((val) => (
+                            <TabsTrigger key={val} value={val}>
+                                {val}
+                            </TabsTrigger>
+                        ))}
+                    </TabsList>
+                    <div className="pb-24 pt-6">
+                        {uniqueStatusArray.map((status) => (
+                            <TabsContent key={status} value={status}>
+                                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                                    {jobsByStatus[status].map((finalFilteredItem) => (
+                                        <CommonCard
+                                            key={finalFilteredItem.id}
+                                            icon={<JobIcon />}
+                                            title={finalFilteredItem.title}
+                                            description={finalFilteredItem.companyName}
+                                            footerContent={undefined}
+                                        />
+                                    ))}
+                                </div>
+                            </TabsContent>
+                        ))}
+                    </div>
+                </Tabs>
+            )}
+        </div>
+    );
     };

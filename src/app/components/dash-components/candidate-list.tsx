@@ -3,9 +3,9 @@
 import { getCandidateDetailsByIDAction } from "actions/getCandidateDetailsByIDAction";
 import { updateJobApplicationAction } from "actions/updateJobApplicationAction";
 import supabaseClient from "lib/supabaseClient";
+import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
-import { DrawerDescription } from "../ui/drawer";
 
 export const CandidateList = ({
     currentCandidateDetails,
@@ -23,8 +23,6 @@ export const CandidateList = ({
         }
     }
 
-    // console.log("currentCandidateDetails?.candidateInfo?.resume ", currentCandidateDetails?.candidateInfo?.resume);
-
     function handlePreviewResume() {
         const { data } = supabaseClient.storage
             .from("hirehub-bucket-public")
@@ -38,11 +36,11 @@ export const CandidateList = ({
         a.click();
         document.body.removeChild(a);
     }
+
     async function handleUpdateJobStatus(getCurrentStatus) {
         let cpyJobApplicants = [...jobApplications];
         const indexOfCurrentJobApplicant = cpyJobApplicants.findIndex(
-            (item) => item.candidateId
-                === currentCandidateDetails?.id
+            (item) => item.candidateId === currentCandidateDetails?.id
         );
         const jobApplicantsToUpdate = {
             ...cpyJobApplicants[indexOfCurrentJobApplicant],
@@ -51,33 +49,33 @@ export const CandidateList = ({
         await updateJobApplicationAction(jobApplicantsToUpdate, "/jobs");
     }
 
+    const info = currentCandidateDetails?.candidateInfo;
+
     return (
         <>
-            <div className="grid grid-cols-1 gap-3 p-10 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 p-6 md:grid-cols-2 lg:grid-cols-3">
                 {jobApplications && jobApplications.length > 0
                     ? jobApplications.map((jobApplicantItem) => (
-                        <div key={jobApplicantItem.id} className="bg-white shadow-lg w-full max-w-sm rounded-lg overflow-hidden mx-auto mt-4">
-                            <div className="px-4 my-6 flex justify-between items-center">
-                                <h3 className="text-lg font-bold dark:text-black">
-                                    {jobApplicantItem?.name}
-                                </h3>
-                                <Button
-                                    onClick={() =>
-                                        handleFetchCandidateDetails(
-                                            jobApplicantItem?.candidateId
-                                        )
-                                    }
-                                    className="dark:bg-[#fffa27]  flex h-11 items-center justify-center px-5"
-                                >
-                                    View Profile
-                                </Button>
-                            </div>
+                        <div
+                            key={jobApplicantItem.id}
+                            className="flex items-center justify-between rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-4 py-3"
+                        >
+                            <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
+                                {jobApplicantItem?.name}
+                            </h3>
+                            <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleFetchCandidateDetails(jobApplicantItem?.candidateId)}
+                            >
+                                View Profile
+                            </Button>
                         </div>
                     ))
-                    :
-                    <> No Applicants</>
+                    : <p className="col-span-full text-sm text-gray-500 dark:text-gray-400">No applicants yet.</p>
                 }
             </div>
+
             <Dialog
                 open={showCurrentCandidateDetailsModal}
                 onOpenChange={() => {
@@ -85,109 +83,82 @@ export const CandidateList = ({
                     setShowCurrentCandidateDetailsModal(false);
                 }}
             >
-                <DrawerDescription />
-                <DialogContent>
-                    <DialogTitle />
-                    <div>
-                        <h1 className="text-2xl font-bold dark:text-white text-black">
-                            {currentCandidateDetails?.candidateInfo?.name},{" "}
-                            {currentCandidateDetails?.email}
-                        </h1>
-                        <p className="text-xl font-medium dark:text-white text-black">
-                            {currentCandidateDetails?.candidateInfo?.currentCompany}
-                        </p>
-                        <p className="text-sm font-normal dark:text-white text-black">
-                            {currentCandidateDetails?.candidateInfo?.currentJobLocation}
-                        </p>
-                        <p className="dark:text-white">
-                            Total Experience:
-                            {currentCandidateDetails?.candidateInfo?.totalExperience} Years
-                        </p>
-                        <p className="dark:text-white">
-                            Salary: {currentCandidateDetails?.candidateInfo?.currentSalary}{" "}
-                            LPA
-                        </p>
-                        <p className="dark:text-white">
-                            Notice Period:{" "}
-                            {currentCandidateDetails?.candidateInfo?.noticePeriod} Days
-                        </p>
-                        <div className="flex items-center gap-4 mt-6">
-                            <h1 className="dark:text-white">Previous Companies</h1>
-                            <div className="flex flex-wrap items-center gap-4">
-                                {currentCandidateDetails?.candidateInfo?.previousCompanies
-                                    .split(",")
-                                    .map((skillItem, index) => (
-                                        <div key={index} className="w-[100px] dark:bg-white flex justify-center items-center h-[35px] bg-black rounded-[4px]">
-                                            <h2 className="text-[13px]  dark:text-black font-medium text-white">
-                                                {skillItem}
-                                            </h2>
-                                        </div>
+                <DialogContent className="max-w-lg">
+                    <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
+                        {info?.name}
+                    </DialogTitle>
+
+                    <div className="space-y-4 mt-2">
+                        {/* Identity */}
+                        <div>
+                            <p className="text-sm font-medium text-gray-900 dark:text-white">{info?.currentCompany}</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400">{currentCandidateDetails?.email} · {info?.currentJobLocation}</p>
+                        </div>
+
+                        {/* Quick stats */}
+                        <div className="flex flex-wrap gap-2">
+                            <Badge variant="outline">{info?.totalExperience} yrs exp</Badge>
+                            <Badge variant="outline">{info?.currentSalary} LPA</Badge>
+                            <Badge variant="outline">{info?.noticePeriod} days notice</Badge>
+                        </div>
+
+                        {/* Skills */}
+                        {info?.skills && (
+                            <div>
+                                <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-400">Skills</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {info.skills.split(",").map((s, i) => (
+                                        <Badge key={i} variant="secondary">{s.trim()}</Badge>
                                     ))}
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex flex-wrap gap-4 mt-6">
-                            {currentCandidateDetails?.candidateInfo?.skills
-                                .split(",")
-                                .map((skillItem, index) => (
-                                    <div key={index} className="w-[100px] dark:bg-white flex justify-center items-center h-[35px] bg-black rounded-[4px]">
-                                        <h2 className="text-[13px] dark:text-black font-medium text-white">
-                                            {skillItem}
-                                        </h2>
-                                    </div>
-                                ))}
-                        </div>
+                        )}
+
+                        {/* Previous companies */}
+                        {info?.previousCompanies && (
+                            <div>
+                                <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-400">Previous Companies</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                    {info.previousCompanies.split(",").map((c, i) => (
+                                        <Badge key={i} variant="outline">{c.trim()}</Badge>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
-                    <div className="flex gap-3">
-                        <Button
-                            onClick={handlePreviewResume}
-                            className=" flex h-11 items-center justify-center px-5"
-                        >
+
+                    {/* Actions */}
+                    <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                        <Button variant="outline" onClick={handlePreviewResume}>
                             Resume
                         </Button>
                         <Button
                             onClick={() => handleUpdateJobStatus("Selected")}
-                            className=" disabled:opacity-65 flex h-11 items-center justify-center px-5"
                             disabled={
                                 jobApplications
-                                    .find(
-                                        (item) =>
-                                            item.candidateId === currentCandidateDetails?.id
-                                    )
-                                    ?.status.includes("Selected")
-                                    ? true
-                                    : false
+                                    .find((item) => item.candidateId === currentCandidateDetails?.id)
+                                    ?.status.includes("Selected") ?? false
                             }
                         >
                             {jobApplications
-                                .find(
-                                    (item) =>
-                                        item.candidateId === currentCandidateDetails?.id
-                                )
+                                .find((item) => item.candidateId === currentCandidateDetails?.id)
                                 ?.status.includes("Selected")
-                                ? "Selected"
+                                ? "Selected ✓"
                                 : "Select"}
                         </Button>
                         <Button
+                            variant="destructive"
                             onClick={() => handleUpdateJobStatus("Rejected")}
-                            className=" disabled:opacity-65 flex h-11 items-center justify-center px-5"
                             disabled={
                                 jobApplications
-                                    .find(
-                                        (item) =>
-                                            item.candidateId === currentCandidateDetails?.id
-                                    )
-                                    ?.status.includes("Rejected")
-                                    ? true
-                                    : false
+                                    .find((item) => item.candidateId === currentCandidateDetails?.id)
+                                    ?.status.includes("Rejected") ?? false
                             }
                         >
                             {jobApplications
-                                .find(
-                                    (item) =>
-                                        item.candidateId === currentCandidateDetails?.id
-                                )
+                                .find((item) => item.candidateId === currentCandidateDetails?.id)
                                 ?.status.includes("Rejected")
-                                ? "Rejected"
+                                ? "Rejected ✗"
                                 : "Reject"}
                         </Button>
                     </div>

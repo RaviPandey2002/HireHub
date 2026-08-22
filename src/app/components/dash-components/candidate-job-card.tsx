@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 
 import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
 import { JobIcon } from "./job-icon";
 
 import CreateJobApplicationAction from "actions/createJobApplicationAction";
@@ -46,13 +47,13 @@ export const CandidateJobCard = ({ jobItem, user, jobApplications }) => {
   }
   // console.log("jobListing jobList", jobItem)
 
-  return (
+  const alreadyApplied = jobApplications?.findIndex(
+    (item) => item.jobId === jobItem?.id
+  ) > -1;
 
+  return (
     <>
-      <Drawer
-        open={showJobDetailsDrawer}
-        onOpenChange={setShowJobDetailsDrawer}
-      >
+      <Drawer open={showJobDetailsDrawer} onOpenChange={setShowJobDetailsDrawer}>
         <CommonCard
           icon={<JobIcon />}
           title={jobItem?.title}
@@ -60,38 +61,27 @@ export const CandidateJobCard = ({ jobItem, user, jobApplications }) => {
           footerContent={
             <Button
               onClick={() => setShowJobDetailsDrawer(true)}
-              className=" dark:bg-[#fffa27] flex h-11 items-center justify-center px-5"
+              className="w-full"
             >
               View Details
             </Button>
           }
         />
         <DrawerContent className="p-6">
-          <DrawerTitle>Candidate List</DrawerTitle>
           <DrawerHeader className="px-0">
-            <div className="flex justify-between">
-              <DrawerTitle className="text-4xl dark:text-white font-extrabold text-gray-800">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <DrawerTitle className="text-3xl dark:text-white font-extrabold text-gray-800">
                 {jobItem?.title}
               </DrawerTitle>
-              <div className="flex gap-3">
+              <div className="flex gap-2">
                 <Button
                   onClick={handlejobApply}
-                  disabled={jobApplications?.findIndex(
-                    (item) => item.jobId === jobItem?.id
-                  ) > -1
-                    ? true
-                    : false
-                  }
-                  className="disabled:opacity-65 flex h-11 items-center justify-center px-5"
+                  disabled={alreadyApplied}
                 >
-                  {jobApplications?.findIndex(
-                    (item) => item?.jobId === jobItem?.id
-                  ) > -1
-                    ? "Applied"
-                    : "Apply"}
+                  {alreadyApplied ? "Applied" : "Apply"}
                 </Button>
                 <Button
-                  className=" flex h-11 items-center justify-center px-5"
+                  variant="outline"
                   onClick={() => setShowJobDetailsDrawer(false)}
                 >
                   Cancel
@@ -99,35 +89,23 @@ export const CandidateJobCard = ({ jobItem, user, jobApplications }) => {
               </div>
             </div>
           </DrawerHeader>
-          <DrawerDescription className="text-2xl dark:text-white  font-medium text-gray-600">
+          <DrawerDescription className="text-base dark:text-white text-gray-600 mt-1">
             {jobItem?.description}
-            <span className="text-xl dark:text-white  ml-4 font-normal text-gray-500">
-              {jobItem?.location}
-            </span>
           </DrawerDescription>
-          <div className="w-[150px] mt-6 flex justify-center dark:bg-white  items-center h-[40px] bg-black rounded-[4px]">
-            <h2 className="text-xl font-bold dark:text-black  text-white">
-              {jobItem?.type} Time
-            </h2>
+          <div className="flex flex-wrap items-center gap-2 mt-4">
+            <Badge variant="secondary">{jobItem?.location}</Badge>
+            <Badge variant="outline">{jobItem?.type} Time</Badge>
+            <Badge variant="outline">{jobItem?.experience} yr exp</Badge>
           </div>
-          <h3 className="text-2xl font-medium text-black mt-3">
-            Experience: {jobItem?.experience} year
-          </h3>
-          <div className="flex gap-4 mt-6">
+          <div className="flex flex-wrap gap-2 mt-4">
             {jobItem?.skills.split(",").map((skillItem, index) => (
-
-              <div
-                key={index}
-                className="w-[100px] flex justify-center items-center h-[35px] dark:bg-white  bg-black rounded-[4px]"
-              >
-                <h2 className="text-[13px] font-medium text-white dark:text-black ">
-                  {skillItem}
-                </h2>
-              </div>
+              <Badge key={index} variant="secondary">
+                {skillItem.trim()}
+              </Badge>
             ))}
           </div>
         </DrawerContent>
-      </Drawer >
+      </Drawer>
     </>
   );
 };

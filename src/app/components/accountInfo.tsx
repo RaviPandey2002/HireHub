@@ -25,14 +25,19 @@ export const AccountInfo = ({ user }) => {
         await updateProfile( user, user?.role === "Candidate" ? candidateFormData : recruiterFormData , "/account")
     }
 
-    return (<div className="mx-auto max-w-7xl">
-        <div className="flex items-baseline dark:border-white justify-between pb-6 border-b pt-10">
-            <h1 className="text-4xl font-bold dark:text-white tracking-tight text-gray-950">
-                Account Details
-            </h1>
+    return (<div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex items-baseline dark:border-white justify-between pb-6 border-b pt-2">
+            <div className="flex items-center gap-3">
+                <h1 className="text-4xl font-bold dark:text-white tracking-tight text-gray-950">
+                    Account Details
+                </h1>
+                <span className="inline-flex items-center rounded-full border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 px-2.5 py-0.5 text-xs font-semibold text-gray-700 dark:text-gray-300">
+                    {user?.role}
+                </span>
+            </div>
         </div>
-        <div className="py-20 pb-24 pt-6">
-            <div className="container mx-auto p-0 space-y-8">
+        <div className="pt-6 pb-24">
+            <div className="container mx-auto p-0 max-w-2xl">
                 <CommonForm
                     action={handleUpdateAccount}
                     formControls={user?.role === "Candidate"

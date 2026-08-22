@@ -20,7 +20,10 @@ export const CommonForm = ({
     switch (getCurrentControl.componentType) {
       case "input":
         content = (
-          <div className="relative flex items-center mt-8">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor={getCurrentControl.name}>
+              {getCurrentControl.label}
+            </Label>
             <Input
               type="text"
               disabled={getCurrentControl.disabled}
@@ -34,33 +37,39 @@ export const CommonForm = ({
                   [event.target.name]: event.target.value,
                 })
               }
-              className="w-full rounded-md h-[60px] px-4 border dark:bg-black bg-gray-100 text-lg outline-none drop-shadow-sm transition-all duration-200 ease-in-out focus:bg-white focus:drop-shadow-lg focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
             />
           </div>
         );
-
         break;
 
       case "file":
         content = (
-          <Label
-            // for={getCurrentControl.name}
-            className="flex bg-gray-100 dark:bg-black items-center px-3 py-3 mx-auto mt-6 text-center border-2 border-dashed rounded-lg cursor-pointer"
-          >
-            <h2>{getCurrentControl.label}</h2>
-            <Input
-              onChange={handleFileChange}
-              id={getCurrentControl.name}
-              type="file"
-            />
-          </Label>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor={getCurrentControl.name}>
+              {getCurrentControl.label}
+            </Label>
+            <label
+              htmlFor={getCurrentControl.name}
+              className="flex cursor-pointer items-center gap-3 rounded-md border border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-4 py-3 text-sm text-gray-600 dark:text-gray-400 transition-colors hover:border-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <span>Click to upload PDF (max 5 MB)</span>
+              <Input
+                onChange={handleFileChange}
+                id={getCurrentControl.name}
+                type="file"
+                className="sr-only"
+              />
+            </label>
+          </div>
         );
-
         break;
 
       default:
         content = (
-          <div className="relative flex items-center mt-8">
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor={getCurrentControl.name}>
+              {getCurrentControl.label}
+            </Label>
             <Input
               type="text"
               disabled={getCurrentControl.disabled}
@@ -74,7 +83,6 @@ export const CommonForm = ({
                   [event.target.name]: event.target.value,
                 })
               }
-              className="w-full dark:bg-black rounded-md h-[60px] px-4 border bg-gray-100 text-lg outline-none drop-shadow-sm transition-all duration-200 ease-in-out focus:bg-white focus:drop-shadow-lg focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
             />
           </div>
         );
@@ -85,17 +93,19 @@ export const CommonForm = ({
   }
 
   return (
-    <form action={action} className="m-6">
-      {formControls.map((control) => (
-        <div key={control.name}>
-          {renderInputByComponentType(control)}
-        </div>
-      ))}
-      <div className="mt-6 w-full">
+    <form action={action}>
+      <div className="space-y-5">
+        {formControls.map((control) => (
+          <div key={control.name}>
+            {renderInputByComponentType(control)}
+          </div>
+        ))}
+      </div>
+      <div className="mt-8">
         <Button
           type={btnType || "submit"}
-          className="disabled:opacity-60 flex h-11 items-center justify-center px-5"
           disabled={isBtnDisabled}
+          className="w-full sm:w-auto"
         >
           {buttonText}
         </Button>

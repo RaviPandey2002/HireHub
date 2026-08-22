@@ -8,16 +8,16 @@ import {
 
 export const CommonCard = ({ title, icon, description, footerContent }) => {
     return (
-        <Card className="flex bg-gray-100 flex-col gap-6 rounded-2xl p-8 transition duration-300 hover:bg-white hover:shadow-2xl hover:shadow-gray-600/10 cursor-pointer mb-5">
+        <Card className="flex flex-col gap-6 rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-6 transition-all duration-200 hover:bg-white dark:hover:bg-gray-800 hover:shadow-lg hover:shadow-gray-200 dark:hover:shadow-gray-900 cursor-pointer">
             <CardHeader className="p-0">
                 {icon ? icon : null}
                 {title ? (
-                    <CardTitle className="text-xl max-w-[250px] text-ellipsis overflow-hidden whitespace-nowrap font-semibold text-gray-950">
+                    <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white line-clamp-2">
                         {title}
                     </CardTitle>
                 ) : null}
                 {description ? (
-                    <CardDescription className="mt-3 text-gray-600">
+                    <CardDescription className="mt-1 text-gray-500 dark:text-gray-400">
                         {description}
                     </CardDescription>
                 ) : null}

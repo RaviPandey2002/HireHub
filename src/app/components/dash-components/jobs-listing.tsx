@@ -94,27 +94,23 @@ export const JobsListing = ({ user, allJobs, jobApplications }) => {
       <div className="mt-10">
         {filteredBySearch.length > 0 ? (
           <div className="pt-6 pb-24">
-            <div className="container mx-auto p-0">
-              <div className="grid grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
-                {filteredBySearch.map((jobItem) =>
-                  user?.role === "Candidate" ? (
-                    <div key={jobItem?.id}>
-                      <CandidateJobCard
-                        jobItem={jobItem}
-                        user={user}
-                        jobApplications={jobApplications}
-                      />
-                    </div>
-                  ) : (
-                    <div key={jobItem?.id}>
-                      <RecruiterJobCard
-                        jobItem={jobItem}
-                        jobApplications={jobApplications}
-                      />
-                    </div>
-                  )
-                )}
-              </div>
+            <div className="grid grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
+              {filteredBySearch.map((jobItem) =>
+                user?.role === "Candidate" ? (
+                  <CandidateJobCard
+                    key={jobItem?.id}
+                    jobItem={jobItem}
+                    user={user}
+                    jobApplications={jobApplications}
+                  />
+                ) : (
+                  <RecruiterJobCard
+                    key={jobItem?.id}
+                    jobItem={jobItem}
+                    jobApplications={jobApplications}
+                  />
+                )
+              )}
             </div>
           </div>
         ) : searchQuery.trim() !== "" ? (
