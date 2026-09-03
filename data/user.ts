@@ -21,9 +21,88 @@ export const getUserById = async (id: string) => {
 }
 
 
-export async function fetchJobsForRecruiter(recruiterId: string) {
+import { Prisma } from "@prisma/client";
+
+export interface JobQueryFilter {
+    recruiterId?: string;
+    search?: string;
+    location?: string;
+    type?: string;
+    company?: string;
+    page?: number;
+    limit?: number;
+}
+
+export async function fetchPaginatedJobs(filter: JobQueryFilter = {}) {
     try {
-        const result = await db.jobs.findMany({ where: { recruiterId } })
+        const where: Prisma.JobsWhereInput = {};
+
+        if (filter.recruiterId) {
+            where.recruiterId = filter.recruiterId;
+        }
+
+        if (filter.company) {
+            where.companyName = { equals: filter.company, mode: "insensitive" };
+        }
+
+        if (filter.type) {
+            where.type = { equals: filter.type, mode: "insensitive" };
+        }
+
+        if (filter.location) {
+            where.location = { contains: filter.location, mode: "insensitive" };
+        }
+
+        if (filter.search && filter.search.trim() !== "") {
+            const term = filter.search.trim();
+            where.OR = [
+                { title: { contains: term, mode: "insensitive" } },
+                { companyName: { contains: term, mode: "insensitive" } },
+                { skills: { contains: term, mode: "insensitive" } },
+                { location: { contains: term, mode: "insensitive" } },
+                { description: { contains: term, mode: "insensitive" } },
+            ];
+        }
+
+        const page = Math.max(1, filter.page || 1);
+        const limit = Math.min(50, Math.max(1, filter.limit || 12));
+        const skip = (page - 1) * limit;
+
+        const [jobs, totalCount] = await Promise.all([
+            db.jobs.findMany({
+                where,
+                skip,
+                take: limit,
+                orderBy: { id: "desc" },
+            }),
+            db.jobs.count({ where }),
+        ]);
+
+        const totalPages = Math.ceil(totalCount / limit) || 1;
+
+        return JSON.parse(JSON.stringify({
+            jobs,
+            totalCount,
+            totalPages,
+            currentPage: page,
+            limit,
+        }));
+    } catch (err) {
+        console.error("Error fetching paginated jobs:", err);
+        return { jobs: [], totalCount: 0, totalPages: 1, currentPage: 1, limit: 12 };
+    }
+}
+
+export async function fetchJobsForRecruiter(recruiterId: string, filter?: Omit<JobQueryFilter, "recruiterId">) {
+    try {
+        if (filter && (filter.search || filter.location || filter.type || filter.company || filter.page)) {
+            const result = await fetchPaginatedJobs({ ...filter, recruiterId });
+            return result.jobs;
+        }
+        const result = await db.jobs.findMany({
+            where: { recruiterId },
+            orderBy: { id: "desc" },
+        });
         return JSON.parse(JSON.stringify(result));
     }
     catch {
@@ -31,9 +110,15 @@ export async function fetchJobsForRecruiter(recruiterId: string) {
     }
 }
 
-export async function fetchJobsForCandidate() {
+export async function fetchJobsForCandidate(filter?: JobQueryFilter) {
     try {
-        const result = await db.jobs.findMany({})
+        if (filter && (filter.search || filter.location || filter.type || filter.company || filter.page)) {
+            const result = await fetchPaginatedJobs(filter);
+            return result.jobs;
+        }
+        const result = await db.jobs.findMany({
+            orderBy: { id: "desc" },
+        });
         return JSON.parse(JSON.stringify(result));
     }
     catch {

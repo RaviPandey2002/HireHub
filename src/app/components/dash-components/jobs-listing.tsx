@@ -6,24 +6,32 @@ import { RecruiterJobCard } from "./recruiter-job-card";
 import { JobFilter } from "./job-filter";
 import { useState, useEffect } from "react";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { AlertCircle, Search } from "lucide-react";
+import { AlertCircle, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useSearchParams } from "next/navigation";
 
-export const JobsListing = ({ user, allJobs, jobApplications }) => {
+const ITEMS_PER_PAGE = 9;
+
+export const JobsListing = ({ user, allJobs, jobApplications }: { user: any; allJobs: any[]; jobApplications: any[] }) => {
   const searchParams = useSearchParams();
   const companyFilter = searchParams.get("company");
 
-  const [jobList, setJobList] = useState(allJobs);
+  const [jobList, setJobList] = useState(allJobs || []);
   const [searchQuery, setSearchQuery] = useState(companyFilter ?? "");
+  const [currentPage, setCurrentPage] = useState(1);
 
   // When navigating here from the Companies page the URL carries ?company=X.
   // Seed the search box with it so the filter is applied immediately.
   useEffect(() => {
     if (companyFilter) setSearchQuery(companyFilter);
   }, [companyFilter]);
+
+  // Reset page to 1 when search query or filter list changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, jobList]);
 
   const filteredBySearch = searchQuery.trim() === ""
     ? jobList
@@ -37,10 +45,14 @@ export const JobsListing = ({ user, allJobs, jobApplications }) => {
         );
       });
 
+  const totalPages = Math.ceil(filteredBySearch.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedJobs = filteredBySearch.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
   return (
-    <div className="mx-auto max-w-7xl">
-      <div className="flex items-center dark:border-white justify-between border-b border-gray-200 pt-6 pb-6">
-        <h1 className="text-4xl dark:text-white font-bold tracking-tight text-gray-900">
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col sm:flex-row sm:items-center dark:border-white justify-between border-b border-gray-200 pt-6 pb-6 gap-4">
+        <h1 className="text-3xl sm:text-4xl dark:text-white font-bold tracking-tight text-gray-900">
           {user?.role === "Candidate" ? "Explore All Jobs" : "Jobs Dashboard"}
         </h1>
         <div className="flex items-center gap-2">
@@ -91,11 +103,19 @@ export const JobsListing = ({ user, allJobs, jobApplications }) => {
         </div>
       )}
 
-      <div className="mt-10">
+      <div className="mt-8 pb-16">
         {filteredBySearch.length > 0 ? (
-          <div className="pt-6 pb-24">
-            <div className="grid grid-cols-1 gap-x-4 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
-              {filteredBySearch.map((jobItem) =>
+          <div>
+            <div className="flex items-center justify-between mb-4 text-sm text-gray-500 dark:text-gray-400">
+              <span>
+                Showing <strong className="font-semibold text-gray-800 dark:text-gray-200">{startIndex + 1}</strong>–
+                <strong className="font-semibold text-gray-800 dark:text-gray-200">{Math.min(startIndex + ITEMS_PER_PAGE, filteredBySearch.length)}</strong> of{" "}
+                <strong className="font-semibold text-gray-800 dark:text-gray-200">{filteredBySearch.length}</strong> jobs
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 gap-x-6 gap-y-8 md:grid-cols-2 lg:grid-cols-3">
+              {paginatedJobs.map((jobItem) =>
                 user?.role === "Candidate" ? (
                   <CandidateJobCard
                     key={jobItem?.id}
@@ -112,6 +132,47 @@ export const JobsListing = ({ user, allJobs, jobApplications }) => {
                 )
               )}
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="mt-12 flex items-center justify-center gap-2 border-t border-gray-100 dark:border-gray-800 pt-8">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="gap-1 text-xs"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+
+                <div className="flex items-center gap-1 mx-2">
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNumber) => (
+                    <Button
+                      key={pageNumber}
+                      variant={currentPage === pageNumber ? "default" : "ghost"}
+                      size="sm"
+                      onClick={() => setCurrentPage(pageNumber)}
+                      className="h-8 w-8 p-0 text-xs font-medium"
+                    >
+                      {pageNumber}
+                    </Button>
+                  ))}
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="gap-1 text-xs"
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
         ) : searchQuery.trim() !== "" ? (
           <Alert>

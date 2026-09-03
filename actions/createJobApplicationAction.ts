@@ -4,6 +4,7 @@ import { auth } from "auth";
 import { db } from "lib/db";
 import { revalidatePath } from "next/cache";
 import { CreateJobApplicationSchema } from "schema";
+import { sendApplicationSubmittedEmail } from "lib/email";
 
 async function CreateJobApplicationAction(data: unknown, pathToRevalidate: string) {
     const session = await auth();
@@ -51,6 +52,34 @@ async function CreateJobApplicationAction(data: unknown, pathToRevalidate: strin
     }
 
     await db.application.create({ data: parsed.data as Required<typeof parsed.data> });
+
+    // Send transactional confirmation and notification emails (non-blocking for DB flow)
+    try {
+        const [job, recruiter] = await Promise.all([
+            db.jobs.findUnique({
+                where: { id: parsed.data.jobId },
+                select: { title: true, companyName: true },
+            }),
+            db.user.findUnique({
+                where: { id: parsed.data.recruiterId },
+                select: { email: true, name: true },
+            }),
+        ]);
+
+        if (job) {
+            await sendApplicationSubmittedEmail({
+                candidateEmail: parsed.data.email,
+                candidateName: parsed.data.name,
+                recruiterEmail: recruiter?.email,
+                recruiterName: recruiter?.name,
+                jobTitle: job.title,
+                companyName: job.companyName,
+            });
+        }
+    } catch (emailErr) {
+        console.error("Error triggering application emails:", emailErr);
+    }
+
     revalidatePath(pathToRevalidate);
     return { success: true };
 }
