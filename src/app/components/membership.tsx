@@ -43,11 +43,13 @@ export const Membership = ({ user }) => {
     async function handlePayment(getCurrentPlan) {
         const stripe = await stripePromise;
         const extractPriceId = await createPriceIdAction({
+            planType: getCurrentPlan?.type,
             amount: Number(getCurrentPlan?.price),
         });
 
-        if (extractPriceId) {
+        if (extractPriceId?.id) {
             const result = await createStripePaymentAction({
+                planType: getCurrentPlan?.type,
                 lineItems: [
                     {
                         price: extractPriceId?.id,
@@ -56,9 +58,11 @@ export const Membership = ({ user }) => {
                 ],
             });
 
-            await stripe.redirectToCheckout({
-                sessionId: result?.id,
-            });
+            if (result?.id) {
+                await stripe.redirectToCheckout({
+                    sessionId: result?.id,
+                });
+            }
         }
     }
 

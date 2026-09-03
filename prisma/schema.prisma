@@ -53,6 +53,9 @@ model Jobs {
   description String
   skills      String
   recruiterId String
+
+  @@index([recruiterId])
+  @@index([companyName])
 }
 
 model Application {
@@ -64,7 +67,11 @@ model Application {
   status             String[]
   jobId              String
   jobApplicationDate DateTime
-  // status             ApplicationStatus[]
+
+  @@index([candidateId])
+  @@index([recruiterId])
+  @@index([jobId])
+  @@unique([candidateId, jobId])
 }
 
 model Account {

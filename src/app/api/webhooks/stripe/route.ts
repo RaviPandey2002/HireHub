@@ -23,22 +23,32 @@ export async function POST(req: NextRequest) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    const customerEmail = session.customer_details?.email;
+    const customerEmail = session.customer_details?.email ?? session.customer_email;
+    const userId = session.client_reference_id ?? session.metadata?.userId;
 
-    if (!customerEmail) {
-      return NextResponse.json({ error: "No customer email in session" }, { status: 400 });
+    if (!userId && !customerEmail) {
+      return NextResponse.json({ error: "No user identification in session" }, { status: 400 });
     }
 
-    // Retrieve the subscription to get the price metadata
-    const subscriptionId = session.subscription as string;
-    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-    const priceId = subscription.items.data[0]?.price?.id;
+    // Determine membership plan type from metadata, or fallback to subscription price
+    let memberShipType = session.metadata?.planType;
 
-    // Map price amount back to plan type
-    const amount = subscription.items.data[0]?.price?.unit_amount;
-    let memberShipType = "basic";
-    if (amount && amount >= 500000) memberShipType = "enterprise";
-    else if (amount && amount >= 200000) memberShipType = "teams";
+    if (!memberShipType && session.subscription) {
+      try {
+        const subscriptionId = session.subscription as string;
+        const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+        const amount = subscription.items.data[0]?.price?.unit_amount;
+        if (amount && amount >= 500000) memberShipType = "enterprise";
+        else if (amount && amount >= 200000) memberShipType = "teams";
+        else memberShipType = "basic";
+      } catch (err) {
+        console.error("Failed to retrieve subscription:", err);
+      }
+    }
+
+    if (!memberShipType) {
+      memberShipType = "basic";
+    }
 
     const memberShipStartDate = new Date().toString();
     const yearsToAdd = memberShipType === "basic" ? 1 : memberShipType === "teams" ? 2 : 5;
@@ -46,16 +56,24 @@ export async function POST(req: NextRequest) {
       new Date().setFullYear(new Date().getFullYear() + yearsToAdd)
     ).toString();
 
-    await db.user.update({
-      where: { email: customerEmail },
-      data: {
-        isPremiumUser: true,
-        memberShipType,
-        memberShipStartDate,
-        memberShipEndDate,
-      },
-    });
+    const updateData = {
+      isPremiumUser: true,
+      memberShipType,
+      memberShipStartDate,
+      memberShipEndDate,
+    };
 
+    if (userId) {
+      await db.user.update({
+        where: { id: userId },
+        data: updateData,
+      });
+    } else if (customerEmail) {
+      await db.user.update({
+        where: { email: customerEmail },
+        data: updateData,
+      });
+    }
   }
 
   return NextResponse.json({ received: true });

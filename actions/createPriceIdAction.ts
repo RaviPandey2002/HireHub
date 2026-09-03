@@ -1,16 +1,34 @@
 "use server";
 
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+import { auth } from "auth";
+import { membershipPlans } from "lib/utils";
+import Stripe from "stripe";
 
-export async function createPriceIdAction(data: { amount: number }) {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+export async function createPriceIdAction(data: { amount?: number; planType?: string }) {
+  const session = await auth();
+  if (!session?.user) {
+    return { error: "Unauthorised" };
+  }
+
+  // Validate against known membership plans
+  const matchedPlan = membershipPlans.find(
+    (p) => p.type === data.planType || p.price === data.amount
+  );
+
+  if (!matchedPlan) {
+    return { error: "Invalid plan" };
+  }
+
   const price = await stripe.prices.create({
     currency: "inr",
-    unit_amount: data.amount * 100,
+    unit_amount: matchedPlan.price * 100,
     recurring: {
       interval: "year",
     },
     product_data: {
-      name: "Premium Plan",
+      name: `${matchedPlan.heading} (${matchedPlan.type.toUpperCase()})`,
     },
   });
 

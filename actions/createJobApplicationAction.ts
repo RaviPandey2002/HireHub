@@ -21,8 +21,38 @@ async function CreateJobApplicationAction(data: unknown, pathToRevalidate: strin
         return { error: "Unauthorised" };
     }
 
+    // Prevent duplicate applications for the same job
+    const existingApplication = await db.application.findFirst({
+        where: {
+            candidateId: session.user.id,
+            jobId: parsed.data.jobId,
+        },
+    });
+
+    if (existingApplication) {
+        return { error: "You have already applied for this position." };
+    }
+
+    // Server-side freemium quota enforcement: max 2 applications on free tier
+    const user = await db.user.findUnique({
+        where: { id: session.user.id },
+        select: { isPremiumUser: true },
+    });
+
+    if (!user?.isPremiumUser) {
+        const applicationCount = await db.application.count({
+            where: { candidateId: session.user.id },
+        });
+        if (applicationCount >= 2) {
+            return {
+                error: "Free accounts can apply to max 2 jobs. Please upgrade your membership to apply to more.",
+            };
+        }
+    }
+
     await db.application.create({ data: parsed.data as Required<typeof parsed.data> });
     revalidatePath(pathToRevalidate);
+    return { success: true };
 }
 
 export default CreateJobApplicationAction;
