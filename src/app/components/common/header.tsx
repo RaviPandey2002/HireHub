@@ -5,17 +5,21 @@ import { UserInfoButton } from "./user-info-button";
 import { NavLink } from "./nav-link";
 
 async function Header({ user }) {
+  const isOnboarded = !!user && user.role !== "OnBoarding";
+  const isOnboarding = user?.role === "OnBoarding";
+
   const menuItems = [
-    { label: "Home",       path: "/",          show: true },
-    { label: "Dashboard",  path: "/dashboard", show: user?.role },
-    { label: "Feed",       path: "/feed",      show: user?.role },
-    { label: "Login",      path: "/login",     show: !user },
-    { label: "Register",   path: "/register",  show: !user },
-    { label: "Activity",   path: "/activity",  show: user?.role === "Candidate" },
-    { label: "Companies",  path: "/companies", show: user?.role === "Candidate" },
-    { label: "Jobs",       path: "/jobs",      show: user },
-    { label: "Membership", path: "/membership",show: user?.role },
-    { label: "Account",    path: "/account",   show: user?.role },
+    { label: "Home",             path: "/",           show: true },
+    { label: "Dashboard",        path: "/dashboard",  show: isOnboarded },
+    { label: "Feed",             path: "/feed",       show: isOnboarded },
+    { label: "Jobs",             path: "/jobs",       show: isOnboarded },
+    { label: "Activity",         path: "/activity",   show: isOnboarded && user?.role === "Candidate" },
+    { label: "Companies",        path: "/companies",  show: isOnboarded && user?.role === "Candidate" },
+    { label: "Membership",       path: "/membership", show: isOnboarded },
+    { label: "Account",          path: "/account",    show: isOnboarded },
+    { label: "Complete Profile", path: "/onboard",    show: isOnboarding },
+    { label: "Login",            path: "/login",      show: !user },
+    { label: "Register",         path: "/register",   show: !user },
   ];
 
   return (

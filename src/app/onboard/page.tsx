@@ -6,6 +6,9 @@ const OnBoardingPage = async () => {
   const user = await getUser();
 
   if (!user) redirect("/login");
+  if (user.role && user.role !== "OnBoarding") {
+    redirect("/");
+  }
 
   return <OnBoarding currentUser={user} />;
 };

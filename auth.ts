@@ -7,7 +7,7 @@ import { LoginSchema } from "schema"
 import bcrypt from "bcryptjs"
 import { ZodError } from "zod"
 
-export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
+export const { handlers: { GET, POST }, auth, signIn, signOut, unstable_update } = NextAuth({
   pages: {
     signIn: "/login",
     error: "/error",
@@ -60,7 +60,7 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
       return session;
     },
 
-    async jwt({ token, user, account, profile, trigger }) {
+    async jwt({ token, user, account, profile, trigger, session }: any) {
       // ── Credentials sign-in ──────────────────────────────────────────────
       // `user` is the object returned by authorize() — already a DB record.
       if (user && account?.provider === "credentials") {
@@ -102,12 +102,17 @@ export const { handlers: { GET, POST }, auth, signIn, signOut } = NextAuth({
       }
 
       // ── Session update() trigger ─────────────────────────────────────────
-      // Re-fetch from DB so role changes (e.g. after onboarding) are reflected.
-      if (trigger === "update" && token.sub) {
-        const existingUser = await getUserById(token.sub);
-        if (existingUser) {
-          token.role = existingUser.role;
-          token.name = existingUser.name;
+      // Re-fetch from DB or session payload so role changes (e.g. after onboarding) are reflected.
+      if (trigger === "update") {
+        if (session?.user?.role) {
+          token.role = session.user.role;
+        }
+        if (token.sub) {
+          const existingUser = await getUserById(token.sub);
+          if (existingUser) {
+            token.role = existingUser.role;
+            token.name = existingUser.name;
+          }
         }
         return token;
       }

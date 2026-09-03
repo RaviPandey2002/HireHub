@@ -35,13 +35,26 @@ export const PostNewJob = ({ user, jobList }) => {
   }
 
   async function createNewJob() {
-    await postNewJobAction(
+    const result = await postNewJobAction(
       {
         ...jobFormData,
         recruiterId: user?.id,
       },
       "/jobs"
     );
+
+    if (result?.error) {
+      toast({
+        variant: "destructive",
+        title: "Failed to post job",
+        description: result.error,
+      });
+      return;
+    }
+
+    toast({
+      title: "Job posted successfully!",
+    });
 
     setJobFormData({
       ...initialPostNewJobFormData,

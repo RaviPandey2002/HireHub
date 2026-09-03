@@ -31,7 +31,7 @@ export const CandidateJobCard = ({ jobItem, user, jobApplications }) => {
       return;
     }
 
-    await CreateJobApplicationAction(
+    const result = await CreateJobApplicationAction(
       {
         recruiterId: jobItem.recruiterId,
         name: user?.name,
@@ -43,6 +43,19 @@ export const CandidateJobCard = ({ jobItem, user, jobApplications }) => {
       },
       "/jobs"
     );
+
+    if (result?.error) {
+      toast({
+        variant: "destructive",
+        title: "Failed to apply",
+        description: result.error,
+      });
+      return;
+    }
+
+    toast({
+      title: "Application submitted successfully!",
+    });
     setShowJobDetailsDrawer(false);
   }
   // console.log("jobListing jobList", jobItem)

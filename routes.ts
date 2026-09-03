@@ -1,5 +1,6 @@
 export const publicRoutes = [
     "/",
+    "/error",
     "/images/HireHubLandingPageImage.png"
 ]
 

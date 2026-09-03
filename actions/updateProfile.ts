@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "auth";
+import { auth, unstable_update } from "auth";
 import { db } from "lib/db";
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
@@ -19,7 +19,9 @@ export async function updateProfile(
   if (!session?.user) {
     return { success: false, message: "Unauthorised" };
   }
-  if (user?.id !== session.user.id) {
+
+  const sessionUserId = session.user.id ?? (session as any).user?.sub;
+  if (user?.id !== sessionUserId) {
     return { success: false, message: "Unauthorised" };
   }
 
@@ -28,16 +30,30 @@ export async function updateProfile(
       ? { candidateInfo: profileInfo }
       : { recruiterInfo: profileInfo };
 
+  const newName = (profileInfo as any)?.name;
+  if (newName && typeof newName === "string") {
+    updateData.name = newName;
+  }
+
   try {
     await db.user.update({
-      where: { id: user?.id },
+      where: { id: sessionUserId },
       data: updateData,
     });
-  } catch (err) {
+
+    if (newName && newName !== session.user.name) {
+      await unstable_update({
+        user: {
+          ...session.user,
+          name: newName,
+        },
+      });
+    }
+  } catch (err: any) {
     console.error("Error updating User Profile:", err);
-    return { success: false, message: "Something went wrong" };
+    return { success: false, message: err?.message || "Something went wrong" };
   }
 
   revalidatePath(pathToRevalidate);
-  return { success: true };
+  return { success: true, message: "Profile updated successfully" };
 }

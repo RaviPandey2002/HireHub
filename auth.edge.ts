@@ -14,7 +14,7 @@ import NextAuth from "next-auth"
 export const { auth } = NextAuth({
   providers: [],           // no providers — auth.ts owns the OAuth flow
   session: { strategy: "jwt" },
-  secret: process.env.AUTH_SECRET,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
   callbacks: {
     async jwt({ token }) {
       // Pass the token through unchanged.

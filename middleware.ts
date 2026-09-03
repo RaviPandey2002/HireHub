@@ -16,7 +16,7 @@ export default auth((req: NextRequest & { auth: any }) => {
   // In NextAuth v5 the JWT token fields are merged directly onto req.auth.user.
   // Depending on the version, role may live at req.auth.user.role OR at the
   // token level via req.auth.user (which IS the token).  Read both paths.
-  const role = (req.auth?.user?.role ?? (req.auth as any)?.token?.role) as string | undefined;
+  const role = (req.auth?.user?.role ?? (req.auth as any)?.token?.role ?? (req.auth as any)?.role) as string | undefined;
   const isOnboarding = role === "OnBoarding";
 
   // Server actions POST to the page URL with a Next-Action header —
@@ -46,6 +46,9 @@ export default auth((req: NextRequest & { auth: any }) => {
   if (isOnboardingRoute) {
     if (!isLoggedIn) {
       return NextResponse.redirect(new URL("/login", nextUrl));
+    }
+    if (role && role !== "OnBoarding") {
+      return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
     }
     return NextResponse.next();
   }

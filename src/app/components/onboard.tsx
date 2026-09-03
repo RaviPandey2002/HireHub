@@ -117,10 +117,10 @@ export const OnBoarding = ({ currentUser }) => {
 
       const response = await createProfileAction(currentTab, formData);
       if (response?.success) {
-        await update();
+        await update({ role: currentTab === "recruiter" ? "Recruiter" : "Candidate" });
         window.location.href = DEFAULT_LOGIN_REDIRECT;
       } else {
-        console.error(response?.message);
+        alert(response?.message || "Failed to update profile. Please verify all fields.");
       }
     } finally {
       setSubmitting(false);
