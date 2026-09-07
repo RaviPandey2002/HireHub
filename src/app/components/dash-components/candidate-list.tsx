@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { getCandidateDetailsByIDAction } from "actions/getCandidateDetailsByIDAction";
 import { updateJobApplicationAction } from "actions/updateJobApplicationAction";
-import supabaseClient from "lib/supabaseClient";
+import { getResumeUrlAction } from "actions/getResumeUrlAction";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
@@ -26,6 +26,7 @@ export const CandidateList = ({
     const { toast } = useToast();
     const [selectedApplication, setSelectedApplication] = useState<any>(null);
     const [isUpdatingStatus, setIsUpdatingStatus] = useState<string | null>(null);
+    const [isLoadingResume, setIsLoadingResume] = useState(false);
 
     async function handleOpenCandidateModal(applicantItem: any) {
         setSelectedApplication(applicantItem);
@@ -36,23 +37,29 @@ export const CandidateList = ({
         }
     }
 
-    function handlePreviewResume() {
-        const resumePath = currentCandidateDetails?.candidateInfo?.resume;
-        if (!resumePath) {
+    async function handlePreviewResume() {
+        if (!currentCandidateDetails?.id) return;
+        setIsLoadingResume(true);
+
+        try {
+            const result = await getResumeUrlAction(currentCandidateDetails.id);
+            if (result?.error) {
+                toast({
+                    variant: "destructive",
+                    title: "Resume unavailable",
+                    description: result.error,
+                });
+            } else if (result?.url) {
+                window.open(result.url, "_blank");
+            }
+        } catch (err: any) {
             toast({
                 variant: "destructive",
-                title: "No resume on file",
-                description: "This candidate has not uploaded a resume.",
+                title: "Error",
+                description: err?.message || "Failed to retrieve secure resume link.",
             });
-            return;
-        }
-
-        const { data } = supabaseClient.storage
-            .from("hirehub-bucket-public")
-            .getPublicUrl(resumePath);
-
-        if (data?.publicUrl) {
-            window.open(data.publicUrl, "_blank");
+        } finally {
+            setIsLoadingResume(false);
         }
     }
 
@@ -212,9 +219,23 @@ export const CandidateList = ({
 
                     {/* Actions */}
                     <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
-                        <Button variant="outline" onClick={handlePreviewResume} className="gap-1.5">
-                            <ExternalLink className="h-3.5 w-3.5" />
-                            Resume
+                        <Button
+                            variant="outline"
+                            onClick={handlePreviewResume}
+                            disabled={isLoadingResume}
+                            className="gap-1.5"
+                        >
+                            {isLoadingResume ? (
+                                <>
+                                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                    Loading...
+                                </>
+                            ) : (
+                                <>
+                                    <ExternalLink className="h-3.5 w-3.5" />
+                                    Resume
+                                </>
+                            )}
                         </Button>
                         <Button
                             onClick={() => handleUpdateJobStatus("Selected")}

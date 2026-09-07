@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { updateProfile } from "actions/updateProfile";
+import { getResumeUrlAction } from "actions/getResumeUrlAction";
 import { initialCandidateFormData, initialRecruiterFormData } from "lib/utils";
 import { useToast } from "@/components/ui/use-toast";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,7 @@ export const AccountInfo = ({ user }: { user: any }) => {
 
   const [newResumeFile, setNewResumeFile] = useState<File | null>(null);
   const [uploadingResume, setUploadingResume] = useState(false);
+  const [isLoadingResume, setIsLoadingResume] = useState(false);
 
   useEffect(() => {
     if (user?.role === "Recruiter" && user?.recruiterInfo) {
@@ -100,20 +102,36 @@ export const AccountInfo = ({ user }: { user: any }) => {
     setRecruiterFormData((prev) => ({ ...prev, [field]: value }));
   }
 
-  function handleDownloadResume() {
-    if (!candidateFormData.resume) return;
-    const { data } = supabaseClient.storage
-      .from("hirehub-bucket-public")
-      .getPublicUrl(candidateFormData.resume);
+  async function handleDownloadResume() {
+    if (!user?.id) return;
+    setIsLoadingResume(true);
 
-    if (data?.publicUrl) {
-      window.open(data.publicUrl, "_blank");
+    try {
+      const result = await getResumeUrlAction(user.id);
+      if (result?.error) {
+        toast({
+          variant: "destructive",
+          title: "Resume unavailable",
+          description: result.error,
+        });
+      } else if (result?.url) {
+        window.open(result.url, "_blank");
+      }
+    } catch (err: any) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: err?.message || "Failed to load secure resume link.",
+      });
+    } finally {
+      setIsLoadingResume(false);
     }
   }
 
   async function handleUpdateAccount() {
     startTransition(async () => {
       try {
+        const oldResumePath = candidateFormData.resume;
         let resumePath = candidateFormData.resume;
 
         if (newResumeFile) {
@@ -135,8 +153,20 @@ export const AccountInfo = ({ user }: { user: any }) => {
             });
             return;
           }
+
           resumePath = data.path;
           setCandidateFormData((prev) => ({ ...prev, resume: data.path }));
+
+          // Remove the previous resume file from Supabase storage to prevent orphaned files
+          if (oldResumePath && oldResumePath !== data.path) {
+            try {
+              await supabaseClient.storage
+                .from("hirehub-bucket-public")
+                .remove([oldResumePath]);
+            } catch (cleanupErr) {
+              console.error("Failed to delete old resume from Supabase:", cleanupErr);
+            }
+          }
         }
 
         const payload =
@@ -535,10 +565,20 @@ export const AccountInfo = ({ user }: { user: any }) => {
                       variant="outline"
                       size="sm"
                       onClick={handleDownloadResume}
+                      disabled={isLoadingResume}
                       className="gap-1.5 text-xs"
                     >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                      View Resume
+                      {isLoadingResume ? (
+                        <>
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          <ExternalLink className="h-3.5 w-3.5" />
+                          View Resume
+                        </>
+                      )}
                     </Button>
                   )}
                   <label className="cursor-pointer">
