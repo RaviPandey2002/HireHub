@@ -2,7 +2,8 @@
 
 import { loadStripe } from "@stripe/stripe-js";
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
 import { Sparkles, Users2, Building2, Check } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -25,7 +26,7 @@ const planFeatures: Record<string, string[]> = {
     ],
     enterprise: [
         "Everything in Teams",
-        "Unlimited job postings",
+        "Post unlimited jobs",
         "Dedicated account manager",
         "Custom integrations",
         "SLA guarantee",
@@ -41,7 +42,17 @@ const planIcons = {
 export const Membership = ({ user }) => {
 
     async function handlePayment(getCurrentPlan) {
+        if (!stripePromise) {
+            alert("Stripe payments are not configured. Please add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY to your .env file.");
+            return;
+        }
+
         const stripe = await stripePromise;
+        if (!stripe) {
+            alert("Unable to connect to Stripe. Please verify your publishable key.");
+            return;
+        }
+
         const extractPriceId = await createPriceIdAction({
             planType: getCurrentPlan?.type,
             amount: Number(getCurrentPlan?.price),
