@@ -1,9 +1,10 @@
 "use server";
 
 import { auth } from "auth";
+import { env } from "lib/env";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const stripe = new Stripe(env.STRIPE_SECRET_KEY || "");
 
 interface LineItem {
   price: string;
@@ -19,7 +20,7 @@ export async function createStripePaymentAction(data: {
     return { error: "Unauthorised" };
   }
 
-  const appUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+  const appUrl = env.NEXTAUTH_URL;
 
   const checkoutSession = await stripe.checkout.sessions.create({
     payment_method_types: ["card"],

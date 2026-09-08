@@ -1,4 +1,5 @@
 import nodemailer from "nodemailer";
+import { env } from "./env";
 
 // Gmail transporter — requires GMAIL_USER and GMAIL_APP_PASSWORD in env.
 // Generate an App Password at: https://myaccount.google.com/apppasswords
@@ -12,8 +13,8 @@ function getTransporter(): nodemailer.Transporter {
         _transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
-                user: process.env.GMAIL_USER,
-                pass: process.env.GMAIL_APP_PASSWORD,
+                user: env.GMAIL_USER,
+                pass: env.GMAIL_APP_PASSWORD,
             },
         });
     }
@@ -21,7 +22,7 @@ function getTransporter(): nodemailer.Transporter {
 }
 
 function isEmailEnabled(): boolean {
-    return !!process.env.GMAIL_USER && !!process.env.GMAIL_APP_PASSWORD;
+    return !!env.GMAIL_USER && !!env.GMAIL_APP_PASSWORD;
 }
 
 /** Escape special HTML characters to prevent XSS in email bodies */
@@ -42,7 +43,7 @@ export async function sendWelcomeEmail(name: string, email: string) {
 
     try {
         await getTransporter().sendMail({
-            from: `"HireHub" <${process.env.GMAIL_USER}>`,
+            from: `"HireHub" <${env.GMAIL_USER}>`,
             to: email,
             subject: "Welcome to HireHub 🎉",
             html: welcomeEmailHtml(name),
@@ -65,12 +66,12 @@ export async function sendApplicationSubmittedEmail(params: ApplicationSubmitted
     if (!isEmailEnabled()) return;
 
     const { candidateEmail, candidateName, recruiterEmail, recruiterName, jobTitle, companyName } = params;
-    const appUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+    const appUrl = env.NEXTAUTH_URL;
 
     // 1. Confirmation to Candidate
     try {
         await getTransporter().sendMail({
-            from: `"HireHub" <${process.env.GMAIL_USER}>`,
+            from: `"HireHub" <${env.GMAIL_USER}>`,
             to: candidateEmail,
             subject: `Application Submitted: ${jobTitle} at ${companyName}`,
             html: applicationSubmittedCandidateHtml(candidateName, jobTitle, companyName, appUrl),
@@ -83,7 +84,7 @@ export async function sendApplicationSubmittedEmail(params: ApplicationSubmitted
     if (recruiterEmail) {
         try {
             await getTransporter().sendMail({
-                from: `"HireHub" <${process.env.GMAIL_USER}>`,
+                from: `"HireHub" <${env.GMAIL_USER}>`,
                 to: recruiterEmail,
                 subject: `New Applicant for ${jobTitle}: ${candidateName}`,
                 html: applicationSubmittedRecruiterHtml(recruiterName || "Recruiter", candidateName, jobTitle, companyName, appUrl),
@@ -106,7 +107,7 @@ export async function sendApplicationStatusEmail(params: ApplicationStatusParams
     if (!isEmailEnabled()) return;
 
     const { candidateEmail, candidateName, jobTitle, companyName, status } = params;
-    const appUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+    const appUrl = env.NEXTAUTH_URL;
 
     const subject = status === "Selected"
         ? `Congratulations! Update on your application for ${jobTitle} at ${companyName}`
@@ -114,7 +115,7 @@ export async function sendApplicationStatusEmail(params: ApplicationStatusParams
 
     try {
         await getTransporter().sendMail({
-            from: `"HireHub" <${process.env.GMAIL_USER}>`,
+            from: `"HireHub" <${env.GMAIL_USER}>`,
             to: candidateEmail,
             subject,
             html: applicationStatusCandidateHtml(candidateName, jobTitle, companyName, status, appUrl),
@@ -126,7 +127,7 @@ export async function sendApplicationStatusEmail(params: ApplicationStatusParams
 
 function welcomeEmailHtml(name: string): string {
     const safeName = escapeHtml(name);
-    const appUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+    const appUrl = env.NEXTAUTH_URL;
 
     return `<!DOCTYPE html>
 <html lang="en">

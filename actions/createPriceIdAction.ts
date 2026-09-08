@@ -2,9 +2,10 @@
 
 import { auth } from "auth";
 import { membershipPlans } from "lib/utils";
+import { env } from "lib/env";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const stripe = new Stripe(env.STRIPE_SECRET_KEY || "");
 
 export async function createPriceIdAction(data: { amount?: number; planType?: string }) {
   const session = await auth();
