@@ -57,6 +57,12 @@ const envSchema = z
 export type Env = z.infer<typeof envSchema>;
 
 function validateEnv(): Env {
+  // If running in the browser (client-side), do not validate server-only variables.
+  // Next.js intentionally strips server secrets (like DATABASE_URL) from the browser bundle.
+  if (typeof window !== "undefined") {
+    return process.env as unknown as Env;
+  }
+
   // During build / CI / testing, allow skipping strict runtime validation if flagged
   if (process.env.SKIP_ENV_VALIDATION) {
     return process.env as unknown as Env;

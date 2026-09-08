@@ -9,5 +9,4 @@ declare global {
 // Otherwise, a new client will be created on every reload
 export const db: PrismaClient = global.prisma || new PrismaClient();
 
-if (process.env.NODE_ENV === 'development') global.prisma = db;
-if (env.NODE_ENV === 'development') global.prisma = db;
+if (env.NODE_ENV === "development") global.prisma = db;
