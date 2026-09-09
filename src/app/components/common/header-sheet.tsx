@@ -17,7 +17,7 @@ export const HeaderSheet = ({ menuItems, user }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const handleLinkClick = () => setIsOpen(false);
-    const handleSubmit = () => signOut();
+    const handleSubmit = () => signOut({ callbackUrl: "/" });
 
     return (
         <>
@@ -62,8 +62,22 @@ export const HeaderSheet = ({ menuItems, user }) => {
                         )}
                     </nav>
                     {user && (
-                        <div className="mt-6 border-t border-gray-100 dark:border-gray-800 pt-4">
-                            <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+                        <div className="mt-6 border-t border-gray-100 dark:border-gray-800 pt-4 flex flex-col gap-1">
+                            <Link
+                                href="/account"
+                                onClick={handleLinkClick}
+                                className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                            >
+                                Account Settings
+                            </Link>
+                            <Link
+                                href="/membership"
+                                onClick={handleLinkClick}
+                                className="flex w-full items-center rounded-md px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+                            >
+                                Membership
+                            </Link>
+                            <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="mt-2">
                                 <Button type="submit" variant="outline" className="w-full">
                                     Logout
                                 </Button>

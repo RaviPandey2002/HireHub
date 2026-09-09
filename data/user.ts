@@ -143,26 +143,35 @@ export async function createFilterCategoriesAction (){
 
 export async function fetchRecruiterDashboardStats(recruiterId: string) {
     try {
-        const [jobs, applications] = await Promise.all([
-            db.jobs.findMany({ where: { recruiterId } }),
+        const [jobs, allApplications] = await Promise.all([
+            db.jobs.findMany({ where: { recruiterId }, orderBy: { id: "desc" } }),
             db.application.findMany({
                 where: { recruiterId },
                 orderBy: { jobApplicationDate: "desc" },
-                take: 10,
             }),
         ]);
 
         const jobMap = new Map(jobs.map((j) => [j.id, j]));
-        const enrichedApplications = applications.map((app) => ({
+        const enrichedApplications = allApplications.slice(0, 10).map((app) => ({
             ...app,
             job: jobMap.get(app.jobId) || null,
         }));
 
+        const jobApplicantCounts = new Map<string, number>();
+        allApplications.forEach((a) => {
+            jobApplicantCounts.set(a.jobId, (jobApplicantCounts.get(a.jobId) || 0) + 1);
+        });
+
+        const postedJobs = jobs.slice(0, 4).map((j) => ({
+            ...j,
+            applicantCount: jobApplicantCounts.get(j.id) || 0,
+        }));
+
         const totalJobs = jobs.length;
-        const totalApplications = applications.length;
-        const selected = applications.filter(a => a.status.includes("Selected")).length;
-        const rejected = applications.filter(a => a.status.includes("Rejected")).length;
-        const pending  = applications.filter(
+        const totalApplications = allApplications.length;
+        const selected = allApplications.filter(a => a.status.includes("Selected")).length;
+        const rejected = allApplications.filter(a => a.status.includes("Rejected")).length;
+        const pending  = allApplications.filter(
             a => !a.status.includes("Selected") && !a.status.includes("Rejected")
         ).length;
 
@@ -173,6 +182,7 @@ export async function fetchRecruiterDashboardStats(recruiterId: string) {
             rejected,
             pending,
             recentApplications: enrichedApplications,
+            postedJobs,
         }));
     } catch {
         return null;

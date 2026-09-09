@@ -1,13 +1,20 @@
 import { getUser } from "actions/getUser";
 import { LandingPage } from "./components/landingPage";
 import { db } from "lib/db";
-import { fetchCandidateDashboardStats, fetchRecruiterDashboardStats } from "data/user";
+import { redirect } from "next/navigation";
 
-// Middleware redirects OnBoarding-role users to /onboard before this page renders.
 const Home = async () => {
   const user = await getUser();
 
-  // 1. Fetch live featured jobs and total count for all visitors
+  // If user is authenticated, route them to their workspace
+  if (user) {
+    if (user.role === "OnBoarding") {
+      redirect("/onboard");
+    }
+    redirect("/dashboard");
+  }
+
+  // Guest visitor: Fetch live featured jobs and total count for marketing view
   const [featuredJobs, totalJobsCount] = await Promise.all([
     db.jobs.findMany({
       take: 6,
@@ -16,24 +23,14 @@ const Home = async () => {
     db.jobs.count(),
   ]);
 
-  // 2. Fetch role-specific metrics if authenticated
-  let candidateStats = null;
-  let recruiterStats = null;
-
-  if (user?.role === "Candidate") {
-    candidateStats = await fetchCandidateDashboardStats(user.id);
-  } else if (user?.role === "Recruiter") {
-    recruiterStats = await fetchRecruiterDashboardStats(user.id);
-  }
-
   return (
     <LandingPage
-      user={user}
-      profileInfo={user?.role}
+      user={null}
+      profileInfo={undefined}
       featuredJobs={JSON.parse(JSON.stringify(featuredJobs))}
       totalJobsCount={totalJobsCount}
-      candidateStats={candidateStats}
-      recruiterStats={recruiterStats}
+      candidateStats={null}
+      recruiterStats={null}
     />
   );
 };

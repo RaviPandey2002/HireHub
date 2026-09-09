@@ -20,7 +20,7 @@ interface CompaniesViewProps {
 export const CompaniesView = ({ companies }: CompaniesViewProps) => {
   return (
     <div className="mx-auto max-w-7xl px-4">
-      <div className="flex items-baseline dark:border-white justify-between border-b pb-6 pt-10">
+      <div className="flex items-baseline justify-between border-b border-gray-200 dark:border-gray-800 pb-6 pt-10">
         <h1 className="text-4xl font-bold dark:text-white tracking-tight text-gray-950">
           Companies
         </h1>

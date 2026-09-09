@@ -9,14 +9,11 @@ async function Header({ user }) {
   const isOnboarding = user?.role === "OnBoarding";
 
   const menuItems = [
-    { label: "Home",             path: "/",           show: true },
+    { label: "Home",             path: "/",           show: !user },
     { label: "Dashboard",        path: "/dashboard",  show: isOnboarded },
-    { label: "Feed",             path: "/feed",       show: isOnboarded },
     { label: "Jobs",             path: "/jobs",       show: isOnboarded },
-    { label: "Activity",         path: "/activity",   show: isOnboarded && user?.role === "Candidate" },
+    { label: "Applications",     path: "/activity",   show: isOnboarded && user?.role === "Candidate" },
     { label: "Companies",        path: "/companies",  show: isOnboarded && user?.role === "Candidate" },
-    { label: "Membership",       path: "/membership", show: isOnboarded },
-    { label: "Account",          path: "/account",    show: isOnboarded },
     { label: "Complete Profile", path: "/onboard",    show: isOnboarding },
     { label: "Login",            path: "/login",      show: !user },
     { label: "Register",         path: "/register",   show: !user },
@@ -27,7 +24,7 @@ async function Header({ user }) {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <Link
-          href="/"
+          href={isOnboarded ? "/dashboard" : "/"}
           className="flex items-center gap-2 font-extrabold text-xl tracking-tight text-gray-900 dark:text-white select-none"
         >
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-sm font-black">

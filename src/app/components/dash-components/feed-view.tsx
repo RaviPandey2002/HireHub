@@ -44,7 +44,7 @@ export const FeedView = ({ user, data }: FeedViewProps) => {
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div className="flex flex-col sm:flex-row sm:items-baseline dark:border-white justify-between border-b pb-6 pt-10 gap-2">
+      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between border-b border-gray-200 dark:border-gray-800 pb-6 pt-10 gap-2">
         <h1 className="text-3xl sm:text-4xl font-bold dark:text-white tracking-tight text-gray-950">
           {isRecruiter ? "Applications Feed" : "Jobs Feed"}
         </h1>

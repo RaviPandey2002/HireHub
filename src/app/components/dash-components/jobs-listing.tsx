@@ -55,7 +55,7 @@ export const JobsListing = ({ user, allJobs, jobApplications }: { user: any; all
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div className="flex flex-col sm:flex-row sm:items-center dark:border-white justify-between border-b border-gray-200 pt-6 pb-6 gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-200 dark:border-gray-800 pt-6 pb-6 gap-4">
         <h1 className="text-3xl sm:text-4xl dark:text-white font-bold tracking-tight text-gray-900">
           {user?.role === "Candidate" ? "Explore All Jobs" : "Jobs Dashboard"}
         </h1>

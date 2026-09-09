@@ -59,6 +59,10 @@ export default auth((req: NextRequest & { auth: any }) => {
     if (isLoggedIn && isOnboarding) {
       return NextResponse.redirect(new URL("/onboard", nextUrl));
     }
+    // If an authenticated user hits "/" redirect them to /dashboard
+    if (isLoggedIn && nextUrl.pathname === "/") {
+      return NextResponse.redirect(new URL("/dashboard", nextUrl));
+    }
     return NextResponse.next();
   }
 

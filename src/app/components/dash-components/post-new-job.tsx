@@ -9,12 +9,19 @@ import { useState } from "react";
 import { CommonForm } from "@/components/common/common-form"
 import { toast } from "@/components/ui/use-toast";
 
-export const PostNewJob = ({ user, jobList }) => {
-
+export const PostNewJob = ({
+  user,
+  jobList,
+  trigger,
+}: {
+  user: any;
+  jobList: any[];
+  trigger?: React.ReactNode;
+}) => {
   const [showJobDialog, setShowJobDialog] = useState(false);
   const [jobFormData, setJobFormData] = useState({
     ...initialPostNewJobFormData,
-    companyName: user?.recruiterInfo?.companyName,
+    companyName: user?.recruiterInfo?.companyName || "",
   });
   function handlePostNewBtnValid() {
     return Object.keys(jobFormData).every(
@@ -58,22 +65,28 @@ export const PostNewJob = ({ user, jobList }) => {
 
     setJobFormData({
       ...initialPostNewJobFormData,
-      companyName: user?.recruiterInfo?.companyName,
+      companyName: user?.recruiterInfo?.companyName || "",
     });
     setShowJobDialog(false);
   }
   return (
     <div>
-      <Button onClick={handleAddNewJob}>
-        Post A Job
-      </Button>
+      {trigger ? (
+        <div onClick={handleAddNewJob} className="inline-block cursor-pointer">
+          {trigger}
+        </div>
+      ) : (
+        <Button onClick={handleAddNewJob}>
+          Post A Job
+        </Button>
+      )}
       <Dialog
         open={showJobDialog}
         onOpenChange={() => {
           setShowJobDialog(false);
           setJobFormData({
             ...initialPostNewJobFormData,
-            companyName: user.recruiterInfo.companyName,
+            companyName: user?.recruiterInfo?.companyName || "",
           });
         }}
       >

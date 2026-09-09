@@ -80,7 +80,7 @@ export const Membership = ({ user }) => {
     return (
         <div className="mx-auto max-w-7xl">
             {/* Page header */}
-            <div className="flex items-baseline dark:border-white justify-between border-b pb-6 pt-10">
+            <div className="flex items-baseline justify-between border-b border-gray-200 dark:border-gray-800 pb-6 pt-10">
                 <div>
                     <h1 className="text-4xl font-bold dark:text-white tracking-tight text-gray-950">
                         {user?.isPremiumUser ? "Your Membership" : "Choose a Plan"}

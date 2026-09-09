@@ -15,4 +15,4 @@ export const onBoardingRoute = [
     "/onboard"
 ]
 
-export const DEFAULT_LOGIN_REDIRECT = "/"
+export const DEFAULT_LOGIN_REDIRECT = "/dashboard"

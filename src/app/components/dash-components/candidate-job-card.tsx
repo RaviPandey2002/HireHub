@@ -335,7 +335,9 @@ export const CandidateJobCard = ({
               </Badge>
               <Badge variant="outline" className="gap-1 text-xs font-medium">
                 <Sparkles className="h-3 w-3" />
-                {jobItem?.experience} yr exp required
+                {jobItem?.experience?.toLowerCase().includes("yr") || jobItem?.experience?.toLowerCase().includes("year")
+                  ? `${jobItem.experience} exp required`
+                  : `${jobItem?.experience} yr exp required`}
               </Badge>
             </div>
           </DialogHeader>
