@@ -20,7 +20,7 @@ export default async function RootLayout({ children }) {
   const session = await auth();
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className} min-h-screen w-full overflow-x-hidden`}>
         <SessionWrapper session={session}>
           <Suspense fallback={<Loading />}>

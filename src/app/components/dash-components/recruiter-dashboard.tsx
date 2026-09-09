@@ -12,6 +12,10 @@ interface Application {
   jobId: string;
   status: string[];
   jobApplicationDate: string;
+  job?: {
+    title?: string;
+    companyName?: string;
+  } | null;
 }
 
 interface RecruiterStats {
@@ -39,7 +43,7 @@ const StatCard = ({
   value: number;
   accent: string;
 }) => (
-  <div className={`rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-6 flex items-center gap-4`}>
+  <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-6 flex items-center gap-4">
     <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg ${accent}`}>
       {icon}
     </div>
@@ -49,6 +53,20 @@ const StatCard = ({
     </div>
   </div>
 );
+
+function formatUtcDate(dateString: string) {
+  try {
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return dateString;
+    const months = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+    return `${months[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+  } catch {
+    return dateString;
+  }
+}
 
 function statusBadgeVariant(status: string[]): "secondary" | "outline" | "destructive" {
   if (status.includes("Selected")) return "secondary";
@@ -129,6 +147,7 @@ export const RecruiterDashboard = ({ user, stats }: RecruiterDashboardProps) => 
               <thead className="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400">
                 <tr>
                   <th className="text-left px-4 py-3 font-medium">Candidate</th>
+                  <th className="text-left px-4 py-3 font-medium">Applied Role</th>
                   <th className="text-left px-4 py-3 font-medium hidden sm:table-cell">Email</th>
                   <th className="text-left px-4 py-3 font-medium">Status</th>
                   <th className="text-left px-4 py-3 font-medium hidden md:table-cell">Date</th>
@@ -138,14 +157,20 @@ export const RecruiterDashboard = ({ user, stats }: RecruiterDashboardProps) => 
                 {stats.recentApplications.map((app) => (
                   <tr key={app.id} className="hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors">
                     <td className="px-4 py-3 font-medium text-gray-900 dark:text-white">{app.name}</td>
+                    <td className="px-4 py-3 text-gray-700 dark:text-gray-300 font-medium">
+                      {app.job?.title || "Position"}
+                    </td>
                     <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden sm:table-cell">{app.email}</td>
                     <td className="px-4 py-3">
                       <Badge variant={statusBadgeVariant(app.status)}>
                         {latestStatus(app.status)}
                       </Badge>
                     </td>
-                    <td className="px-4 py-3 text-gray-400 dark:text-gray-500 hidden md:table-cell">
-                      {new Date(app.jobApplicationDate).toLocaleDateString()}
+                    <td
+                      className="px-4 py-3 text-gray-400 dark:text-gray-500 hidden md:table-cell"
+                      suppressHydrationWarning
+                    >
+                      {formatUtcDate(app.jobApplicationDate)}
                     </td>
                   </tr>
                 ))}

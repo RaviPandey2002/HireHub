@@ -29,6 +29,11 @@ export const UpdateJobApplicationSchema = z.object({
     status: z.array(z.string()).min(1),
 })
 
+// ── Withdraw application ─────────────────────────────────────────────────────
+export const WithdrawApplicationSchema = z.object({
+    applicationId: z.string().min(1, "Application ID is required"),
+})
+
 // ── Onboarding profile ───────────────────────────────────────────────────────
 export const RecruiterProfileSchema = z.object({
     name:        z.string().min(1, "Name is required").max(100),

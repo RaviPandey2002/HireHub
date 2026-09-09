@@ -152,6 +152,12 @@ export async function fetchRecruiterDashboardStats(recruiterId: string) {
             }),
         ]);
 
+        const jobMap = new Map(jobs.map((j) => [j.id, j]));
+        const enrichedApplications = applications.map((app) => ({
+            ...app,
+            job: jobMap.get(app.jobId) || null,
+        }));
+
         const totalJobs = jobs.length;
         const totalApplications = applications.length;
         const selected = applications.filter(a => a.status.includes("Selected")).length;
@@ -166,7 +172,7 @@ export async function fetchRecruiterDashboardStats(recruiterId: string) {
             selected,
             rejected,
             pending,
-            recentApplications: applications,
+            recentApplications: enrichedApplications,
         }));
     } catch {
         return null;
@@ -180,6 +186,24 @@ export async function fetchCandidateDashboardStats(candidateId: string) {
             orderBy: { jobApplicationDate: "desc" },
         });
 
+        const jobIds = [...new Set(applications.map((a) => a.jobId))];
+        const jobs = await db.jobs.findMany({
+            where: { id: { in: jobIds } },
+            select: {
+                id: true,
+                title: true,
+                companyName: true,
+                location: true,
+                type: true,
+            },
+        });
+        const jobMap = new Map(jobs.map((j) => [j.id, j]));
+
+        const enrichedApplications = applications.map((app) => ({
+            ...app,
+            job: jobMap.get(app.jobId) || null,
+        }));
+
         const total    = applications.length;
         const selected = applications.filter(a => a.status.includes("Selected")).length;
         const rejected = applications.filter(a => a.status.includes("Rejected")).length;
@@ -192,7 +216,7 @@ export async function fetchCandidateDashboardStats(candidateId: string) {
             selected,
             rejected,
             applied,
-            recentApplications: applications,
+            recentApplications: enrichedApplications,
         }));
     } catch {
         return null;
