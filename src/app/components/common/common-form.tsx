@@ -42,6 +42,31 @@ export const CommonForm = ({
         );
         break;
 
+      case "textarea":
+        content = (
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor={getCurrentControl.name}>
+              {getCurrentControl.label}
+            </Label>
+            <textarea
+              rows={4}
+              disabled={getCurrentControl.disabled}
+              placeholder={getCurrentControl.placeholder}
+              name={getCurrentControl.name}
+              id={getCurrentControl.name}
+              value={formData[getCurrentControl.name]}
+              onChange={(event) =>
+                setFormData({
+                  ...formData,
+                  [event.target.name]: event.target.value,
+                })
+              }
+              className="flex min-h-[90px] w-full rounded-md border border-gray-300 dark:border-gray-700 bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 dark:focus-visible:ring-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+            />
+          </div>
+        );
+        break;
+
       case "file":
         content = (
           <div className="flex flex-col gap-1.5">

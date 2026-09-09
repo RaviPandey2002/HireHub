@@ -29,7 +29,7 @@ export function UserInfoButton() {
         : "?"
 
     return (
-        <DropdownMenu>
+        <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer">
                     <AvatarImage src={user?.image ?? undefined} alt={user?.name ?? "User"} />

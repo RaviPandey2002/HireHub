@@ -22,11 +22,15 @@ export const JobsListing = ({ user, allJobs, jobApplications }: { user: any; all
   const [searchQuery, setSearchQuery] = useState(companyFilter ?? "");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // When navigating here from the Companies page the URL carries ?company=X.
   // Seed the search box with it so the filter is applied immediately.
   useEffect(() => {
     if (companyFilter) setSearchQuery(companyFilter);
   }, [companyFilter]);
+
+  // Sync jobList when allJobs prop updates from server revalidations
+  useEffect(() => {
+    setJobList(allJobs || []);
+  }, [allJobs]);
 
   // Reset page to 1 when search query or filter list changes
   useEffect(() => {

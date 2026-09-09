@@ -9,7 +9,7 @@ interface FormControl {
   label: string;
   name: string;
   placeholder?: string;
-  componentType: "input" | "file";
+  componentType: "input" | "file" | "textarea";
   disabled?: boolean;
 }
 
@@ -202,8 +202,8 @@ export const postNewJobFormControls: FormControl[] = [
   {
     label: "Description",
     name: "description",
-    placeholder: "Description",
-    componentType: "input",
+    placeholder: "Provide an overview, key responsibilities, and requirements...",
+    componentType: "textarea",
   },
   {
     label: "Skills",
