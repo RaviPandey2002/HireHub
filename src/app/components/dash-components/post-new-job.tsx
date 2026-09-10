@@ -6,16 +6,17 @@ import {
 import { postNewJobAction } from "actions/postNewJobAction";
 import { initialPostNewJobFormData, postNewJobFormControls } from "lib/utils";
 import { useState } from "react";
-import { CommonForm } from "@/components/common/common-form"
+import { CommonForm } from "@/components/common/common-form";
 import { toast } from "@/components/ui/use-toast";
+import { AppUser, JobOpening } from "types";
 
 export const PostNewJob = ({
   user,
   jobList,
   trigger,
 }: {
-  user: any;
-  jobList: any[];
+  user: AppUser | null;
+  jobList: JobOpening[];
   trigger?: React.ReactNode;
 }) => {
   const [showJobDialog, setShowJobDialog] = useState(false);
