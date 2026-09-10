@@ -34,7 +34,6 @@ import { deleteJobAction } from "actions/deleteJobAction";
 import { editJobAction } from "actions/editJobAction";
 import { toggleJobStatusAction } from "actions/toggleJobStatusAction";
 import { useToast } from "../ui/use-toast";
-import { JobOpening, JobApplication } from "types";
 import { JobOpening, JobApplication, AppUser } from "types";
 
 interface RecruiterJobCardProps {
@@ -44,7 +43,6 @@ interface RecruiterJobCardProps {
 
 export const RecruiterJobCard = ({ jobItem, jobApplications }: RecruiterJobCardProps) => {
   const [showApplicantsDrawer, setShowApplicantsDrawer] = useState(false);
-  const [currentCandidateDetails, setCurrentCandidateDetails] = useState<unknown>(null);
   const [currentCandidateDetails, setCurrentCandidateDetails] = useState<AppUser | null>(null);
   const [showCurrentCandidateDetailsModal, setShowCurrentCandidateDetailsModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);

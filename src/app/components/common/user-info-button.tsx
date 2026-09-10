@@ -50,7 +50,6 @@ export function UserInfoButton() {
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
         <button
-          className="relative rounded-full focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 transition-all group"
           className="relative rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all group"
           aria-label="User Account Menu"
         >

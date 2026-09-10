@@ -15,10 +15,6 @@ interface JobApplicantsProps {
   setShowApplicantsDrawer: (open: boolean) => void;
   showCurrentCandidateDetailsModal: boolean;
   setShowCurrentCandidateDetailsModal: (open: boolean) => void;
-  currentCandidateDetails: unknown;
-  setCurrentCandidateDetails: (details: unknown) => void;
-  jobItem: { id: string; title: string; companyName?: string };
-  jobApplications: unknown[];
   currentCandidateDetails: AppUser | null;
   setCurrentCandidateDetails: (details: AppUser | null) => void;
   jobItem: JobOpening | { id: string; title: string; companyName?: string };

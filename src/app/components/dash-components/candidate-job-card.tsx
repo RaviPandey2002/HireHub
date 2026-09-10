@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "../ui/button";
@@ -24,7 +23,6 @@ import {
   Eye,
   Loader2,
   AlertCircle,
-  Clock,
   Bookmark,
 } from "lucide-react";
 import CreateJobApplicationAction from "actions/createJobApplicationAction";
@@ -53,7 +51,6 @@ export const CandidateJobCard = ({
   const [hasAppliedLocally, setHasAppliedLocally] = useState(false);
   const [isBookmarking, setIsBookmarking] = useState(false);
 
-  const initialSaved = Array.isArray(user?.candidateInfo?.savedJobs)
   const initialSaved = isBookmarked !== undefined
     ? isBookmarked
     : Array.isArray(user?.candidateInfo?.savedJobs)

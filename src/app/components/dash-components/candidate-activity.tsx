@@ -36,30 +36,10 @@ import { withdrawApplicationAction } from "actions/withdrawApplicationAction";
 import { LinkedInJobDescription } from "./linkedin-job-description";
 import { JobOpening, JobApplication } from "types";
 
-export interface Job {
-    id: string;
-    title: string;
-    companyName: string;
-    location?: string;
-    type?: string;
-    experience?: string;
-    description?: string;
-    skills?: string;
-}
 export type Job = JobOpening;
 export type JobApplicant = JobApplication;
 
-export interface JobApplicant {
-    id: string;
-    status: string[];
-    jobId: string;
-    jobApplicationDate: string | Date;
-    candidateId?: string;
-}
-
 interface CandidateActivityProps {
-    jobList: Job[];
-    jobApplicants: JobApplicant[];
     jobList: JobOpening[];
     jobApplicants: JobApplication[];
 }
