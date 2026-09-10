@@ -4,26 +4,38 @@ import { CandidateJobCard } from "./candidate-job-card";
 import { PostNewJob } from "./post-new-job";
 import { RecruiterJobCard } from "./recruiter-job-card";
 import { JobFilter } from "./job-filter";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { AlertCircle, Search, ChevronLeft, ChevronRight } from "lucide-react";
-import Link from "next/link";
+import { AlertCircle, Search, ChevronLeft, ChevronRight, Bookmark } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useSearchParams, useRouter } from "next/navigation";
+import { AppUser, JobOpening, JobApplication } from "types";
 
 const ITEMS_PER_PAGE = 9;
 
-export const JobsListing = ({ user, allJobs, jobApplications }: { user: any; allJobs: any[]; jobApplications: any[] }) => {
+interface JobsListingProps {
+  user: AppUser | null;
+  allJobs: JobOpening[];
+  jobApplications: JobApplication[];
+}
+
+export const JobsListing = ({ user, allJobs, jobApplications }: JobsListingProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const companyFilter = searchParams.get("company");
 
-  const [jobList, setJobList] = useState(allJobs || []);
+  const [jobList, setJobList] = useState<JobOpening[]>(allJobs || []);
   const [searchQuery, setSearchQuery] = useState(companyFilter ?? "");
   const [currentPage, setCurrentPage] = useState(1);
+  const [savedOnly, setSavedOnly] = useState(false);
 
-  // Seed the search box with it so the filter is applied immediately.
+  const initialSavedIds: string[] = Array.isArray(user?.candidateInfo?.savedJobs)
+    ? (user.candidateInfo.savedJobs as string[])
+    : [];
+  const [savedJobIds, setSavedJobIds] = useState<string[]>(initialSavedIds);
+
+  // Seed the search box with company filter if present
   useEffect(() => {
     if (companyFilter) setSearchQuery(companyFilter);
   }, [companyFilter]);
@@ -33,15 +45,28 @@ export const JobsListing = ({ user, allJobs, jobApplications }: { user: any; all
     setJobList(allJobs || []);
   }, [allJobs]);
 
-  // Reset page to 1 when search query or filter list changes
+  // Reset page to 1 when search query, filter list, or saved tab changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery, jobList]);
+  }, [searchQuery, jobList, savedOnly]);
 
-  const filteredBySearch = searchQuery.trim() === ""
-    ? jobList
-    : jobList.filter((job) => {
-        const q = searchQuery.toLowerCase();
+  function handleBookmarkChange(jobId: string, isSaved: boolean) {
+    setSavedJobIds((prev) =>
+      isSaved ? [...prev, jobId] : prev.filter((id) => id !== jobId)
+    );
+  }
+
+  // Filter pipeline: saved tab + text search
+  const filteredJobs = useMemo(() => {
+    let list = jobList;
+
+    if (savedOnly) {
+      list = list.filter((job) => savedJobIds.includes(job.id));
+    }
+
+    if (searchQuery.trim() !== "") {
+      const q = searchQuery.toLowerCase();
+      list = list.filter((job) => {
         return (
           job.title?.toLowerCase().includes(q) ||
           job.description?.toLowerCase().includes(q) ||
@@ -49,17 +74,29 @@ export const JobsListing = ({ user, allJobs, jobApplications }: { user: any; all
           job.companyName?.toLowerCase().includes(q)
         );
       });
+    }
 
-  const totalPages = Math.ceil(filteredBySearch.length / ITEMS_PER_PAGE);
+    return list;
+  }, [jobList, savedOnly, savedJobIds, searchQuery]);
+
+  const totalPages = Math.ceil(filteredJobs.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedJobs = filteredBySearch.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedJobs = filteredJobs.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-200 dark:border-gray-800 pt-6 pb-6 gap-4">
-        <h1 className="text-3xl sm:text-4xl dark:text-white font-bold tracking-tight text-gray-900">
-          {user?.role === "Candidate" ? "Explore All Jobs" : "Jobs Dashboard"}
-        </h1>
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-gray-200 dark:border-gray-800 pb-6 gap-4">
+        <div>
+          <h1 className="text-3xl sm:text-4xl dark:text-white font-extrabold tracking-tight text-gray-900">
+            {user?.role === "Candidate" ? "Explore All Jobs" : "Jobs Dashboard"}
+          </h1>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            {user?.role === "Candidate"
+              ? "Discover verified engineering opportunities matching your technical skills."
+              : "Manage, edit, pause, and review applicants across your published openings."}
+          </p>
+        </div>
+
         <div className="flex items-center gap-2">
           <div className="relative hidden sm:block">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
@@ -71,14 +108,40 @@ export const JobsListing = ({ user, allJobs, jobApplications }: { user: any; all
               className="pl-9 w-48 lg:w-64"
             />
           </div>
-          {user?.role === "Candidate"
-            ? <JobFilter allJobs={allJobs} jobList={jobList} setJobList={setJobList} />
-            : <PostNewJob user={user} jobList={jobList} />}
+          {user?.role === "Candidate" ? (
+            <JobFilter allJobs={allJobs} jobList={jobList} setJobList={setJobList} />
+          ) : (
+            <PostNewJob user={user} jobList={jobList} />
+          )}
         </div>
       </div>
 
+      {/* Candidate Tab Switcher: All Roles vs Saved Jobs */}
+      {user?.role === "Candidate" && (
+        <div className="flex items-center gap-2 pt-1">
+          <Button
+            size="sm"
+            variant={!savedOnly ? "default" : "outline"}
+            onClick={() => setSavedOnly(false)}
+            className="text-xs font-semibold rounded-lg"
+          >
+            All Roles ({jobList.length})
+          </Button>
+
+          <Button
+            size="sm"
+            variant={savedOnly ? "default" : "outline"}
+            onClick={() => setSavedOnly(true)}
+            className="text-xs font-semibold rounded-lg gap-1.5"
+          >
+            <Bookmark className={`h-3.5 w-3.5 ${savedOnly ? "fill-white" : ""}`} />
+            Saved Jobs ({savedJobIds.length})
+          </Button>
+        </div>
+      )}
+
       {/* Mobile search */}
-      <div className="relative sm:hidden mt-4">
+      <div className="relative sm:hidden">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 pointer-events-none" />
         <Input
           type="search"
@@ -91,7 +154,7 @@ export const JobsListing = ({ user, allJobs, jobApplications }: { user: any; all
 
       {/* Active company filter pill */}
       {companyFilter && searchQuery === companyFilter && (
-        <div className="mt-4 flex items-center gap-2">
+        <div className="flex items-center gap-2">
           <span className="text-sm text-gray-500 dark:text-gray-400">
             Showing jobs at
           </span>
@@ -111,14 +174,14 @@ export const JobsListing = ({ user, allJobs, jobApplications }: { user: any; all
         </div>
       )}
 
-      <div className="mt-8 pb-16">
-        {filteredBySearch.length > 0 ? (
+      <div className="pb-16">
+        {filteredJobs.length > 0 ? (
           <div>
             <div className="flex items-center justify-between mb-4 text-sm text-gray-500 dark:text-gray-400">
               <span>
                 Showing <strong className="font-semibold text-gray-800 dark:text-gray-200">{startIndex + 1}</strong>–
-                <strong className="font-semibold text-gray-800 dark:text-gray-200">{Math.min(startIndex + ITEMS_PER_PAGE, filteredBySearch.length)}</strong> of{" "}
-                <strong className="font-semibold text-gray-800 dark:text-gray-200">{filteredBySearch.length}</strong> jobs
+                <strong className="font-semibold text-gray-800 dark:text-gray-200">{Math.min(startIndex + ITEMS_PER_PAGE, filteredJobs.length)}</strong> of{" "}
+                <strong className="font-semibold text-gray-800 dark:text-gray-200">{filteredJobs.length}</strong> jobs
               </span>
             </div>
 
@@ -130,6 +193,8 @@ export const JobsListing = ({ user, allJobs, jobApplications }: { user: any; all
                     jobItem={jobItem}
                     user={user}
                     jobApplications={jobApplications}
+                    isBookmarked={savedJobIds.includes(jobItem.id)}
+                    onBookmarkChange={handleBookmarkChange}
                   />
                 ) : (
                   <RecruiterJobCard
@@ -182,6 +247,17 @@ export const JobsListing = ({ user, allJobs, jobApplications }: { user: any; all
               </div>
             )}
           </div>
+        ) : savedOnly ? (
+          <Alert>
+            <Bookmark className="h-4 w-4 text-amber-500" />
+            <AlertTitle>No saved jobs yet</AlertTitle>
+            <AlertDescription>
+              Click the bookmark icon on any job card to save opportunities you want to apply to later.
+            </AlertDescription>
+            <Button className="mt-4" variant="outline" onClick={() => setSavedOnly(false)}>
+              Browse all jobs
+            </Button>
+          </Alert>
         ) : searchQuery.trim() !== "" ? (
           <Alert>
             <AlertCircle className="h-4 w-4" />

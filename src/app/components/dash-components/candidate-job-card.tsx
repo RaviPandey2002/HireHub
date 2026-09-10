@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
@@ -20,66 +21,113 @@ import {
   Briefcase,
   Sparkles,
   CheckCircle2,
-  ArrowUpRight,
   Eye,
   Loader2,
   AlertCircle,
   Clock,
+  Bookmark,
 } from "lucide-react";
 import CreateJobApplicationAction from "actions/createJobApplicationAction";
+import { toggleSaveJobAction } from "actions/toggleSaveJobAction";
 import { useToast } from "../ui/use-toast";
 import { LinkedInJobDescription } from "./linkedin-job-description";
-
-interface JobItem {
-  id: string;
-  title: string;
-  companyName: string;
-  location: string;
-  type: string;
-  experience: string;
-  description: string;
-  skills: string;
-  recruiterId: string;
-}
-
-interface User {
-  id: string;
-  name?: string;
-  email?: string;
-  role: string;
-  isPremiumUser?: boolean;
-}
-
-interface JobApplication {
-  jobId: string;
-  status: string[];
-}
+import { JobOpening, AppUser, JobApplication } from "types";
 
 interface CandidateJobCardProps {
-  jobItem: JobItem;
-  user: User;
+  jobItem: JobOpening;
+  user: AppUser | null;
   jobApplications: JobApplication[];
+  isBookmarked?: boolean;
+  onBookmarkChange?: (jobId: string, isSaved: boolean) => void;
 }
 
 export const CandidateJobCard = ({
   jobItem,
   user,
   jobApplications,
+  isBookmarked,
+  onBookmarkChange,
 }: CandidateJobCardProps) => {
   const [showJobDetailsModal, setShowJobDetailsModal] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
   const [hasAppliedLocally, setHasAppliedLocally] = useState(false);
+  const [isBookmarking, setIsBookmarking] = useState(false);
+
+  const initialSaved = Array.isArray(user?.candidateInfo?.savedJobs)
+  const initialSaved = isBookmarked !== undefined
+    ? isBookmarked
+    : Array.isArray(user?.candidateInfo?.savedJobs)
+    ? user?.candidateInfo?.savedJobs.includes(jobItem.id)
+    : false;
+  const [isSaved, setIsSaved] = useState(initialSaved);
+
+  useEffect(() => {
+    if (isBookmarked !== undefined) {
+      setIsSaved(isBookmarked);
+    }
+  }, [isBookmarked]);
+
   const { toast } = useToast();
 
   const isAppliedFromProps =
     (jobApplications || []).findIndex((item) => item.jobId === jobItem?.id) > -1;
   const alreadyApplied = isAppliedFromProps || hasAppliedLocally;
+  const isClosed = jobItem.status === "Closed";
 
   const isFreeQuotaExceeded =
     !user?.isPremiumUser && (jobApplications || []).length >= 2 && !alreadyApplied;
 
+  async function handleToggleSave() {
+    if (!user) {
+      toast({
+        title: "Sign in required",
+        description: "Please sign in as a candidate to bookmark jobs.",
+      });
+      return;
+    }
+
+    const nextState = !isSaved;
+    setIsSaved(nextState);
+    setIsBookmarking(true);
+
+    try {
+      const res = await toggleSaveJobAction(jobItem.id);
+      if (res?.error) {
+        setIsSaved(!nextState); // rollback
+        toast({
+          variant: "destructive",
+          title: "Failed to update bookmark",
+          description: res.error,
+        });
+      } else {
+        toast({
+          title: nextState ? "Job Saved 🔖" : "Job Removed from Saved",
+          description: nextState
+            ? `"${jobItem.title}" was added to your bookmarked positions.`
+            : `"${jobItem.title}" was removed from your bookmarks.`,
+        });
+        if (onBookmarkChange) {
+          onBookmarkChange(jobItem.id, nextState);
+        }
+      }
+    } catch {
+      setIsSaved(!nextState);
+    } finally {
+      setIsBookmarking(false);
+    }
+  }
+
   async function handlejobApply() {
     if (alreadyApplied) return;
+
+    if (isClosed) {
+      toast({
+        variant: "destructive",
+        title: "Position Closed",
+        description: "This company is no longer accepting new applications for this role.",
+      });
+      return;
+    }
 
     if (!user?.isPremiumUser && (jobApplications || []).length >= 2) {
       toast({
@@ -151,9 +199,15 @@ export const CandidateJobCard = ({
 
   return (
     <>
-      <Card className="group flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm hover:shadow-md hover:border-emerald-500/40 dark:hover:border-emerald-500/40 transition-all duration-200">
+      <Card
+        className={`group flex flex-col justify-between overflow-hidden rounded-2xl border transition-all duration-200 shadow-sm hover:shadow-md ${
+          isClosed
+            ? "border-slate-200/60 dark:border-slate-800/60 bg-slate-50/40 dark:bg-slate-950/40 opacity-85"
+            : "border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-950 hover:border-emerald-500/40 dark:hover:border-emerald-500/40"
+        }`}
+      >
         <CardHeader className="p-5 pb-3">
-          {/* Top Row: Company avatar + Name + Status Badge */}
+          {/* Top Row: Company avatar + Name + Status Badge + Bookmark */}
           <div className="flex items-start justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white font-bold text-sm shadow-sm">
@@ -170,16 +224,41 @@ export const CandidateJobCard = ({
               </div>
             </div>
 
-            {alreadyApplied ? (
-              <Badge className="shrink-0 bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800 font-semibold text-[11px] gap-1 px-2 py-0.5">
-                <CheckCircle2 className="h-3 w-3" />
-                Applied
-              </Badge>
-            ) : (
-              <Badge variant="outline" className="shrink-0 text-[11px] font-medium text-slate-600 dark:text-slate-400">
-                {jobItem?.type || "Full-time"}
-              </Badge>
-            )}
+            <div className="flex items-center gap-1.5 shrink-0">
+              {/* Bookmark button */}
+              {user?.role === "Candidate" && (
+                <button
+                  onClick={handleToggleSave}
+                  disabled={isBookmarking}
+                  title={isSaved ? "Remove bookmark" : "Save this job"}
+                  className={`p-1.5 rounded-lg border transition-all ${
+                    isSaved
+                      ? "bg-amber-50 dark:bg-amber-950/50 border-amber-300 dark:border-amber-800 text-amber-600 dark:text-amber-400"
+                      : "border-slate-200 dark:border-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  }`}
+                >
+                  <Bookmark className={`h-3.5 w-3.5 ${isSaved ? "fill-amber-500 text-amber-500" : ""}`} />
+                </button>
+              )}
+
+              {alreadyApplied ? (
+                <Badge className="shrink-0 bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800 font-semibold text-[11px] gap-1 px-2 py-0.5">
+                  <CheckCircle2 className="h-3 w-3" />
+                  Applied
+                </Badge>
+              ) : isClosed ? (
+                <Badge
+                  variant="outline"
+                  className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-700"
+                >
+                  Closed
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="shrink-0 text-[11px] font-medium text-slate-600 dark:text-slate-400">
+                  {jobItem?.type || "Full-time"}
+                </Badge>
+              )}
+            </div>
           </div>
 
           {/* Metadata Row: Location, Experience */}
@@ -248,6 +327,15 @@ export const CandidateJobCard = ({
               <CheckCircle2 className="h-3.5 w-3.5" />
               Applied
             </Button>
+          ) : isClosed ? (
+            <Button
+              variant="outline"
+              size="sm"
+              disabled
+              className="text-xs font-semibold text-slate-400 border-slate-200 dark:border-slate-800"
+            >
+              Hiring Closed
+            </Button>
           ) : (
             <Button
               size="sm"
@@ -261,10 +349,7 @@ export const CandidateJobCard = ({
                   Applying...
                 </>
               ) : (
-                <>
-                  Apply Now
-                  <ArrowUpRight className="h-3.5 w-3.5" />
-                </>
+                "Quick Apply"
               )}
             </Button>
           )}
@@ -273,90 +358,68 @@ export const CandidateJobCard = ({
 
       {/* Centered Job Details Modal Dialog */}
       <Dialog open={showJobDetailsModal} onOpenChange={setShowJobDetailsModal}>
-        <DialogContent className="p-6 sm:max-w-2xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader className="px-0 pr-8 pb-4 border-b border-slate-200 dark:border-slate-800">
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-              <div className="flex items-start gap-3.5">
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white font-extrabold text-base shadow-sm">
-                  {companyMonogram}
-                </div>
-                <div>
-                  <DialogTitle className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-                    {jobItem?.title}
-                  </DialogTitle>
-                  <div className="flex items-center gap-2 mt-1 text-sm font-semibold text-slate-600 dark:text-slate-400">
-                    <Building2 className="h-4 w-4 text-slate-400" />
-                    <span>{jobItem?.companyName}</span>
-                  </div>
-                </div>
+        <DialogContent className="sm:max-w-2xl max-h-[85vh] overflow-y-auto p-6">
+          <DialogHeader className="pr-8 pb-4 border-b border-slate-200 dark:border-slate-800">
+            <div className="flex items-start gap-3.5">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 to-teal-700 text-white font-extrabold text-base shadow-sm">
+                {companyMonogram}
               </div>
-              <DialogDescription className="sr-only">
-                Detailed job requirements and description for {jobItem?.title} at {jobItem?.companyName}
-              </DialogDescription>
-
-              {/* Action in header */}
-              <div className="flex items-center gap-2 shrink-0">
-                {alreadyApplied ? (
-                  <Button variant="outline" disabled className="gap-1 text-xs text-emerald-600">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    Already Applied
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={handlejobApply}
-                    disabled={isApplying}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs gap-1"
-                  >
-                    {isApplying ? (
-                      <>
-                        <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                        Applying...
-                      </>
-                    ) : (
-                      <>
-                        Apply Now
-                        <ArrowUpRight className="h-3.5 w-3.5" />
-                      </>
-                    )}
-                  </Button>
-                )}
+              <div className="min-w-0 flex-1">
+                <DialogTitle className="text-2xl font-extrabold text-slate-900 dark:text-white">
+                  {jobItem?.title}
+                </DialogTitle>
+                <div className="flex items-center gap-2 mt-1 text-sm font-semibold text-slate-600 dark:text-slate-400">
+                  <Building2 className="h-4 w-4 text-slate-400" />
+                  <span>{jobItem?.companyName}</span>
+                </div>
               </div>
             </div>
+            <DialogDescription className="sr-only">
+              Job opening overview and application details for {jobItem?.title} at {jobItem?.companyName}
+            </DialogDescription>
 
-            {/* Quick Specs Badges */}
-            <div className="flex flex-wrap items-center gap-2 mt-4">
-              <Badge variant="secondary" className="gap-1 text-xs font-medium">
-                <MapPin className="h-3 w-3" />
-                {jobItem?.location}
-              </Badge>
-              <Badge variant="outline" className="gap-1 text-xs font-medium">
-                <Briefcase className="h-3 w-3" />
-                {jobItem?.type}
-              </Badge>
-              <Badge variant="outline" className="gap-1 text-xs font-medium">
-                <Sparkles className="h-3 w-3" />
-                {jobItem?.experience?.toLowerCase().includes("yr") || jobItem?.experience?.toLowerCase().includes("year")
-                  ? `${jobItem.experience} exp required`
-                  : `${jobItem?.experience} yr exp required`}
-              </Badge>
+            {/* Badges in modal */}
+            <div className="flex flex-wrap items-center gap-2 mt-3 pt-2">
+              {isClosed ? (
+                <Badge variant="outline" className="text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-900 border-slate-300 dark:border-slate-700">
+                  Hiring Closed
+                </Badge>
+              ) : (
+                <Badge variant="secondary" className="gap-1 text-xs">
+                  <MapPin className="h-3 w-3" />
+                  {jobItem?.location}
+                </Badge>
+              )}
+              {jobItem?.type && (
+                <Badge variant="outline" className="gap-1 text-xs">
+                  <Briefcase className="h-3 w-3" />
+                  {jobItem.type}
+                </Badge>
+              )}
+              {jobItem?.experience && (
+                <Badge variant="outline" className="gap-1 text-xs">
+                  <Sparkles className="h-3 w-3" />
+                  {jobItem.experience} yr exp
+                </Badge>
+              )}
             </div>
           </DialogHeader>
 
-          {/* Quota Limit Notice if applicable */}
+          {/* Freemium Banner inside Modal */}
           {isFreeQuotaExceeded && (
             <Alert className="mt-4 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40">
-              <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-              <AlertDescription className="text-xs text-amber-800 dark:text-amber-200">
-                You have reached the free application limit (2/2 applied).{" "}
-                <Link href="/membership" className="font-bold underline underline-offset-2">
-                  Upgrade to Premium
+              <AlertCircle className="h-4 w-4 text-amber-600" />
+              <AlertDescription className="text-xs text-amber-800 dark:text-amber-300">
+                You have reached your 2-application limit on the free tier.{" "}
+                <Link href="/membership" className="font-bold underline">
+                  Upgrade your membership
                 </Link>{" "}
-                for unlimited applications.
+                to unlock unlimited applications.
               </AlertDescription>
             </Alert>
           )}
 
-          {/* LinkedIn Style Job Description & Highlights */}
+          {/* LinkedIn Style Job Description */}
           <div className="mt-5">
             <LinkedInJobDescription
               description={jobItem?.description}
@@ -368,44 +431,44 @@ export const CandidateJobCard = ({
             />
           </div>
 
-          {/* Hiring Workflow Info */}
-          <div className="mt-6 p-4 rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-emerald-600 shrink-0" />
-              <span>Typical response turnaround within <strong>24–48 hours</strong></span>
-            </div>
-            <Link href="/activity" className="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">
-              View Your Activity
-            </Link>
-          </div>
-
-          <DialogFooter className="px-0 pt-6 mt-4 border-t border-slate-200 dark:border-slate-800 flex flex-row items-center justify-end gap-2">
+          <DialogFooter className="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <Button
               variant="outline"
               onClick={() => setShowJobDetailsModal(false)}
             >
               Close
             </Button>
-            {!alreadyApplied && (
-              <Button
-                onClick={handlejobApply}
-                disabled={isApplying}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
-              >
-                {isApplying ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  "Submit Application"
-                )}
-              </Button>
-            )}
+
+            <div className="flex items-center gap-2">
+              {alreadyApplied ? (
+                <Button disabled variant="outline" className="text-emerald-700 border-emerald-300 gap-1.5">
+                  <CheckCircle2 className="h-4 w-4" />
+                  Already Applied
+                </Button>
+              ) : isClosed ? (
+                <Button disabled variant="outline" className="text-slate-400">
+                  Hiring Closed
+                </Button>
+              ) : (
+                <Button
+                  onClick={handlejobApply}
+                  disabled={isApplying}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
+                >
+                  {isApplying ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    "Submit Application"
+                  )}
+                </Button>
+              )}
+            </div>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
   );
 };
-
