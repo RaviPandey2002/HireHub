@@ -27,7 +27,9 @@ const candidateSections = [
   { heading: "Online Presence", fields: ["linkedinProfile", "githubProfile"] },
 ];
 
-export const OnBoarding = ({ currentUser }: { currentUser: any }) => {
+import { AppUser } from "types";
+
+export const OnBoarding = ({ currentUser }: { currentUser: AppUser | null }) => {
   const { toast } = useToast();
   const { update } = useSession();
   const [currentTab, setCurrentTab] = useState("candidate");

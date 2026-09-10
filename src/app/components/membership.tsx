@@ -20,6 +20,7 @@ import { useToast } from "./ui/use-toast";
 import { membershipPlans } from "lib/utils";
 import { createStripePaymentAction } from "actions/createStripePaymentAction";
 import { createPriceIdAction } from "actions/createPriceIdAction";
+import { AppUser } from "types";
 
 const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 const stripePromise = stripePublishableKey ? loadStripe(stripePublishableKey) : null;
@@ -91,7 +92,7 @@ const faqs = [
   },
 ];
 
-export const Membership = ({ user }: { user: any }) => {
+export const Membership = ({ user }: { user: AppUser | null }) => {
   const { toast } = useToast();
   const [processingPlan, setProcessingPlan] = useState<string | null>(null);
 
@@ -186,6 +187,7 @@ export const Membership = ({ user }: { user: any }) => {
               <Badge className="bg-amber-500 hover:bg-amber-600 text-white font-semibold gap-1">
                 <Sparkles className="h-3 w-3" /> Active:{" "}
                 {planDisplayNames[memberShipType] || "Premium Tier"}
+                {planDisplayNames[memberShipType || ""] || "Premium Tier"}
               </Badge>
             ) : (
               <Badge variant="secondary" className="font-medium text-slate-600 dark:text-slate-400">

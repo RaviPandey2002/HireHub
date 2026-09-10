@@ -31,13 +31,14 @@ import {
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 import { cn } from "lib/utils";
+import { AppUser } from "types";
 
 export const HeaderSheet = ({
   menuItems,
   user,
 }: {
   menuItems: { label: string; path: string; show: boolean }[];
-  user: any;
+  user: AppUser | null;
 }) => {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);

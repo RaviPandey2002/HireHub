@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
+import { AppUser, CandidateDashboardStats, JobOpening } from "types";
 
 interface ApplicationJob {
   id?: string;
@@ -54,15 +55,9 @@ interface FeaturedJob {
 }
 
 interface CandidateDashboardProps {
-  user: {
-    id?: string;
-    name?: string;
-    email?: string;
-    isPremiumUser?: boolean;
-    candidateInfo?: any;
-  };
-  stats: CandidateStats | null;
-  featuredJobs?: FeaturedJob[];
+  user: AppUser | null;
+  stats: CandidateDashboardStats | null;
+  featuredJobs?: JobOpening[];
   totalJobsCount?: number;
 }
 

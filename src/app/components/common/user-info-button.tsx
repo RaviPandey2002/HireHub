@@ -51,6 +51,7 @@ export function UserInfoButton() {
       <DropdownMenuTrigger asChild>
         <button
           className="relative rounded-full focus:outline-hidden focus:ring-2 focus:ring-emerald-500/50 transition-all group"
+          className="relative rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all group"
           aria-label="User Account Menu"
         >
           <Avatar className="h-9 w-9 ring-2 ring-transparent group-hover:ring-slate-300 dark:group-hover:ring-slate-700 transition-all cursor-pointer">

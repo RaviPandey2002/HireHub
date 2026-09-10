@@ -19,6 +19,7 @@ import {
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import { PostNewJob } from "./post-new-job";
+import { AppUser, RecruiterDashboardStats } from "types";
 
 interface Application {
   id: string;
@@ -58,14 +59,8 @@ interface RecruiterStats {
 }
 
 interface RecruiterDashboardProps {
-  user: {
-    id?: string;
-    name?: string;
-    email?: string;
-    isPremiumUser?: boolean;
-    recruiterInfo?: { companyName?: string };
-  };
-  stats: RecruiterStats | null;
+  user: AppUser | null;
+  stats: RecruiterDashboardStats | null;
 }
 
 function formatUtcDate(dateString: string) {

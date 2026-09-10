@@ -34,6 +34,7 @@ import {
 import { useToast } from "../ui/use-toast";
 import { withdrawApplicationAction } from "actions/withdrawApplicationAction";
 import { LinkedInJobDescription } from "./linkedin-job-description";
+import { JobOpening, JobApplication } from "types";
 
 export interface Job {
     id: string;
@@ -45,6 +46,8 @@ export interface Job {
     description?: string;
     skills?: string;
 }
+export type Job = JobOpening;
+export type JobApplicant = JobApplication;
 
 export interface JobApplicant {
     id: string;
@@ -57,6 +60,8 @@ export interface JobApplicant {
 interface CandidateActivityProps {
     jobList: Job[];
     jobApplicants: JobApplicant[];
+    jobList: JobOpening[];
+    jobApplicants: JobApplication[];
 }
 
 function formatUtcDate(dateInput: string | Date) {

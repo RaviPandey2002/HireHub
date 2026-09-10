@@ -15,15 +15,18 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import Link from "next/link";
 import { Badge } from "../ui/badge";
+import { CompanySummary } from "types";
 
 interface Company {
   companyName: string;
   location: string;
   jobCount: number;
 }
+export type Company = CompanySummary;
 
 interface CompaniesViewProps {
   companies: Company[];
+  companies: CompanySummary[];
 }
 
 function getCompanyMonogram(name: string) {

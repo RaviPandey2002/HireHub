@@ -27,8 +27,9 @@ import {
   MapPin,
   Calendar,
 } from "lucide-react";
+import { AppUser } from "types";
 
-export const AccountInfo = ({ user }: { user: any }) => {
+export const AccountInfo = ({ user }: { user: AppUser | null }) => {
   const { toast } = useToast();
   const { update } = useSession();
   const [isPending, startTransition] = useTransition();

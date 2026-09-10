@@ -37,19 +37,20 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { getResumeUrlAction } from "actions/getResumeUrlAction";
+import { AppUser, JobOpening, CandidateInfo } from "types";
 
 interface CandidateItem {
   id: string;
   name: string;
   email: string;
   image?: string | null;
-  candidateInfo?: any;
+  candidateInfo?: CandidateInfo | null;
 }
 
 interface TalentViewProps {
-  user: any;
+  user: AppUser | null;
   candidates: CandidateItem[];
-  recruiterJobs: any[];
+  recruiterJobs: JobOpening[];
 }
 
 const POPULAR_SKILLS = [

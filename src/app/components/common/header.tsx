@@ -3,8 +3,9 @@ import Link from "next/link";
 import { HeaderSheet } from "./header-sheet";
 import { UserInfoButton } from "./user-info-button";
 import { NavLink } from "./nav-link";
+import { AppUser } from "types";
 
-async function Header({ user }: { user: any }) {
+async function Header({ user }: { user: AppUser | null }) {
   const isOnboarded = !!user && user.role !== "OnBoarding";
   const isOnboarding = user?.role === "OnBoarding";
 

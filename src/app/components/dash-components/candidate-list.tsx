@@ -9,6 +9,7 @@ import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "../ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, ExternalLink } from "lucide-react";
+import { AppUser, JobApplication } from "types";
 
 export const CandidateList = ({
     currentCandidateDetails,
@@ -17,18 +18,18 @@ export const CandidateList = ({
     showCurrentCandidateDetailsModal,
     setShowCurrentCandidateDetailsModal
 }: {
-    currentCandidateDetails: any;
-    setCurrentCandidateDetails: (d: any) => void;
-    jobApplications: any[];
+    currentCandidateDetails: AppUser | null;
+    setCurrentCandidateDetails: (d: AppUser | null) => void;
+    jobApplications: JobApplication[];
     showCurrentCandidateDetailsModal: boolean;
     setShowCurrentCandidateDetailsModal: (b: boolean) => void;
 }) => {
     const { toast } = useToast();
-    const [selectedApplication, setSelectedApplication] = useState<any>(null);
+    const [selectedApplication, setSelectedApplication] = useState<JobApplication | null>(null);
     const [isUpdatingStatus, setIsUpdatingStatus] = useState<string | null>(null);
     const [isLoadingResume, setIsLoadingResume] = useState(false);
 
-    async function handleOpenCandidateModal(applicantItem: any) {
+    async function handleOpenCandidateModal(applicantItem: JobApplication) {
         setSelectedApplication(applicantItem);
         const data = await getCandidateDetailsByIDAction(applicantItem?.candidateId);
         if (data) {

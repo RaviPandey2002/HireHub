@@ -41,35 +41,11 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { updateJobApplicationAction } from "actions/updateJobApplicationAction";
 import { getResumeUrlAction } from "actions/getResumeUrlAction";
-
-interface EnrichedApplicant {
-  id: string;
-  candidateId: string;
-  jobId: string;
-  name: string;
-  email: string;
-  status: string[];
-  jobApplicationDate: string | Date;
-  job?: {
-    id: string;
-    title: string;
-    companyName: string;
-    location?: string;
-    type?: string;
-  } | null;
-  candidate?: {
-    id: string;
-    name?: string;
-    email?: string;
-    image?: string;
-    candidateInfo?: any;
-  } | null;
-}
-
+import { AppUser, JobOpening, EnrichedApplicant } from "types";
 interface ApplicantsViewProps {
-  user: any;
+  user: AppUser | null;
   initialApplicants: EnrichedApplicant[];
-  jobs: any[];
+  jobs: JobOpening[];
 }
 
 function formatUtcDate(dateInput: string | Date) {

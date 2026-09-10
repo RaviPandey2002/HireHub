@@ -19,11 +19,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { filterMenuDataArray } from 'lib/utils';
+import { JobOpening } from 'types';
 
 interface JobFilterProps {
-  allJobs: any[];
-  jobList: any[];
-  setJobList: (jobs: any[]) => void;
+  allJobs: JobOpening[];
+  jobList: JobOpening[];
+  setJobList: (jobs: JobOpening[]) => void;
 }
 
 export function JobFilter({ allJobs, jobList: _jobList, setJobList }: JobFilterProps) {

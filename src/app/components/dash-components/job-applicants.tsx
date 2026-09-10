@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "../ui/dialog";
 import { CandidateList } from "./candidate-list";
+import { AppUser, JobApplication, JobOpening } from "types";
 
 interface JobApplicantsProps {
   showApplicantsDrawer: boolean;
@@ -18,6 +19,10 @@ interface JobApplicantsProps {
   setCurrentCandidateDetails: (details: unknown) => void;
   jobItem: { id: string; title: string; companyName?: string };
   jobApplications: unknown[];
+  currentCandidateDetails: AppUser | null;
+  setCurrentCandidateDetails: (details: AppUser | null) => void;
+  jobItem: JobOpening | { id: string; title: string; companyName?: string };
+  jobApplications: JobApplication[];
 }
 
 export const JobApplicants = ({
