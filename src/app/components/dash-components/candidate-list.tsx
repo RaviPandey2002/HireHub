@@ -6,7 +6,7 @@ import { updateJobApplicationAction } from "actions/updateJobApplicationAction";
 import { getResumeUrlAction } from "actions/getResumeUrlAction";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "../ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { Loader2, ExternalLink } from "lucide-react";
 
@@ -165,6 +165,9 @@ export const CandidateList = ({
                 }}
             >
                 <DialogContent className="max-w-lg">
+                    <DialogDescription className="sr-only">
+                        Candidate profile and resume review
+                    </DialogDescription>
                     <div className="flex items-center justify-between gap-3 pr-6">
                         <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
                             {info?.name}

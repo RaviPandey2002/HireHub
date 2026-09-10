@@ -324,7 +324,7 @@ export const RecruiterDashboard = ({ user, stats }: RecruiterDashboardProps) => 
 
         {/* Shortcut 2: Candidate Pipeline */}
         <Link
-          href="/jobs"
+          href="/applicants"
           className="group rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm hover:shadow-md hover:border-blue-300 dark:hover:border-blue-700 transition-all flex flex-col justify-between"
         >
           <div>
@@ -381,10 +381,10 @@ export const RecruiterDashboard = ({ user, stats }: RecruiterDashboardProps) => 
               </Badge>
             </div>
             <Link
-              href="/jobs"
+              href="/applicants"
               className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
             >
-              All in Jobs <ArrowRight className="h-3 w-3" />
+              View Full Pipeline <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
 

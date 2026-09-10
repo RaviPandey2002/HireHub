@@ -33,6 +33,20 @@ interface FeedViewProps {
 
 const ITEMS_PER_PAGE = 8;
 
+function formatUtcDate(dateInput: string | Date) {
+  try {
+    const d = new Date(dateInput);
+    if (isNaN(d.getTime())) return String(dateInput);
+    const months = [
+      "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    ];
+    return `${months[d.getUTCMonth()]} ${d.getUTCDate()}, ${d.getUTCFullYear()}`;
+  } catch {
+    return String(dateInput);
+  }
+}
+
 export const FeedView = ({ user, data }: FeedViewProps) => {
   const isRecruiter = user?.role === "Recruiter";
   const [currentPage, setCurrentPage] = useState(1);
@@ -83,7 +97,7 @@ export const FeedView = ({ user, data }: FeedViewProps) => {
               (paginatedItems as FeedApplication[]).map((app) => (
                 <div
                   key={app.id}
-                  className="flex items-start justify-between rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-5 hover:bg-white dark:hover:bg-gray-800 transition-colors"
+                  className="flex items-start justify-between rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-5 hover:bg-white dark:hover:bg-gray-800 transition-colors"
                 >
                   <div className="flex flex-col gap-1">
                     <p className="font-semibold text-gray-900 dark:text-white text-base">
@@ -98,9 +112,9 @@ export const FeedView = ({ user, data }: FeedViewProps) => {
                       ))}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 shrink-0 ml-4">
+                  <div className="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500 shrink-0 ml-4" suppressHydrationWarning>
                     <Clock className="h-3.5 w-3.5" />
-                    {new Date(app.jobApplicationDate).toLocaleDateString()}
+                    {formatUtcDate(app.jobApplicationDate)}
                   </div>
                 </div>
               ))
@@ -108,7 +122,7 @@ export const FeedView = ({ user, data }: FeedViewProps) => {
               (paginatedItems as FeedJob[]).map((job) => (
                 <div
                   key={job.id}
-                  className="rounded-xl border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-5 hover:bg-white dark:hover:bg-gray-800 transition-colors"
+                  className="rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 p-5 hover:bg-white dark:hover:bg-gray-800 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex flex-col gap-1">

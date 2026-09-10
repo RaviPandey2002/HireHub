@@ -1,166 +1,177 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
-import { Filter } from 'lucide-react'
-import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
+import { useState, useMemo } from 'react';
+import { Filter } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet"
-import { filterMenuDataArray } from 'lib/utils'
+} from "@/components/ui/dialog";
+import { filterMenuDataArray } from 'lib/utils';
 
+interface JobFilterProps {
+  allJobs: any[];
+  jobList: any[];
+  setJobList: (jobs: any[]) => void;
+}
 
-export function JobFilter({ allJobs, jobList, setJobList }) {
-  const [filteredJobs, setFilteredJobs] = useState(allJobs)
-  const [filters, setFilters] = useState<Record<string, string>>({})
-  const [filterMenus, setFilterMenus] = useState<Array<{ id: string; name: string; options: string[] }>>([])
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isSheetOpen, setIsSheetOpen] = useState(false)
-  const [appliedFilters, setAppliedFilters] = useState<Record<string, string>>({})
+export function JobFilter({ allJobs, jobList: _jobList, setJobList }: JobFilterProps) {
+  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Generate options from allJobs dynamically
+  const filterMenus = useMemo(() => {
+    return filterMenuDataArray.map((item) => {
+      const uniqueOptions = Array.from(
+        new Set(
+          (allJobs || [])
+            .map((job) => job?.[item.id])
+            .filter((val): val is string => typeof val === 'string' && val.trim().length > 0)
+        )
+      );
+      return {
+        id: item.id,
+        name: item.label,
+        options: uniqueOptions,
+      };
+    });
+  }, [allJobs]);
+
   const activeFiltersCount = Object.keys(filters).length;
 
-  useEffect(() => {
-    const generatedFilterMenus = filterMenuDataArray.map(item => ({
-      id: item.id,
-      name: item.label,
-      options: [...new Set(filteredJobs.map(listItem => listItem[item.id as keyof typeof listItem]))] as string[], // Type assertion to enforce string[]
-    }));
-    setFilterMenus(generatedFilterMenus);
-  }, [filteredJobs]);
-
-
   const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => ({ ...prev, [key]: value }))
-  }
-
-  const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
-    applyFilters(allJobs); 
-  }
-  
-  const applyFilters = (jobsToFilter) => {
-    setAppliedFilters(filters);
-    const newFilteredJobs = jobsToFilter.filter(job => {
-      return Object.entries(filters).every(([key, value]) => {
-        return job[key as keyof typeof job] === value;
+    if (!value || value === "__ALL__") {
+      setFilters((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
       });
-    });
-    setJobList(newFilteredJobs);
-    setIsDialogOpen(false);
-    setIsSheetOpen(false);
-  }
+    } else {
+      setFilters((prev) => ({ ...prev, [key]: value }));
+    }
+  };
 
+  const applyFilters = () => {
+    const activeEntries = Object.entries(filters).filter(([_, v]) => v && v !== "__ALL__");
+    if (activeEntries.length === 0) {
+      setJobList(allJobs || []);
+    } else {
+      const filtered = (allJobs || []).filter((job) => {
+        return activeEntries.every(([key, value]) => job?.[key] === value);
+      });
+      setJobList(filtered);
+    }
+    setIsDialogOpen(false);
+  };
 
   const resetFilters = () => {
-    setFilters({})
-    setJobList(allJobs)
-  }
-
-  const FilterForm = () => (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {filterMenus.map((menu) => (
-        <div key={menu.id}>
-          <Label htmlFor={menu.id}>{menu.name}</Label>
-          <Select
-            value={filters[menu.id] || ''}
-            onValueChange={(value) => handleFilterChange(menu.id, value)}
-          >
-            <SelectTrigger id={menu.id}>
-              <SelectValue placeholder={`${menu.name}`} />
-            </SelectTrigger>
-            <SelectContent>
-              {menu.options.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      ))}
-      <div className="flex justify-end space-x-4">
-        <Button variant="outline" type="button" onClick={resetFilters}>
-          Reset
-        </Button>
-        <Button type="submit">Apply Filters</Button>
-      </div>
-    </form>
-  )
-
-  // const FilterButton = ({ onClick, className }: { onClick: () => void, className: string }) => (
-  //   <Button
-  //     variant={activeFiltersCount > 0 ? "default" : "outline"}
-  //     className={`${className} ${activeFiltersCount > 0 ? "bg-primary text-primary-foreground font-bold" : ""}`}
-  //     onClick={onClick}
-  //   >
-  //     <Filter className={`mr-2 h-4 w-4 ${activeFiltersCount > 0 ? "animate-pulse" : ""}`} />
-  //     Filters {activeFiltersCount > 0 ? `( ${activeFiltersCount} )` : ""}
-  //   </Button>
-  // )
+    setFilters({});
+    setJobList(allJobs || []);
+    setIsDialogOpen(false);
+  };
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4">
-      {/* Desktop Dialog */}
+    <div>
+      <Button
+        variant={activeFiltersCount > 0 ? "default" : "outline"}
+        size="sm"
+        onClick={() => setIsDialogOpen(true)}
+        className={`gap-1.5 text-xs font-medium h-9 ${
+          activeFiltersCount > 0
+            ? "bg-gray-900 text-white dark:bg-white dark:text-gray-900"
+            : "border-gray-200 dark:border-gray-800"
+        }`}
+      >
+        <Filter className="h-3.5 w-3.5" />
+        <span>Filter</span>
+        {activeFiltersCount > 0 && (
+          <span className="ml-0.5 rounded-full bg-blue-500 text-white text-[10px] font-bold px-1.5 py-0.2">
+            {activeFiltersCount}
+          </span>
+        )}
+      </Button>
+
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogTrigger asChild>
-          {/* <FilterButton onClick={() => setIsDialogOpen(true)} className="hidden md:flex mb-4" /> */}
-          <Button onClick={() => setIsDialogOpen(true)} className="hidden md:flex mb-4" variant="outline" >
-            <Filter className="mr-2 h-4 w-4" />
-            Filter
-          </Button>
-        </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Job Filters</DialogTitle>
-            <DialogDescription>
-              Apply filters to find the perfect job opportunity.
+            <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
+              Filter Job Openings
+            </DialogTitle>
+            <DialogDescription className="text-xs text-gray-500 dark:text-gray-400">
+              Refine jobs by company, role title, employment type, or location.
             </DialogDescription>
           </DialogHeader>
-          <FilterForm />
+
+          <div className="space-y-4 py-3">
+            {filterMenus.map((menu) => (
+              <div key={menu.id} className="space-y-1.5">
+                <Label htmlFor={menu.id} className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                  {menu.name}
+                </Label>
+                <Select
+                  value={filters[menu.id] || "__ALL__"}
+                  onValueChange={(value) => handleFilterChange(menu.id, value)}
+                >
+                  <SelectTrigger id={menu.id} className="h-9 text-xs">
+                    <SelectValue placeholder={`All ${menu.name}s`} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__ALL__" className="text-xs text-gray-500">
+                      All {menu.name}s
+                    </SelectItem>
+                    {menu.options.map((option) => (
+                      <SelectItem key={option} value={option} className="text-xs">
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between border-t border-gray-100 dark:border-gray-800 pt-4 mt-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              type="button"
+              onClick={resetFilters}
+              disabled={activeFiltersCount === 0}
+              className="text-xs text-gray-500 hover:text-gray-900 dark:hover:text-white"
+            >
+              Reset Filters
+            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsDialogOpen(false)}
+                className="text-xs"
+              >
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                onClick={applyFilters}
+                className="text-xs font-medium"
+              >
+                Apply Filters
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
-
-      {/* Mobile Sheet */}
-      <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-        <SheetTrigger asChild>
-          {/* <FilterButton onClick={() => setIsSheetOpen(true)} className="md:hidden mb-4" /> */}
-          <Button className="md:hidden mb-4" variant="outline">
-            <Filter className="mr-2 h-4 w-4 " />
-            Filter
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="bottom" className="h-[90%]">
-          <SheetHeader>
-            <SheetTitle>Job Filters</SheetTitle>
-            <SheetDescription>
-              Apply filters to find the perfect job opportunity.
-            </SheetDescription>
-          </SheetHeader>
-          <div className="mt-4">
-            <FilterForm />
-          </div>
-        </SheetContent>
-      </Sheet>
     </div>
-  )
+  );
 }

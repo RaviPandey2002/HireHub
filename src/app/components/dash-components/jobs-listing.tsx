@@ -10,11 +10,12 @@ import { AlertCircle, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 const ITEMS_PER_PAGE = 9;
 
 export const JobsListing = ({ user, allJobs, jobApplications }: { user: any; allJobs: any[]; jobApplications: any[] }) => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const companyFilter = searchParams.get("company");
 
@@ -94,11 +95,14 @@ export const JobsListing = ({ user, allJobs, jobApplications }: { user: any; all
           <span className="text-sm text-gray-500 dark:text-gray-400">
             Showing jobs at
           </span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 dark:bg-gray-800 px-3 py-1 text-sm font-medium text-gray-800 dark:text-gray-200">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-gray-100 dark:bg-gray-800 px-3 py-1 text-sm font-medium text-gray-800 dark:text-gray-200">
             {companyFilter}
             <button
-              onClick={() => setSearchQuery("")}
-              className="ml-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+              onClick={() => {
+                setSearchQuery("");
+                router.replace("/jobs");
+              }}
+              className="ml-0.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 font-bold"
               aria-label="Clear company filter"
             >
               ×

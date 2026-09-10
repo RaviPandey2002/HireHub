@@ -538,7 +538,7 @@ export const LandingPage = ({
               <div className="mt-8 flex flex-col sm:flex-row items-center gap-3">
                 <Link href="/jobs" className="w-full sm:w-auto">
                   <Button size="lg" className="w-full sm:w-auto gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold shadow-md">
-                    <Briefcase className="h-4 w-4" /> Explore 19+ Jobs
+                    <Briefcase className="h-4 w-4" /> Explore {totalJobsCount > 0 ? `${totalJobsCount}+ ` : ""}Jobs
                   </Button>
                 </Link>
                 <Link href="/login" className="w-full sm:w-auto">

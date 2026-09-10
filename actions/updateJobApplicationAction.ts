@@ -75,5 +75,8 @@ export async function updateJobApplicationAction(
     }
 
     revalidatePath(pathToRevalidate);
+    revalidatePath("/dashboard");
+    revalidatePath("/activity");
+    revalidatePath("/applicants");
     return { success: true };
 }

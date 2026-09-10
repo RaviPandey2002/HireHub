@@ -559,14 +559,25 @@ export const AccountInfo = ({ user }: { user: any }) => {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  {candidateFormData.resume && (
+                  {newResumeFile && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setNewResumeFile(null)}
+                      className="text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 h-8 px-2.5"
+                    >
+                      Clear Selection
+                    </Button>
+                  )}
+                  {candidateFormData.resume && !newResumeFile && (
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       onClick={handleDownloadResume}
                       disabled={isLoadingResume}
-                      className="gap-1.5 text-xs"
+                      className="gap-1.5 text-xs h-8"
                     >
                       {isLoadingResume ? (
                         <>
@@ -594,7 +605,11 @@ export const AccountInfo = ({ user }: { user: any }) => {
                         const files = e.target.files;
                         if (files && files[0]) {
                           if (files[0].size > 5 * 1024 * 1024) {
-                            alert("File size exceeds 5MB limit.");
+                            toast({
+                              variant: "destructive",
+                              title: "File too large",
+                              description: "Resume PDF file size must be less than 5MB.",
+                            });
                             return;
                           }
                           setNewResumeFile(files[0]);
@@ -638,6 +653,45 @@ export const AccountInfo = ({ user }: { user: any }) => {
           </Button>
         </div>
       </div>
+
+      {/* ── Sticky Unsaved Changes Floating Bar ── */}
+      {isDirty && (
+        <div className="sticky bottom-6 z-30 flex items-center justify-between gap-4 rounded-2xl border border-amber-300 dark:border-amber-800 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md px-5 py-3.5 shadow-xl shadow-amber-500/5">
+          <div className="flex items-center gap-2.5">
+            <span className="flex h-2.5 w-2.5 rounded-full bg-amber-500 animate-pulse" />
+            <span className="text-xs sm:text-sm font-semibold text-gray-800 dark:text-gray-200">
+              You have unsaved changes
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={isPending || uploadingResume}
+              onClick={handleDiscardChanges}
+              className="text-xs text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+            >
+              Discard
+            </Button>
+            <Button
+              size="sm"
+              onClick={handleUpdateAccount}
+              disabled={isPending || uploadingResume}
+              className="text-xs font-semibold min-w-[110px]"
+            >
+              {isPending || uploadingResume ? (
+                <>
+                  <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                "Save Changes"
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

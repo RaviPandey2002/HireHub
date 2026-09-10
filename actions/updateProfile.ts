@@ -55,5 +55,8 @@ export async function updateProfile(
   }
 
   revalidatePath(pathToRevalidate);
+  revalidatePath("/talent");
+  revalidatePath("/applicants");
+  revalidatePath("/dashboard");
   return { success: true, message: "Profile updated successfully" };
 }

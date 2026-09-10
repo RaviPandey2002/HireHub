@@ -34,25 +34,11 @@ export async function getResumeUrlAction(candidateId: string) {
     return { error: "No resume on file for this candidate." };
   }
 
-  // 2. Access Control
+  // 2. Access Control: Owner candidate or authenticated Recruiter
   const isOwner = session.user.id === candidate.id;
 
-  if (!isOwner) {
-    // If not the owner, check if the requester is a recruiter who received an application from this candidate
-    if (session.user.role !== "Recruiter") {
-      return { error: "Unauthorized to access this resume." };
-    }
-
-    const application = await db.application.findFirst({
-      where: {
-        candidateId: candidate.id,
-        recruiterId: session.user.id,
-      },
-    });
-
-    if (!application) {
-      return { error: "You can only view resumes of candidates who have applied to your jobs." };
-    }
+  if (!isOwner && session.user.role !== "Recruiter") {
+    return { error: "Unauthorized to access this resume." };
   }
 
   // 3. Generate short-lived signed URL (valid for 60 seconds)

@@ -4,7 +4,7 @@ import { HeaderSheet } from "./header-sheet";
 import { UserInfoButton } from "./user-info-button";
 import { NavLink } from "./nav-link";
 
-async function Header({ user }) {
+async function Header({ user }: { user: any }) {
   const isOnboarded = !!user && user.role !== "OnBoarding";
   const isOnboarding = user?.role === "OnBoarding";
 
@@ -14,6 +14,8 @@ async function Header({ user }) {
     { label: "Jobs",             path: "/jobs",       show: isOnboarded },
     { label: "Applications",     path: "/activity",   show: isOnboarded && user?.role === "Candidate" },
     { label: "Companies",        path: "/companies",  show: isOnboarded && user?.role === "Candidate" },
+    { label: "Applicants",       path: "/applicants", show: isOnboarded && user?.role === "Recruiter" },
+    { label: "Talent Pool",      path: "/talent",     show: isOnboarded && user?.role === "Recruiter" },
     { label: "Complete Profile", path: "/onboard",    show: isOnboarding },
     { label: "Login",            path: "/login",      show: !user },
     { label: "Register",         path: "/register",   show: !user },

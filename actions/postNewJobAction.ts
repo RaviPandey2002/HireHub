@@ -40,5 +40,8 @@ export async function postNewJobAction(formData: unknown, pathToRevalidate: stri
 
     await db.jobs.create({ data: parsed.data as Required<typeof parsed.data> });
     revalidatePath(pathToRevalidate);
+    revalidatePath("/dashboard");
+    revalidatePath("/companies");
+    revalidatePath("/");
     return { success: true };
 }

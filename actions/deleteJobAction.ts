@@ -31,5 +31,10 @@ export async function deleteJobAction(jobId: string, pathToRevalidate: string) {
     await db.jobs.delete({ where: { id: jobId } });
 
     revalidatePath(pathToRevalidate);
+    revalidatePath("/dashboard");
+    revalidatePath("/activity");
+    revalidatePath("/applicants");
+    revalidatePath("/companies");
+    revalidatePath("/");
     return { success: true };
 }

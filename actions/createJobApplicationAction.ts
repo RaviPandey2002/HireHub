@@ -83,6 +83,7 @@ async function CreateJobApplicationAction(data: unknown, pathToRevalidate: strin
     revalidatePath(pathToRevalidate);
     revalidatePath("/activity");
     revalidatePath("/dashboard");
+    revalidatePath("/applicants");
     return { success: true };
 }
 

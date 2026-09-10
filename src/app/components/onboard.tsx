@@ -15,6 +15,7 @@ import { useSession } from "next-auth/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
 import { Upload, Loader2, CheckCircle2 } from "lucide-react";
 
 // ─── section groupings for the candidate form ────────────────────────────────
@@ -26,11 +27,18 @@ const candidateSections = [
   { heading: "Online Presence", fields: ["linkedinProfile", "githubProfile"] },
 ];
 
-export const OnBoarding = ({ currentUser }) => {
+export const OnBoarding = ({ currentUser }: { currentUser: any }) => {
+  const { toast } = useToast();
   const { update } = useSession();
   const [currentTab, setCurrentTab] = useState("candidate");
-  const [recruiterFormData, setRecruiterFormData] = useState(initialRecruiterFormData);
-  const [candidateFormData, setCandidateFormData] = useState(initialCandidateFormData);
+  const [recruiterFormData, setRecruiterFormData] = useState({
+    ...initialRecruiterFormData,
+    name: currentUser?.name || "",
+  });
+  const [candidateFormData, setCandidateFormData] = useState({
+    ...initialCandidateFormData,
+    name: currentUser?.name || "",
+  });
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string>("");
   const [submitting, setSubmitting] = useState(false);
@@ -63,11 +71,19 @@ export const OnBoarding = ({ currentUser }) => {
     const selected = e.target.files?.[0];
     if (!selected) return;
     if (selected.type !== "application/pdf") {
-      alert("Please upload a PDF file.");
+      toast({
+        variant: "destructive",
+        title: "Invalid file format",
+        description: "Please upload a PDF document.",
+      });
       return;
     }
     if (selected.size > 5 * 1024 * 1024) {
-      alert("File size exceeds 5 MB.");
+      toast({
+        variant: "destructive",
+        title: "File too large",
+        description: "Resume file size exceeds the 5MB limit.",
+      });
       return;
     }
     setFile(selected);
@@ -76,7 +92,9 @@ export const OnBoarding = ({ currentUser }) => {
 
   async function uploadPdfToSupabase() {
     if (!file) return null;
-    const filePath = `public/${currentUser.name}/${Date.now()}_${file.name}`;
+    const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const userFolder = currentUser?.id || "user";
+    const filePath = `public/${userFolder}/${Date.now()}_${sanitizedFileName}`;
     const { data, error } = await supabaseClient.storage
       .from("hirehub-bucket-public")
       .upload(filePath, file, { cacheControl: "3600", upsert: false });
@@ -94,7 +112,14 @@ export const OnBoarding = ({ currentUser }) => {
 
       if (currentTab === "candidate" && file) {
         const uploaded = await uploadPdfToSupabase();
-        if (!uploaded) { alert("Failed to upload resume."); return; }
+        if (!uploaded) {
+          toast({
+            variant: "destructive",
+            title: "Upload failed",
+            description: "Failed to upload resume to storage. Please try again.",
+          });
+          return;
+        }
         resumePath = uploaded;
       }
 
@@ -120,7 +145,11 @@ export const OnBoarding = ({ currentUser }) => {
         await update({ role: currentTab === "recruiter" ? "Recruiter" : "Candidate" });
         window.location.href = DEFAULT_LOGIN_REDIRECT;
       } else {
-        alert(response?.message || "Failed to update profile. Please verify all fields.");
+        toast({
+          variant: "destructive",
+          title: "Profile update failed",
+          description: response?.message || "Failed to update profile. Please verify all fields.",
+        });
       }
     } finally {
       setSubmitting(false);

@@ -254,3 +254,73 @@ export async function fetchDistinctCompanies() {
         return [];
     }
 }
+
+export async function fetchEnrichedApplicantsForRecruiter(recruiterId: string) {
+    try {
+        const [applications, jobs] = await Promise.all([
+            db.application.findMany({
+                where: { recruiterId },
+                orderBy: { jobApplicationDate: "desc" },
+            }),
+            db.jobs.findMany({
+                where: { recruiterId },
+                select: { id: true, title: true, companyName: true, location: true, type: true },
+            }),
+        ]);
+
+        const candidateIds = [...new Set(applications.map((a) => a.candidateId))];
+        const candidates = await db.user.findMany({
+            where: { id: { in: candidateIds } },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+                candidateInfo: true,
+            },
+        });
+
+        const jobMap = new Map(jobs.map((j) => [j.id, j]));
+        const candidateMap = new Map(candidates.map((c) => [c.id, c]));
+
+        const enriched = applications.map((app) => {
+            const job = jobMap.get(app.jobId) || null;
+            const candidate = candidateMap.get(app.candidateId) || null;
+            return {
+                ...app,
+                job,
+                candidate,
+            };
+        });
+
+        return JSON.parse(JSON.stringify(enriched));
+    } catch (err) {
+        console.error("Error fetching enriched applicants:", err);
+        return [];
+    }
+}
+
+export async function fetchCandidatesForTalentPool() {
+    try {
+        const users = await db.user.findMany({
+            where: { role: "Candidate" },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                image: true,
+                candidateInfo: true,
+            },
+            orderBy: { id: "desc" },
+        });
+
+        const candidates = users.filter(
+            (u) => u.candidateInfo !== null && typeof u.candidateInfo === "object"
+        );
+
+        return JSON.parse(JSON.stringify(candidates));
+    } catch (err) {
+        console.error("Error fetching talent pool candidates:", err);
+        return [];
+    }
+}

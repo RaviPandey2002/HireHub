@@ -82,18 +82,22 @@ export const PostNewJob = ({
       )}
       <Dialog
         open={showJobDialog}
-        onOpenChange={() => {
-          setShowJobDialog(false);
-          setJobFormData({
-            ...initialPostNewJobFormData,
-            companyName: user?.recruiterInfo?.companyName || "",
-          });
+        onOpenChange={(open) => {
+          setShowJobDialog(open);
+          if (!open) {
+            setJobFormData({
+              ...initialPostNewJobFormData,
+              companyName: user?.recruiterInfo?.companyName || "",
+            });
+          }
         }}
       >
         <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Post New Job</DialogTitle>
-            <DialogDescription />
+            <DialogDescription>
+              Fill in the role details, requirements, and tech stack to post a new job opening.
+            </DialogDescription>
           </DialogHeader>
           <CommonForm
             buttonText="Add Job"

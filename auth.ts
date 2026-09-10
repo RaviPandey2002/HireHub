@@ -56,6 +56,8 @@ export const { handlers: { GET, POST }, auth, signIn, signOut, unstable_update }
         session.user.email = token.email as string;
         session.user.role = token.role as any;
         session.user.image = token.picture as string;
+        session.user.isPremiumUser = !!token.isPremiumUser;
+        session.user.memberShipType = token.memberShipType as string | undefined;
       }
       return session;
     },
@@ -69,6 +71,8 @@ export const { handlers: { GET, POST }, auth, signIn, signOut, unstable_update }
         token.email = user.email;
         token.role = (user as any).role;
         token.picture = (user as any).image ?? null;
+        token.isPremiumUser = !!(user as any).isPremiumUser;
+        token.memberShipType = (user as any).memberShipType;
         return token;
       }
 
@@ -97,6 +101,8 @@ export const { handlers: { GET, POST }, auth, signIn, signOut, unstable_update }
           token.email = dbUser.email;
           token.role = dbUser.role;          // "OnBoarding" for new users
           token.picture = dbUser.image ?? null;
+          token.isPremiumUser = !!dbUser.isPremiumUser;
+          token.memberShipType = dbUser.memberShipType ?? undefined;
         }
         return token;
       }
@@ -112,6 +118,8 @@ export const { handlers: { GET, POST }, auth, signIn, signOut, unstable_update }
           if (existingUser) {
             token.role = existingUser.role;
             token.name = existingUser.name;
+            token.isPremiumUser = !!existingUser.isPremiumUser;
+            token.memberShipType = existingUser.memberShipType ?? undefined;
           }
         }
         return token;

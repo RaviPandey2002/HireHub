@@ -42,6 +42,7 @@ export async function withdrawApplicationAction(data: unknown) {
         revalidatePath("/activity");
         revalidatePath("/jobs");
         revalidatePath("/dashboard");
+        revalidatePath("/applicants");
         revalidatePath("/");
 
         return { success: true };
