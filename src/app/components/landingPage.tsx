@@ -18,6 +18,7 @@ import {
   Check,
   UserCheck,
 } from "lucide-react";
+import { AppUser, JobApplication } from "types";
 
 export interface FeaturedJob {
   id: string;
@@ -35,7 +36,7 @@ export interface CandidateStats {
   selected: number;
   rejected: number;
   applied: number;
-  recentApplications: any[];
+  recentApplications: JobApplication[];
 }
 
 export interface RecruiterStats {
@@ -44,11 +45,11 @@ export interface RecruiterStats {
   selected: number;
   rejected: number;
   pending: number;
-  recentApplications: any[];
+  recentApplications: JobApplication[];
 }
 
 export interface LandingPageProps {
-  user: any;
+  user: AppUser | null;
   profileInfo: string | undefined;
   featuredJobs: FeaturedJob[];
   totalJobsCount: number;

@@ -96,7 +96,7 @@ export const Membership = ({ user }: { user: AppUser | null }) => {
   const { toast } = useToast();
   const [processingPlan, setProcessingPlan] = useState<string | null>(null);
 
-  async function handlePayment(getCurrentPlan: any) {
+  async function handlePayment(getCurrentPlan: { type: string; price: number; heading?: string }) {
     if (!stripePublishableKey || !stripePromise) {
       toast({
         variant: "destructive",
@@ -155,11 +155,12 @@ export const Membership = ({ user }: { user: AppUser | null }) => {
           description: result?.error || "Could not initialize Stripe checkout session.",
         });
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred during checkout.";
       toast({
         variant: "destructive",
         title: "Payment error",
-        description: err?.message || "An unexpected error occurred during checkout.",
+        description: errorMessage,
       });
     } finally {
       setProcessingPlan(null);

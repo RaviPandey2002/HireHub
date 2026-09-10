@@ -53,6 +53,12 @@ describe("createJobApplicationAction", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(db.jobs.findUnique).mockResolvedValue({
+      id: "job_123",
+      title: "Senior Engineer",
+      companyName: "Acme Corp",
+      status: "Active",
+    } as any);
   });
 
   it("returns Unauthorised when user is not authenticated", async () => {
@@ -60,6 +66,39 @@ describe("createJobApplicationAction", () => {
 
     const result = await CreateJobApplicationAction(validPayload, "/jobs");
     expect(result).toEqual({ error: "Unauthorised" });
+  });
+
+  it("rejects application when job opening does not exist", async () => {
+    vi.mocked(auth).mockResolvedValue({
+      user: candidateUser,
+      expires: "1",
+    } as any);
+
+    vi.mocked(db.jobs.findUnique).mockResolvedValue(null);
+
+    const result = await CreateJobApplicationAction(validPayload, "/jobs");
+    expect(result).toEqual({ error: "Job opening not found." });
+    expect(db.application.create).not.toHaveBeenCalled();
+  });
+
+  it("rejects application when job opening is Closed", async () => {
+    vi.mocked(auth).mockResolvedValue({
+      user: candidateUser,
+      expires: "1",
+    } as any);
+
+    vi.mocked(db.jobs.findUnique).mockResolvedValue({
+      id: "job_123",
+      status: "Closed",
+      title: "Senior Engineer",
+      companyName: "Acme Corp",
+    } as any);
+
+    const result = await CreateJobApplicationAction(validPayload, "/jobs");
+    expect(result).toEqual({
+      error: "This job opening is closed and is no longer accepting applications.",
+    });
+    expect(db.application.create).not.toHaveBeenCalled();
   });
 
   it("returns Unauthorised when user role is not Candidate", async () => {

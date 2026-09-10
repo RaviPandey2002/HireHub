@@ -53,11 +53,12 @@ export const CandidateList = ({
             } else if (result?.url) {
                 window.open(result.url, "_blank");
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : "Failed to retrieve secure resume link.";
             toast({
                 variant: "destructive",
                 title: "Error",
-                description: err?.message || "Failed to retrieve secure resume link.",
+                description: errorMessage,
             });
         } finally {
             setIsLoadingResume(false);
@@ -84,20 +85,20 @@ export const CandidateList = ({
                     description: result.error,
                 });
             } else {
-                setSelectedApplication((prev: any) => ({
-                    ...prev,
-                    status: ["Applied", getCurrentStatus],
-                }));
+                setSelectedApplication((prev) =>
+                    prev ? { ...prev, status: ["Applied", getCurrentStatus] } : null
+                );
                 toast({
                     title: `Candidate ${getCurrentStatus.toLowerCase()}!`,
                     description: `Application status updated to ${getCurrentStatus}.`,
                 });
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : "Something went wrong.";
             toast({
                 variant: "destructive",
                 title: "Error",
-                description: err?.message || "Something went wrong.",
+                description: errorMessage,
             });
         } finally {
             setIsUpdatingStatus(null);
