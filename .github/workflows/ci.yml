@@ -1,0 +1,50 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality-check:
+    name: Lint, Typecheck, and Test
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: "mongodb+srv://mock:mock@cluster0.mongodb.net/hirehub?retryWrites=true&w=majority"
+      AUTH_SECRET: "mock_secret_key_for_testing_purposes_only"
+      NEXTAUTH_SECRET: "mock_secret_key_for_testing_purposes_only"
+      NEXTAUTH_URL: "http://localhost:3000"
+      STRIPE_SECRET_KEY: "sk_test_mock"
+      STRIPE_WEBHOOK_SECRET: "whsec_mock"
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: "pk_test_mock"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Type Check (tsc)
+        run: npx tsc --noEmit
+
+      - name: Lint Check (eslint)
+        run: npm run lint
+
+      - name: Run Vitest Unit & Integration Tests
+        run: npm test
+
+      - name: Build Next.js Application
+        run: npm run build
+
