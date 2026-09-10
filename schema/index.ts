@@ -12,6 +12,24 @@ export const PostNewJobSchema = z.object({
     recruiterId: z.string().min(1),
 })
 
+// ── Edit job ───────────────────────────────────────────────────────────────
+export const EditJobSchema = z.object({
+    id:          z.string().min(1, "Job ID is required"),
+    companyName: z.string().min(1, "Company name is required").max(100),
+    title:       z.string().min(1, "Title is required").max(100),
+    type:        z.string().min(1, "Job type is required").max(50),
+    location:    z.string().min(1, "Location is required").max(100),
+    experience:  z.string().min(1, "Experience is required").max(50),
+    description: z.string().min(1, "Description is required").max(5000),
+    skills:      z.string().min(1, "Skills are required").max(500),
+})
+
+// ── Toggle job status ───────────────────────────────────────────────────────
+export const ToggleJobStatusSchema = z.object({
+    jobId:  z.string().min(1, "Job ID is required"),
+    status: z.enum(["Active", "Closed"]),
+})
+
 // ── Job application ──────────────────────────────────────────────────────────
 export const CreateJobApplicationSchema = z.object({
     recruiterId:        z.string().min(1),
@@ -20,7 +38,7 @@ export const CreateJobApplicationSchema = z.object({
     email:              z.string().email("Invalid email"),
     status:             z.array(z.string()).min(1),
     jobId:              z.string().min(1),
-    jobApplicationDate: z.date(),
+    jobApplicationDate: z.coerce.date(),
 })
 
 // ── Update application status ────────────────────────────────────────────────

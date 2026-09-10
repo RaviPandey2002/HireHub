@@ -53,6 +53,7 @@ model Jobs {
   description String
   skills      String
   recruiterId String
+  status      String?  @default("Active")
 
   @@index([recruiterId])
   @@index([companyName])
