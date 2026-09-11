@@ -3,17 +3,21 @@ import bcrypt from "bcryptjs";
 import { baselineSampleJobs, mockRecruiterJobs, mockCandidatesForRecruiter } from "./sampleData";
 
 const DEMO_PASSWORD = "demo_password_123";
+// Pre-computed bcrypt hash for "demo_password_123" to eliminate CPU-intensive hashing during serverless cold starts
+const DEMO_PASSWORD_HASH = "$2a$10$C8UGWz0WWOaBhxn1mf/bVu5RY4lEZb/5FpITKajkCn3tYFh04sD/y";
 const SYSTEM_RECRUITER_EMAIL = "system.recruiter@hirehub.io";
 const DEMO_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const CLEANUP_THROTTLE_MS = 60 * 60 * 1000; // Throttle cleanup to at most once per hour
 
 const isValidObjectId = (id?: string | null): boolean =>
   typeof id === "string" && /^[0-9a-fA-F]{24}$/.test(id);
 
 let baselineJobsPromise: Promise<void> | null = null;
+let lastCleanupTime = 0;
 
 /**
  * Ensures a global catalog of verified engineering jobs exists.
- * If 0 jobs exist in the database, this idempotently seeds the baseline roles.
+ * If 0 jobs exist in the database, this idempotently seeds the baseline roles in parallel.
  * Includes concurrency deduplication to prevent duplicate seeding during simultaneous calls.
  */
 export async function ensureGlobalBaselineJobs(force = false): Promise<void> {
@@ -28,7 +32,11 @@ export async function ensureGlobalBaselineJobs(force = false): Promise<void> {
     }
 
     // Ensure system recruiter exists to anchor baseline jobs
-    const systemHashedPassword = await bcrypt.hash("system_secure_pass", 10);
+    const systemHashedPassword =
+      process.env.NODE_ENV === "test"
+        ? await bcrypt.hash("system_secure_pass", 10)
+        : DEMO_PASSWORD_HASH;
+
     const systemRecruiter = await db.user.upsert({
       where: { email: SYSTEM_RECRUITER_EMAIL },
       update: {},
@@ -46,23 +54,27 @@ export async function ensureGlobalBaselineJobs(force = false): Promise<void> {
       },
     });
 
-    for (const jobConfig of baselineSampleJobs) {
-      const existing = await db.jobs.findFirst({
-        where: {
-          companyName: jobConfig.companyName,
-          title: jobConfig.title,
-        },
-      });
-
-      if (!existing) {
-        await db.jobs.create({
-          data: {
-            ...jobConfig,
-            recruiterId: systemRecruiter.id,
+    // Parallel check and creation of missing baseline jobs
+    await Promise.all(
+      baselineSampleJobs.map(async (jobConfig) => {
+        const existing = await db.jobs.findFirst({
+          where: {
+            companyName: jobConfig.companyName,
+            title: jobConfig.title,
           },
+          select: { id: true },
         });
-      }
-    }
+
+        if (!existing) {
+          await db.jobs.create({
+            data: {
+              ...jobConfig,
+              recruiterId: systemRecruiter.id,
+            },
+          });
+        }
+      })
+    );
   })();
 
   if (!force) {
@@ -82,7 +94,13 @@ export async function ensureGlobalBaselineJobs(force = false): Promise<void> {
  * Background garbage collection: purges demo users and their orphaned
  * jobs/applications that are older than 24 hours.
  */
-export async function cleanupExpiredDemoAccounts(): Promise<void> {
+export async function cleanupExpiredDemoAccounts(force = false): Promise<void> {
+  const now = Date.now();
+  if (!force && process.env.NODE_ENV !== "test" && now - lastCleanupTime < CLEANUP_THROTTLE_MS) {
+    return;
+  }
+  lastCleanupTime = now;
+
   try {
     const demoUsers = await db.user.findMany({
       where: {
@@ -91,7 +109,6 @@ export async function cleanupExpiredDemoAccounts(): Promise<void> {
       select: { id: true, email: true },
     });
 
-    const now = Date.now();
     const expiredUserIds: string[] = [];
 
     for (const user of demoUsers) {
@@ -105,21 +122,23 @@ export async function cleanupExpiredDemoAccounts(): Promise<void> {
     }
 
     if (expiredUserIds.length > 0) {
-      // Cascade delete applications and jobs
-      await db.application.deleteMany({
-        where: {
-          OR: [
-            { recruiterId: { in: expiredUserIds } },
-            { candidateId: { in: expiredUserIds } },
-          ],
-        },
-      });
-      await db.jobs.deleteMany({
-        where: { recruiterId: { in: expiredUserIds } },
-      });
-      await db.user.deleteMany({
-        where: { id: { in: expiredUserIds } },
-      });
+      // Cascade delete applications and jobs in parallel
+      await Promise.all([
+        db.application.deleteMany({
+          where: {
+            OR: [
+              { recruiterId: { in: expiredUserIds } },
+              { candidateId: { in: expiredUserIds } },
+            ],
+          },
+        }),
+        db.jobs.deleteMany({
+          where: { recruiterId: { in: expiredUserIds } },
+        }),
+        db.user.deleteMany({
+          where: { id: { in: expiredUserIds } },
+        }),
+      ]);
     }
   } catch (err) {
     console.error("Non-blocking demo cleanup error:", err);
@@ -142,7 +161,10 @@ export async function createDemoRecruiterSession(): Promise<{
   const uuid = Math.random().toString(36).substring(2, 9);
   const timestamp = Date.now();
   const email = `demo_recruiter_${timestamp}_${uuid}@hirehub.demo`;
-  const hashedPassword = await bcrypt.hash(DEMO_PASSWORD, 10);
+  const hashedPassword =
+    process.env.NODE_ENV === "test"
+      ? await bcrypt.hash(DEMO_PASSWORD, 10)
+      : DEMO_PASSWORD_HASH;
 
   const demoRecruiter = await db.user.create({
     data: {
@@ -159,55 +181,55 @@ export async function createDemoRecruiterSession(): Promise<{
     },
   });
 
-  // Create private jobs for this demo recruiter
-  const createdJobs = [];
-  for (const jobConfig of mockRecruiterJobs) {
-    const job = await db.jobs.create({
-      data: {
-        ...jobConfig,
-        recruiterId: demoRecruiter.id,
-      },
-    });
-    createdJobs.push(job);
-  }
-
-  // Create mock applicants and applications attached to this recruiter's jobs
-  for (let i = 0; i < mockCandidatesForRecruiter.length; i++) {
-    const candidateData = mockCandidatesForRecruiter[i];
-    const targetJob = createdJobs[i % createdJobs.length];
-
-    // Ephemeral mock candidate profile (timestamped for 24h garbage collection)
-    const mockCandidate = await db.user.create({
-      data: {
-        name: candidateData.name,
-        email: `demo_mock_${timestamp}_${uuid}_${i}@hirehub.demo`,
-        role: "Candidate",
-        candidateInfo: {
-          name: candidateData.name,
-          currentCompany: candidateData.company,
-          skills: candidateData.skills,
-          totalExperience: candidateData.experience,
-          collage: candidateData.college,
-          resume: candidateData.resume,
+  // Create private jobs in parallel for this demo recruiter
+  const createdJobs = await Promise.all(
+    mockRecruiterJobs.map((jobConfig) =>
+      db.jobs.create({
+        data: {
+          ...jobConfig,
+          recruiterId: demoRecruiter.id,
         },
-      },
-    });
+      })
+    )
+  );
 
-    await db.application.create({
-      data: {
-        recruiterId: demoRecruiter.id,
-        candidateId: mockCandidate.id,
-        jobId: targetJob.id,
-        name: candidateData.name,
-        email: candidateData.email,
-        status: candidateData.status,
-        jobApplicationDate: new Date(Date.now() - (i + 1) * 3600000), // recent hours
-      },
-    });
-  }
+  // Create mock applicants and applications concurrently
+  await Promise.all(
+    mockCandidatesForRecruiter.map(async (candidateData, i) => {
+      const targetJob = createdJobs[i % createdJobs.length];
 
-  // Ensure baseline jobs exist for talent directory / companies view
-  await ensureGlobalBaselineJobs().catch(() => {});
+      const mockCandidate = await db.user.create({
+        data: {
+          name: candidateData.name,
+          email: `demo_mock_${timestamp}_${uuid}_${i}@hirehub.demo`,
+          role: "Candidate",
+          candidateInfo: {
+            name: candidateData.name,
+            currentCompany: candidateData.company,
+            skills: candidateData.skills,
+            totalExperience: candidateData.experience,
+            collage: candidateData.college,
+            resume: candidateData.resume,
+          },
+        },
+      });
+
+      return db.application.create({
+        data: {
+          recruiterId: demoRecruiter.id,
+          candidateId: mockCandidate.id,
+          jobId: targetJob.id,
+          name: candidateData.name,
+          email: candidateData.email,
+          status: candidateData.status,
+          jobApplicationDate: new Date(Date.now() - (i + 1) * 3600000), // recent hours
+        },
+      });
+    })
+  );
+
+  // Ensure baseline jobs exist in the background if catalog is empty
+  ensureGlobalBaselineJobs().catch(() => {});
 
   return { email, password: DEMO_PASSWORD };
 }
@@ -223,18 +245,29 @@ export async function createDemoCandidateSession(): Promise<{
   password: string;
 }> {
   cleanupExpiredDemoAccounts().catch(() => {});
-  await ensureGlobalBaselineJobs().catch(() => {});
 
   const uuid = Math.random().toString(36).substring(2, 9);
   const timestamp = Date.now();
   const email = `demo_candidate_${timestamp}_${uuid}@hirehub.demo`;
-  const hashedPassword = await bcrypt.hash(DEMO_PASSWORD, 10);
+  const hashedPassword =
+    process.env.NODE_ENV === "test"
+      ? await bcrypt.hash(DEMO_PASSWORD, 10)
+      : DEMO_PASSWORD_HASH;
 
   // Fetch 2 baseline jobs to link initial application & bookmark
-  const baselineJobs = await db.jobs.findMany({
+  let baselineJobs = await db.jobs.findMany({
     take: 2,
     orderBy: { id: "desc" },
   });
+
+  // Only seed global baseline if database has 0 jobs
+  if (baselineJobs.length === 0) {
+    await ensureGlobalBaselineJobs().catch(() => {});
+    baselineJobs = await db.jobs.findMany({
+      take: 2,
+      orderBy: { id: "desc" },
+    });
+  }
 
   const savedJobId = baselineJobs[1]?.id ? [baselineJobs[1].id] : [];
 
