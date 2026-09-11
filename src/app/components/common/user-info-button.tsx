@@ -195,7 +195,7 @@ export function UserInfoButton() {
 
         {/* Logout */}
         <DropdownMenuItem
-          onClick={() => signOut({ callbackUrl: "/" })}
+          onClick={() => signOut({ callbackUrl: "/login" })}
           className="cursor-pointer py-2 px-2.5 rounded-md text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400 flex items-center gap-2.5"
         >
           <LogOut className="h-4 w-4" />

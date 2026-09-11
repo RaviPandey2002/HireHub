@@ -18,7 +18,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { FormError } from "@/components/helper/form-error"
-import { FormSuccess } from "@/components/helper/form-success"
 import { login } from "actions/login"
 import { demoLoginAction } from "actions/demoLoginAction"
 import { LoginSchema } from "schema"
@@ -27,7 +26,6 @@ export function LoginForm() {
   const [isPending, startTransition] = useTransition()
   const [demoLoadingRole, setDemoLoadingRole] = useState<"Recruiter" | "Candidate" | null>(null)
   const [error, setError] = useState<string | undefined>("")
-  const [success, setSuccess] = useState<string | undefined>("")
   const [showPassword, setShowPassword] = useState(false)
 
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -39,16 +37,12 @@ export function LoginForm() {
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     setError("")
-    setSuccess("")
     startTransition(async () => {
       const response = await login(values)
       if (response?.error) {
         setError(response.error)
       } else if (response?.success) {
-        setSuccess(response.success)
-        await update()   // sync the client-side session token first
-        // Use a full HTTP navigation so middleware can intercept and redirect
-        // OnBoarding-role users to /onboard automatically.
+        await update() // sync client-side session token first
         window.location.href = "/"
       }
     })
@@ -56,7 +50,6 @@ export function LoginForm() {
 
   const handleDemoLogin = (role: "Recruiter" | "Candidate") => {
     setError("")
-    setSuccess("")
     setDemoLoadingRole(role)
     startTransition(async () => {
       try {
@@ -65,8 +58,7 @@ export function LoginForm() {
           setError(res.error)
           setDemoLoadingRole(null)
         } else if (res?.success) {
-          setSuccess(res.success)
-          await update() // sync the client-side session token first
+          await update() // sync client-side session token first
           window.location.href = "/"
         }
       } catch {
@@ -75,6 +67,8 @@ export function LoginForm() {
       }
     })
   }
+
+  const isAnyLoading = isPending || !!demoLoadingRole
 
   return (
     <Form {...form}>
@@ -89,7 +83,7 @@ export function LoginForm() {
                 <FormControl>
                   <Input
                     {...field}
-                    disabled={isPending || !!demoLoadingRole}
+                    disabled={isAnyLoading}
                     placeholder="johndoe@example.com"
                     type="email"
                     autoComplete="email"
@@ -110,7 +104,7 @@ export function LoginForm() {
                   <div className="relative">
                     <Input
                       {...field}
-                      disabled={isPending || !!demoLoadingRole}
+                      disabled={isAnyLoading}
                       placeholder="••••••••"
                       type={showPassword ? "text" : "password"}
                       autoComplete="current-password"
@@ -134,14 +128,17 @@ export function LoginForm() {
         </div>
 
         <FormError message={error} />
-        <FormSuccess message={success} />
 
         <Button
-          disabled={isPending || !!demoLoadingRole}
+          disabled={isAnyLoading}
           type="submit"
-          className="w-full"
+          className="w-full flex items-center justify-center gap-2"
         >
-          {isPending && !demoLoadingRole ? "Signing in…" : "Sign in"}
+          {isPending && !demoLoadingRole ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            "Sign in"
+          )}
         </Button>
 
         {/* Divider */}
@@ -161,15 +158,12 @@ export function LoginForm() {
           <Button
             type="button"
             variant="outline"
-            disabled={isPending || !!demoLoadingRole}
+            disabled={isAnyLoading}
             onClick={() => handleDemoLogin("Recruiter")}
             className="w-full relative py-5 border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50/50 dark:border-indigo-900/60 dark:hover:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-medium flex items-center justify-center gap-2 group transition-all"
           >
             {demoLoadingRole === "Recruiter" ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin text-indigo-600 dark:text-indigo-400" />
-                <span>Launching...</span>
-              </>
+              <Loader2 className="h-4 w-4 animate-spin text-indigo-600 dark:text-indigo-400" />
             ) : (
               <>
                 <Briefcase className="h-4 w-4 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
@@ -181,15 +175,12 @@ export function LoginForm() {
           <Button
             type="button"
             variant="outline"
-            disabled={isPending || !!demoLoadingRole}
+            disabled={isAnyLoading}
             onClick={() => handleDemoLogin("Candidate")}
             className="w-full relative py-5 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50/50 dark:border-emerald-900/60 dark:hover:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-medium flex items-center justify-center gap-2 group transition-all"
           >
             {demoLoadingRole === "Candidate" ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin text-emerald-600 dark:text-emerald-400" />
-                <span>Launching...</span>
-              </>
+              <Loader2 className="h-4 w-4 animate-spin text-emerald-600 dark:text-emerald-400" />
             ) : (
               <>
                 <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" />

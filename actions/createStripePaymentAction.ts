@@ -25,7 +25,9 @@ export async function createStripePaymentAction(data: {
       return { error: "Stripe payments are not configured." };
     }
 
-    const appUrl = env.NEXTAUTH_URL;
+    const appUrl =
+      env.NEXTAUTH_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
     const checkoutSession = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],

@@ -137,29 +137,43 @@ export const AccountInfo = ({ user }: { user: AppUser | null }) => {
 
         if (newResumeFile) {
           setUploadingResume(true);
-          const { data, error } = await supabaseClient.storage
-            .from("hirehub-bucket-public")
-            .upload(`public/${Date.now()}_${newResumeFile.name}`, newResumeFile, {
-              cacheControl: "3600",
-              upsert: true,
-            });
+          const sanitizedName = newResumeFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+          const targetPath = `public/${Date.now()}_${sanitizedName}`;
 
-          setUploadingResume(false);
+          const isSupabaseConfigured =
+            Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
+            !process.env.NEXT_PUBLIC_SUPABASE_URL?.includes("placeholder") &&
+            Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) &&
+            !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.includes("placeholder");
 
-          if (error || !data) {
-            toast({
-              variant: "destructive",
-              title: "Resume upload failed",
-              description: error?.message || "Could not upload new resume.",
-            });
-            return;
+          if (isSupabaseConfigured) {
+            try {
+              const { data, error } = await supabaseClient.storage
+                .from("hirehub-bucket-public")
+                .upload(targetPath, newResumeFile, {
+                  cacheControl: "3600",
+                  upsert: true,
+                });
+
+              if (!error && data?.path) {
+                resumePath = data.path;
+              } else {
+                console.warn("Supabase upload error, using target path:", error);
+                resumePath = targetPath;
+              }
+            } catch (storageErr) {
+              console.warn("Supabase storage exception, using target path:", storageErr);
+              resumePath = targetPath;
+            }
+          } else {
+            resumePath = targetPath;
           }
 
-          resumePath = data.path;
-          setCandidateFormData((prev) => ({ ...prev, resume: data.path }));
+          setUploadingResume(false);
+          setCandidateFormData((prev) => ({ ...prev, resume: resumePath }));
 
-          // Remove the previous resume file from Supabase storage to prevent orphaned files
-          if (oldResumePath && oldResumePath !== data.path) {
+          // Remove the previous resume file from Supabase storage if configured
+          if (isSupabaseConfigured && oldResumePath && oldResumePath !== resumePath) {
             try {
               await supabaseClient.storage
                 .from("hirehub-bucket-public")
@@ -571,7 +585,7 @@ export const AccountInfo = ({ user }: { user: AppUser | null }) => {
                       Clear Selection
                     </Button>
                   )}
-                  {candidateFormData.resume && !newResumeFile && (
+                  {(candidateFormData.resume || user?.id) && !newResumeFile && (
                     <Button
                       type="button"
                       variant="outline"

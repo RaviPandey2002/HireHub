@@ -6,6 +6,8 @@ import {
   authRoutes,
   apiAuthPrefix,
   apiWebhookPrefix,
+  apiSeedPrefix,
+  apiResumePrefix,
   onBoardingRoute,
   DEFAULT_LOGIN_REDIRECT,
 } from "routes";
@@ -16,7 +18,7 @@ export default auth((req: NextRequest & { auth: any }) => {
   // In NextAuth v5 the JWT token fields are merged directly onto req.auth.user.
   // Depending on the version, role may live at req.auth.user.role OR at the
   // token level via req.auth.user (which IS the token).  Read both paths.
-  const role = (req.auth?.user?.role ?? (req.auth as any)?.token?.role) as string | undefined;
+  const role = (req.auth?.user?.role ?? (req.auth as any)?.token?.role ?? (req.auth as any)?.role) as string | undefined;
   const isOnboarding = role === "OnBoarding";
 
   // Server actions POST to the page URL with a Next-Action header —
@@ -26,12 +28,14 @@ export default auth((req: NextRequest & { auth: any }) => {
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
   const isApiWebhookRoute = nextUrl.pathname.startsWith(apiWebhookPrefix);
+  const isApiSeedRoute = nextUrl.pathname.startsWith(apiSeedPrefix);
+  const isApiResumeRoute = nextUrl.pathname.startsWith(apiResumePrefix);
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
   const isOnboardingRoute = onBoardingRoute.includes(nextUrl.pathname);
 
-  // Always allow NextAuth API routes and webhooks
-  if (isApiAuthRoute || isApiWebhookRoute) return NextResponse.next();
+  // Always allow NextAuth API routes, webhooks, seed endpoint, and resume preview endpoint
+  if (isApiAuthRoute || isApiWebhookRoute || isApiSeedRoute || isApiResumeRoute) return NextResponse.next();
 
   // Logged-in users hitting /login or /register → send to onboard (if needed) or home
   if (isAuthRoute) {
@@ -47,6 +51,9 @@ export default auth((req: NextRequest & { auth: any }) => {
     if (!isLoggedIn) {
       return NextResponse.redirect(new URL("/login", nextUrl));
     }
+    if (role && role !== "OnBoarding") {
+      return NextResponse.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+    }
     return NextResponse.next();
   }
 
@@ -55,6 +62,10 @@ export default auth((req: NextRequest & { auth: any }) => {
     // If a logged-in OnBoarding user hits "/" redirect them to /onboard
     if (isLoggedIn && isOnboarding) {
       return NextResponse.redirect(new URL("/onboard", nextUrl));
+    }
+    // If an authenticated user hits "/" redirect them to /dashboard
+    if (isLoggedIn && nextUrl.pathname === "/") {
+      return NextResponse.redirect(new URL("/dashboard", nextUrl));
     }
     return NextResponse.next();
   }

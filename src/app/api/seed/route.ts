@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ensureGlobalBaselineJobs } from "lib/demoSandboxService";
+import { ensureGlobalBaselineJobs, cleanupExpiredDemoAccounts } from "lib/demoSandboxService";
 import { db } from "lib/db";
 
 export async function GET(req: Request) {
@@ -7,6 +7,7 @@ export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
     const force = searchParams.get("force") === "true";
 
+    cleanupExpiredDemoAccounts().catch(() => {});
     await ensureGlobalBaselineJobs(force);
     const totalJobs = await db.jobs.count();
     const totalUsers = await db.user.count();

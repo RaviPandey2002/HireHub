@@ -564,7 +564,7 @@ export function ApplicantsView({ user: _user, initialApplicants, jobs }: Applica
                 </div>
               </div>
 
-              {inspectingCandidateInfo.resume && (
+              {(inspectingCandidateInfo.resume || inspectingApplicant?.candidateId) && (
                 <Button
                   size="sm"
                   variant="outline"

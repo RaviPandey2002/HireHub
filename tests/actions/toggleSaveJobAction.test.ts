@@ -132,5 +132,18 @@ describe("toggleSaveJobAction", () => {
       },
     });
   });
+
+  it("handles unexpected database error gracefully", async () => {
+    vi.mocked(auth).mockResolvedValue({
+      user: candidateUser,
+      expires: "1",
+    } as any);
+
+    vi.mocked(db.user.findUnique).mockRejectedValue(new Error("Database connection error"));
+
+    const result = await toggleSaveJobAction("job_99");
+    expect(result).toEqual({ error: "Failed to update saved job. Please try again." });
+  });
 });
+
 

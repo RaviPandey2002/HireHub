@@ -7,6 +7,7 @@ import {
   apiAuthPrefix,
   apiWebhookPrefix,
   apiSeedPrefix,
+  apiResumePrefix,
   onBoardingRoute,
   DEFAULT_LOGIN_REDIRECT,
 } from "routes";
@@ -28,12 +29,13 @@ export default auth((req: NextRequest & { auth: any }) => {
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
   const isApiWebhookRoute = nextUrl.pathname.startsWith(apiWebhookPrefix);
   const isApiSeedRoute = nextUrl.pathname.startsWith(apiSeedPrefix);
+  const isApiResumeRoute = nextUrl.pathname.startsWith(apiResumePrefix);
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
   const isOnboardingRoute = onBoardingRoute.includes(nextUrl.pathname);
 
-  // Always allow NextAuth API routes, webhooks, and seed endpoint
-  if (isApiAuthRoute || isApiWebhookRoute || isApiSeedRoute) return NextResponse.next();
+  // Always allow NextAuth API routes, webhooks, seed endpoint, and resume preview endpoint
+  if (isApiAuthRoute || isApiWebhookRoute || isApiSeedRoute || isApiResumeRoute) return NextResponse.next();
 
   // Logged-in users hitting /login or /register → send to onboard (if needed) or home
   if (isAuthRoute) {

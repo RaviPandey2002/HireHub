@@ -4,6 +4,7 @@ import { useState } from "react"
 import { signIn } from "next-auth/react"
 import { FcGoogle } from "react-icons/fc"
 import { FaGithub } from "react-icons/fa"
+import { Loader2 } from "lucide-react"
 import { DEFAULT_LOGIN_REDIRECT } from "routes"
 
 export const OtherProviders = () => {
@@ -35,8 +36,14 @@ export const OtherProviders = () => {
           aria-label="Sign in with Google"
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm transition-colors hover:bg-gray-50 dark:hover:bg-gray-900 active:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <FcGoogle className="h-5 w-5 shrink-0" />
-          <span>Google</span>
+          {pendingProvider === "google" ? (
+            <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+          ) : (
+            <>
+              <FcGoogle className="h-5 w-5 shrink-0" />
+              <span>Google</span>
+            </>
+          )}
         </button>
         <button
           type="button"
@@ -45,8 +52,14 @@ export const OtherProviders = () => {
           aria-label="Sign in with GitHub"
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm transition-colors hover:bg-gray-50 dark:hover:bg-gray-900 active:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <FaGithub className="h-5 w-5 shrink-0" />
-          <span>GitHub</span>
+          {pendingProvider === "github" ? (
+            <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+          ) : (
+            <>
+              <FaGithub className="h-5 w-5 shrink-0" />
+              <span>GitHub</span>
+            </>
+          )}
         </button>
       </div>
     </div>

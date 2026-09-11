@@ -1,4 +1,3 @@
-import { Inter } from "next/font/google";
 import { Suspense } from "react";
 import Loading from "./components/loading";
 import "./globals.css";
@@ -6,7 +5,6 @@ import { auth } from "auth";
 import Header from "@/components/common/header";
 import SessionWrapper from "./components/sessionWrapper";
 import { Toaster } from "./components/ui/toaster";
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "HireHub — Find Jobs & Hire Talent",
@@ -16,12 +14,12 @@ export const metadata = {
   },
 };
 
-export default async function RootLayout({ children }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
 
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} min-h-screen w-full overflow-x-hidden`}>
+      <body className="min-h-screen w-full overflow-x-hidden font-sans antialiased">
         <SessionWrapper session={session}>
           <Suspense fallback={<Loading />}>
             <Header user={session?.user} />

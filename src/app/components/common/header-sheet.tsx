@@ -44,7 +44,7 @@ export const HeaderSheet = ({
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLinkClick = () => setIsOpen(false);
-  const handleSubmit = () => signOut({ callbackUrl: "/" });
+  const handleSubmit = () => signOut({ callbackUrl: "/login" });
 
   const initials = user?.name
     ? user.name

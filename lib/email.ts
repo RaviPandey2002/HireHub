@@ -25,6 +25,27 @@ function isEmailEnabled(): boolean {
     return !!env.GMAIL_USER && !!env.GMAIL_APP_PASSWORD;
 }
 
+/**
+ * Detects whether an email address belongs to a demo, synthetic, or non-existent test account.
+ * Prevents unnecessary outbound SMTP connection attempts, error logs, and bounce errors.
+ */
+export function isDemoEmail(email?: string | null): boolean {
+    if (!email || typeof email !== "string") return true;
+    const lower = email.toLowerCase().trim();
+    return (
+        lower.includes("@hirehub.demo") ||
+        lower.includes("@demo.local") ||
+        lower.includes("system.recruiter@hirehub.io") ||
+        lower.endsWith(".demo") ||
+        lower.endsWith(".local") ||
+        lower.endsWith(".test") ||
+        lower.endsWith("@test.com") ||
+        lower.endsWith("@example.com") ||
+        lower.includes("demo_") ||
+        lower.includes("placeholder")
+    );
+}
+
 /** Escape special HTML characters to prevent XSS in email bodies */
 function escapeHtml(str: string): string {
     return str
@@ -36,8 +57,8 @@ function escapeHtml(str: string): string {
 }
 
 export async function sendWelcomeEmail(name: string, email: string) {
-    if (!isEmailEnabled()) {
-        // Email not configured — skip silently.
+    if (!isEmailEnabled() || isDemoEmail(email)) {
+        // Email not configured or demo address — skip silently.
         return;
     }
 
@@ -68,20 +89,22 @@ export async function sendApplicationSubmittedEmail(params: ApplicationSubmitted
     const { candidateEmail, candidateName, recruiterEmail, recruiterName, jobTitle, companyName } = params;
     const appUrl = env.NEXTAUTH_URL;
 
-    // 1. Confirmation to Candidate
-    try {
-        await getTransporter().sendMail({
-            from: `"HireHub" <${env.GMAIL_USER}>`,
-            to: candidateEmail,
-            subject: `Application Submitted: ${jobTitle} at ${companyName}`,
-            html: applicationSubmittedCandidateHtml(candidateName, jobTitle, companyName, appUrl),
-        });
-    } catch (err) {
-        console.error("Failed to send candidate application confirmation email:", err);
+    // 1. Confirmation to Candidate (skip if demo account)
+    if (!isDemoEmail(candidateEmail)) {
+        try {
+            await getTransporter().sendMail({
+                from: `"HireHub" <${env.GMAIL_USER}>`,
+                to: candidateEmail,
+                subject: `Application Submitted: ${jobTitle} at ${companyName}`,
+                html: applicationSubmittedCandidateHtml(candidateName, jobTitle, companyName, appUrl),
+            });
+        } catch (err) {
+            console.error("Failed to send candidate application confirmation email:", err);
+        }
     }
 
-    // 2. Notification to Recruiter
-    if (recruiterEmail) {
+    // 2. Notification to Recruiter (skip if demo account)
+    if (recruiterEmail && !isDemoEmail(recruiterEmail)) {
         try {
             await getTransporter().sendMail({
                 from: `"HireHub" <${env.GMAIL_USER}>`,
@@ -107,6 +130,8 @@ export async function sendApplicationStatusEmail(params: ApplicationStatusParams
     if (!isEmailEnabled()) return;
 
     const { candidateEmail, candidateName, jobTitle, companyName, status } = params;
+    if (isDemoEmail(candidateEmail)) return;
+
     const appUrl = env.NEXTAUTH_URL;
 
     const subject = status === "Selected"

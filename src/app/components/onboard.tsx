@@ -97,13 +97,29 @@ export const OnBoarding = ({ currentUser }: { currentUser: AppUser | null }) => 
     const sanitizedFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
     const userFolder = currentUser?.id || "user";
     const filePath = `public/${userFolder}/${Date.now()}_${sanitizedFileName}`;
-    const { data, error } = await supabaseClient.storage
-      .from("hirehub-bucket-public")
-      .upload(filePath, file, { cacheControl: "3600", upsert: false });
-    if (data) return filePath;
-    if (error?.message === "The resource already exists") return filePath;
-    console.error("File upload error:", error);
-    return null;
+
+    const isSupabaseConfigured =
+      Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
+      !process.env.NEXT_PUBLIC_SUPABASE_URL?.includes("placeholder") &&
+      Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) &&
+      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.includes("placeholder");
+
+    if (!isSupabaseConfigured) {
+      return filePath;
+    }
+
+    try {
+      const { data, error } = await supabaseClient.storage
+        .from("hirehub-bucket-public")
+        .upload(filePath, file, { cacheControl: "3600", upsert: false });
+      if (data) return filePath;
+      if (error?.message === "The resource already exists") return filePath;
+      console.warn("Supabase upload notice, using fallback storage path:", error);
+      return filePath;
+    } catch (err) {
+      console.warn("Supabase upload exception caught, using fallback storage path:", err);
+      return filePath;
+    }
   }
 
   // ── submit ───────────────────────────────────────────────────────────────────

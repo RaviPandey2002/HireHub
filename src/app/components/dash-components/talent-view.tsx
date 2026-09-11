@@ -499,7 +499,7 @@ export function TalentView({ user: _user, candidates, recruiterJobs }: TalentVie
                 </div>
               </div>
 
-              {inspectingInfo.resume && (
+              {(inspectingInfo.resume || inspectingCandidate?.id) && (
                 <Button
                   size="sm"
                   variant="outline"
