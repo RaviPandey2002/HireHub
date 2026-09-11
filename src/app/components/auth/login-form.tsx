@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { useState, useTransition } from "react"
 import { useSession } from "next-auth/react"
-import { Eye, EyeOff } from "lucide-react"
+import { Eye, EyeOff, Briefcase, Sparkles, Loader2 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -20,10 +20,12 @@ import { Input } from "@/components/ui/input"
 import { FormError } from "@/components/helper/form-error"
 import { FormSuccess } from "@/components/helper/form-success"
 import { login } from "actions/login"
+import { demoLoginAction } from "actions/demoLoginAction"
 import { LoginSchema } from "schema"
 
 export function LoginForm() {
   const [isPending, startTransition] = useTransition()
+  const [demoLoadingRole, setDemoLoadingRole] = useState<"Recruiter" | "Candidate" | null>(null)
   const [error, setError] = useState<string | undefined>("")
   const [success, setSuccess] = useState<string | undefined>("")
   const [showPassword, setShowPassword] = useState(false)
@@ -52,6 +54,28 @@ export function LoginForm() {
     })
   }
 
+  const handleDemoLogin = (role: "Recruiter" | "Candidate") => {
+    setError("")
+    setSuccess("")
+    setDemoLoadingRole(role)
+    startTransition(async () => {
+      try {
+        const res = await demoLoginAction(role)
+        if (res?.error) {
+          setError(res.error)
+          setDemoLoadingRole(null)
+        } else if (res?.success) {
+          setSuccess(res.success)
+          await update() // sync the client-side session token first
+          window.location.href = "/"
+        }
+      } catch {
+        setError("An unexpected error occurred while launching demo sandbox. Please try again.")
+        setDemoLoadingRole(null)
+      }
+    })
+  }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -65,7 +89,7 @@ export function LoginForm() {
                 <FormControl>
                   <Input
                     {...field}
-                    disabled={isPending}
+                    disabled={isPending || !!demoLoadingRole}
                     placeholder="johndoe@example.com"
                     type="email"
                     autoComplete="email"
@@ -86,7 +110,7 @@ export function LoginForm() {
                   <div className="relative">
                     <Input
                       {...field}
-                      disabled={isPending}
+                      disabled={isPending || !!demoLoadingRole}
                       placeholder="••••••••"
                       type={showPassword ? "text" : "password"}
                       autoComplete="current-password"
@@ -113,12 +137,67 @@ export function LoginForm() {
         <FormSuccess message={success} />
 
         <Button
-          disabled={isPending}
+          disabled={isPending || !!demoLoadingRole}
           type="submit"
           className="w-full"
         >
-          {isPending ? "Signing in…" : "Sign in"}
+          {isPending && !demoLoadingRole ? "Signing in…" : "Sign in"}
         </Button>
+
+        {/* Divider */}
+        <div className="relative my-6">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-slate-200 dark:border-slate-800" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-white dark:bg-slate-900 px-3 text-slate-500 dark:text-slate-400 font-medium">
+              Or explore instantly
+            </span>
+          </div>
+        </div>
+
+        {/* 1-Click Demo Sandbox Buttons */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isPending || !!demoLoadingRole}
+            onClick={() => handleDemoLogin("Recruiter")}
+            className="w-full relative py-5 border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50/50 dark:border-indigo-900/60 dark:hover:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-medium flex items-center justify-center gap-2 group transition-all"
+          >
+            {demoLoadingRole === "Recruiter" ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin text-indigo-600 dark:text-indigo-400" />
+                <span>Launching...</span>
+              </>
+            ) : (
+              <>
+                <Briefcase className="h-4 w-4 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
+                <span>Demo Recruiter</span>
+              </>
+            )}
+          </Button>
+
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isPending || !!demoLoadingRole}
+            onClick={() => handleDemoLogin("Candidate")}
+            className="w-full relative py-5 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50/50 dark:border-emerald-900/60 dark:hover:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-medium flex items-center justify-center gap-2 group transition-all"
+          >
+            {demoLoadingRole === "Candidate" ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin text-emerald-600 dark:text-emerald-400" />
+                <span>Launching...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" />
+                <span>Demo Candidate</span>
+              </>
+            )}
+          </Button>
+        </div>
       </form>
     </Form>
   )

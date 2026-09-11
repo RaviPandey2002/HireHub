@@ -11,6 +11,7 @@ export const authRoutes = [
 
 export const apiAuthPrefix = "/api/auth"
 export const apiWebhookPrefix = "/api/webhooks"
+export const apiSeedPrefix = "/api/seed"
 export const onBoardingRoute = [
     "/onboard"
 ]

@@ -16,21 +16,16 @@ A full-stack job board connecting **recruiters** and **candidates** — post job
 
 ---
 
-## Tech Stack
-## ⚡ Quick Demo Logins
+## ⚡ Quick Demo Logins & Interactive Sandbox
 
-| Layer | Technology |
-|---|---|
-| Framework | Next.js 14 (App Router, Server Actions) |
-| Language | TypeScript |
-| Styling | Tailwind CSS + shadcn/ui |
-| Database | MongoDB via Prisma ORM |
-| Auth | NextAuth v5 (Credentials + GitHub + Google OAuth) |
-| File Storage | Supabase Storage (resume PDFs) |
-| Payments | Stripe Checkout + Webhooks |
-| Validation | Zod |
-| Containerisation | Docker + Docker Compose |
-If exploring the seeded local environment or staging deployment, use these pre-configured test personas:
+HireHub features **1-click ephemeral sandboxes** that allow instant exploration without manually typing credentials or risking multi-tenant test collisions:
+
+- **1-Click Demo Recruiter**: On `/login`, click **Demo Recruiter** to launch a private hiring manager persona at Stripe with pre-loaded applicants across stages, requisitions, and 1 remaining free quota slot to test live job creation.
+- **1-Click Demo Candidate**: Click **Demo Candidate** to launch a verified engineering profile with 1 pre-submitted application, 1 bookmarked role, and 1 available application slot to test live apply.
+- **Instant Enterprise Quota Toggle**: On `/membership`, demo accounts feature a 1-click toggle between **Free Tier** (quota testing: max 2 jobs/applications) and **Enterprise Tier** (unlimited) without entering payment details.
+- **Serverless Auto-Seeding Endpoint**: Hit `/api/seed` in any browser or curl to idempotently populate the 12 curated baseline engineering positions without shell access.
+
+For manual sign-in on seeded staging or local environments:
 
 | Role | Email | Password | Access Capabilities |
 |---|---|---|---|
@@ -39,16 +34,54 @@ If exploring the seeded local environment or staging deployment, use these pre-c
 
 ---
 
-## Features
-## 🏗️ System Architecture
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Framework | Next.js 14 (App Router, Server Actions) |
+| Language | TypeScript (Strict Mode) |
+| Styling | Tailwind CSS + shadcn/ui |
+| Database | MongoDB via Prisma ORM |
+| Auth | NextAuth v5 (Credentials + GitHub + Google OAuth) |
+| File Storage | Supabase Storage (resume PDFs) |
+| Payments | Stripe Checkout + Webhooks |
+| Validation | Zod |
+| Testing | Vitest (55 tests across 9 suites) |
+| Containerisation | Docker + Docker Compose |
+
+---
+
+## ✨ Core Features
 
 ### Candidates
-- Register / sign in with email & password or OAuth (GitHub, Google)
-- Complete onboarding profile (resume PDF upload to Supabase)
+- Register / sign in with credentials, OAuth (GitHub, Google), or 1-click demo sandbox
+- Complete onboarding profile with resume PDF upload
 - Browse all job listings with keyword search and filters (company, title, type, location)
-- Apply to jobs (freemium: 2 applications on free tier)
-- Track application statuses (Applied → Selected / Rejected) in the Activity page
-- Personal dashboard with application stats
+- 1-click job bookmarking / saving with dedicated "Saved Jobs" filter tab
+- Apply to jobs with freemium quota guards (max 2 applications on free tier)
+- Real-time application timeline tracking (Applied → Selected / Rejected) in Activity
+- Personal dashboard with application stats and recent status updates
+
+### Recruiters
+- Complete recruiter onboarding profile with company affiliation
+- Post new jobs with freemium quota checks (max 2 active jobs on free tier)
+- In-place job editing for title, description, skills, location, type, and experience
+- Job status lifecycle management (toggle between `Active` and `Closed`)
+- Delete requisitions with cascading deletion of linked applications
+- Comprehensive applicant pipeline per requisition with resume previews and status actions
+- Recruiter analytics dashboard and automated company directory
+
+### Platform & Architecture
+- Freemium membership tiers (Basic / Teams / Enterprise) with Stripe Checkout & webhooks
+- Ephemeral demo sandbox architecture with automatic 24-hour background garbage collection
+- Serverless auto-seeding route (`/api/seed`) for zero-CLI deployment initialization
+- Dark mode throughout and mobile-first responsive layout
+- Strict TypeScript domain modeling (`types/index.ts`) eliminating loose `: any` typings
+
+---
+
+## 🏗️ System Architecture
+
 ```mermaid
 flowchart TD
     subgraph Client["Frontend Client (Next.js 14 App Router)"]
@@ -56,27 +89,16 @@ flowchart TD
         AuthHook["NextAuth v5 Client Session"]
     end
 
-### Recruiters
-- Complete onboarding profile
-- Post new jobs (freemium: 2 jobs on free tier)
-- Delete jobs (cascades to all linked applications)
-- View applicants per job, download resumes, select or reject candidates
-- Dashboard with jobs posted, applicant counts, and recent application table
-- Companies page auto-populated from posted jobs
     subgraph Security["Edge & Gateway Layer"]
         MW["Middleware Route Guard (middleware.ts)"]
         RBAC["Role-Based Access Control (/onboard, /jobs, /applicants)"]
     end
 
-### Shared
-- Membership tiers (Basic / Teams / Enterprise) via Stripe Checkout — upgrades lift posting/application limits
-- Feed page — candidates see latest jobs, recruiters see incoming applications
-- Dark mode throughout
-- Responsive (mobile sheet filters, mobile-first layouts)
     subgraph AppLayer["Application Layer (Server Actions)"]
         SA_Job["Job Engine (Post, Edit, Toggle Status, Delete)"]
         SA_App["Application Engine (Apply, Withdraw, Select, Reject)"]
         SA_User["Profile & Onboarding (Candidate / Recruiter)"]
+        SA_Demo["Demo Sandbox & Tier Switcher"]
         SA_Stripe["Stripe Checkout & Tier Upgrade"]
         ZodVal["Zod Schema Validation & Coercion"]
     end
@@ -95,11 +117,13 @@ flowchart TD
     ZodVal --> SA_Job
     ZodVal --> SA_App
     ZodVal --> SA_User
+    ZodVal --> SA_Demo
     ZodVal --> SA_Stripe
 
     SA_Job --> Prisma
     SA_App --> Prisma
     SA_User --> Prisma
+    SA_Demo --> Prisma
     SA_Stripe --> StripeAPI
 
     Prisma --> MongoDB
@@ -109,7 +133,6 @@ flowchart TD
 
 ---
 
-## Project Structure
 ## 🔄 Core Workflows & Lifecycles
 
 ### 1. Job Opening Lifecycle (Recruiters)

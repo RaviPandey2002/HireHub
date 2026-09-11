@@ -12,6 +12,7 @@ export default defineConfig({
       "schema": path.resolve(__dirname, "./schema"),
       "types": path.resolve(__dirname, "./types"),
       "actions": path.resolve(__dirname, "./actions"),
+      "next-auth": path.resolve(__dirname, "./tests/mocks/next-auth.ts"),
     },
   },
 });

@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
   Sparkles,
@@ -20,6 +22,7 @@ import { useToast } from "./ui/use-toast";
 import { membershipPlans } from "lib/utils";
 import { createStripePaymentAction } from "actions/createStripePaymentAction";
 import { createPriceIdAction } from "actions/createPriceIdAction";
+import { toggleDemoPremiumAction } from "actions/toggleDemoPremiumAction";
 import { AppUser } from "types";
 
 const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
@@ -169,6 +172,39 @@ export const Membership = ({ user }: { user: AppUser | null }) => {
 
   const { memberShipType } = user ?? {};
   const isPremiumUser = !!user?.isPremiumUser;
+  const isDemoUser = Boolean(user?.email?.includes("@hirehub.demo") || user?.email?.includes("@demo.local"));
+  const [isTogglingDemo, setIsTogglingDemo] = useState(false);
+  const { update } = useSession();
+  const router = useRouter();
+
+  async function handleToggleDemo() {
+    setIsTogglingDemo(true);
+    try {
+      const res = await toggleDemoPremiumAction();
+      if (res?.error) {
+        toast({
+          variant: "destructive",
+          title: "Demo plan toggle failed",
+          description: res.error,
+        });
+      } else {
+        toast({
+          title: res.isPremiumUser ? "Enterprise Unlocked!" : "Free Tier Active",
+          description: res.message,
+        });
+        await update();
+        router.refresh();
+      }
+    } catch {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to update demo membership.",
+      });
+    } finally {
+      setIsTogglingDemo(false);
+    }
+  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-12">
@@ -187,7 +223,6 @@ export const Membership = ({ user }: { user: AppUser | null }) => {
             {isPremiumUser ? (
               <Badge className="bg-amber-500 hover:bg-amber-600 text-white font-semibold gap-1">
                 <Sparkles className="h-3 w-3" /> Active:{" "}
-                {planDisplayNames[memberShipType] || "Premium Tier"}
                 {planDisplayNames[memberShipType || ""] || "Premium Tier"}
               </Badge>
             ) : (
@@ -208,6 +243,60 @@ export const Membership = ({ user }: { user: AppUser | null }) => {
           </p>
         </div>
       </div>
+
+      {/* ──────────────────────────────────────────────────────────── */}
+      {/* DEMO SANDBOX CONTROLS BANNER                                */}
+      {/* ──────────────────────────────────────────────────────────── */}
+      {isDemoUser && (
+        <div className="relative overflow-hidden rounded-2xl border border-indigo-200 dark:border-indigo-800/60 bg-gradient-to-r from-indigo-50/90 via-purple-50/50 to-pink-50/80 dark:from-indigo-950/40 dark:via-purple-950/20 dark:to-pink-950/30 p-5 sm:p-6 shadow-sm">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
+                  Interactive Demo Mode Active
+                </span>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                Test Free Tier Quotas vs. Enterprise Capabilities
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl">
+                You are testing HireHub inside an isolated ephemeral sandbox. Currently active on{" "}
+                <span className="font-semibold text-slate-900 dark:text-white">
+                  {isPremiumUser ? "Enterprise Tier (Unlimited Actions)" : "Free Tier (Max 2 Actions Quota)"}
+                </span>
+                . Switch back and forth instantly without entering any credit card.
+              </p>
+            </div>
+
+            <Button
+              onClick={handleToggleDemo}
+              disabled={isTogglingDemo}
+              className={`shrink-0 font-semibold shadow-sm transition-all ${
+                isPremiumUser
+                  ? "bg-slate-800 hover:bg-slate-900 dark:bg-slate-100 dark:text-slate-900 text-white"
+                  : "bg-indigo-600 hover:bg-indigo-700 text-white"
+              }`}
+            >
+              {isTogglingDemo ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Updating...
+                </>
+              ) : isPremiumUser ? (
+                <>
+                  <span>Switch back to Free Tier</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  <span>Unlock Enterprise Demo (Instant)</span>
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* ──────────────────────────────────────────────────────────── */}
       {/* 2. PRICING PLAN CARDS                                       */}
