@@ -135,7 +135,10 @@ export function LoginForm() {
           className="w-full flex items-center justify-center gap-2"
         >
           {isPending && !demoLoadingRole ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <>
+              <Loader2 className="h-4 w-4 animate-spin" />
+              <span>Signing in...</span>
+            </>
           ) : (
             "Sign in"
           )}
@@ -163,7 +166,10 @@ export function LoginForm() {
             className="w-full relative py-5 border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50/50 dark:border-indigo-900/60 dark:hover:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 font-medium flex items-center justify-center gap-2 group transition-all"
           >
             {demoLoadingRole === "Recruiter" ? (
-              <Loader2 className="h-4 w-4 animate-spin text-indigo-600 dark:text-indigo-400" />
+              <>
+                <Loader2 className="h-4 w-4 animate-spin text-indigo-600 dark:text-indigo-400" />
+                <span>Loading Recruiter...</span>
+              </>
             ) : (
               <>
                 <Briefcase className="h-4 w-4 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
@@ -180,7 +186,10 @@ export function LoginForm() {
             className="w-full relative py-5 border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50/50 dark:border-emerald-900/60 dark:hover:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-medium flex items-center justify-center gap-2 group transition-all"
           >
             {demoLoadingRole === "Candidate" ? (
-              <Loader2 className="h-4 w-4 animate-spin text-emerald-600 dark:text-emerald-400" />
+              <>
+                <Loader2 className="h-4 w-4 animate-spin text-emerald-600 dark:text-emerald-400" />
+                <span>Loading Candidate...</span>
+              </>
             ) : (
               <>
                 <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" />

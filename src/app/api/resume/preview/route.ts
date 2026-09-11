@@ -59,7 +59,7 @@ export async function GET(req: Request) {
     }
 
     const info = (candidate.candidateInfo || {}) as Record<string, any>;
-    const name = info.name || candidate.name || "Candidate Dossier";
+    const name = info.name || candidate.name || "Candidate Profile";
     const email = info.email || candidate.email || "candidate@hirehub.demo";
     const currentCompany = info.currentCompany || "TechCorp Inc.";
     const location = info.currentJobLocation || info.preferedJobLocation || "San Francisco, CA";
@@ -78,7 +78,7 @@ export async function GET(req: Request) {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${escapeHtml(name)} - Resume & Candidate Dossier | HireHub</title>
+  <title>${escapeHtml(name)} - Resume & Candidate Profile | HireHub</title>
   <style>
     :root {
       --primary: #059669;
@@ -285,7 +285,7 @@ export async function GET(req: Request) {
       color: #1e293b;
       margin-top: 2px;
     }
-    footer.dossier-footer {
+    footer.profile-footer {
       margin-top: 36px;
       padding-top: 18px;
       border-top: 1px dashed var(--border);
@@ -311,7 +311,7 @@ export async function GET(req: Request) {
   <div class="top-actions">
     <span class="status-badge">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/></svg>
-      HireHub Verified Candidate Dossier
+      HireHub Verified Candidate Profile
     </span>
     <div class="actions-buttons">
       <button onclick="window.print()" class="btn btn-primary">
@@ -419,8 +419,8 @@ export async function GET(req: Request) {
       </div>
     </section>
 
-    <footer class="dossier-footer">
-      <span>HireHub Technical Talent Platform · Secure Resume Dossier</span>
+    <footer class="profile-footer">
+      <span>HireHub Technical Talent Platform · Secure Candidate Profile</span>
       <span>Generated ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</span>
     </footer>
   </main>

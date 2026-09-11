@@ -67,10 +67,10 @@ export async function getResumeUrlAction(candidateId: string) {
       return { success: true, url: data.signedUrl };
     }
 
-    console.warn("Supabase signed URL error, falling back to dynamic resume dossier:", error);
+    console.warn("Supabase signed URL error, falling back to dynamic candidate profile:", error);
     return { success: true, url: `/api/resume/preview?candidateId=${candidate.id}` };
   } catch (err: any) {
-    console.warn("Supabase error caught, falling back to dynamic resume dossier:", err);
+    console.warn("Supabase error caught, falling back to dynamic candidate profile:", err);
     return { success: true, url: `/api/resume/preview?candidateId=${candidate.id}` };
   }
 }

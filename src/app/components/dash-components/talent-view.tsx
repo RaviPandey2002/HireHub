@@ -447,7 +447,7 @@ export function TalentView({ user: _user, candidates, recruiterJobs }: TalentVie
                       onClick={() => setInspectingCandidate(candidate)}
                       className="text-xs font-semibold gap-1.5 h-8 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                     >
-                      View Dossier
+                      View Profile
                     </Button>
 
                     {recruiterJobs.length > 0 && (
@@ -471,7 +471,7 @@ export function TalentView({ user: _user, candidates, recruiterJobs }: TalentVie
         )}
       </div>
 
-      {/* ── Candidate Dossier Modal Dialog ── */}
+      {/* ── Candidate Profile Modal Dialog ── */}
       <Dialog
         open={!!inspectingCandidate}
         onOpenChange={(open) => !open && setInspectingCandidate(null)}
@@ -526,7 +526,7 @@ export function TalentView({ user: _user, candidates, recruiterJobs }: TalentVie
             </DialogDescription>
           </DialogHeader>
 
-          {/* Dossier Body */}
+          {/* Profile Body */}
           <div className="space-y-6 py-4">
             {/* Quick Metrics */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">

@@ -37,7 +37,10 @@ export const OtherProviders = () => {
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm transition-colors hover:bg-gray-50 dark:hover:bg-gray-900 active:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {pendingProvider === "google" ? (
-            <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+            <>
+              <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+              <span>Google...</span>
+            </>
           ) : (
             <>
               <FcGoogle className="h-5 w-5 shrink-0" />
@@ -53,7 +56,10 @@ export const OtherProviders = () => {
           className="flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 px-4 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 shadow-sm transition-colors hover:bg-gray-50 dark:hover:bg-gray-900 active:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {pendingProvider === "github" ? (
-            <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+            <>
+              <Loader2 className="h-4 w-4 animate-spin text-gray-500" />
+              <span>GitHub...</span>
+            </>
           ) : (
             <>
               <FaGithub className="h-5 w-5 shrink-0" />

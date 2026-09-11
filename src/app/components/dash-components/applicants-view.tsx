@@ -501,7 +501,7 @@ export function ApplicantsView({ user: _user, initialApplicants, jobs }: Applica
                         className="text-xs font-semibold gap-1.5 h-8 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
                       >
                         <Eye className="h-3.5 w-3.5" />
-                        Dossier
+                        Profile
                       </Button>
 
                       <div className="flex items-center gap-1.5">
@@ -536,7 +536,7 @@ export function ApplicantsView({ user: _user, initialApplicants, jobs }: Applica
         </TabsContent>
       </Tabs>
 
-      {/* ── Candidate Dossier Review Modal Dialog ── */}
+      {/* ── Candidate Profile Review Modal Dialog ── */}
       <Dialog
         open={!!inspectingApplicant}
         onOpenChange={(open) => !open && setInspectingApplicant(null)}
@@ -591,7 +591,7 @@ export function ApplicantsView({ user: _user, initialApplicants, jobs }: Applica
             </DialogDescription>
           </DialogHeader>
 
-          {/* Dossier Body */}
+          {/* Profile Body */}
           <div className="space-y-6 py-4">
             {/* Experience & Current Role Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -711,7 +711,7 @@ export function ApplicantsView({ user: _user, initialApplicants, jobs }: Applica
             )}
           </div>
 
-          {/* Dossier Footer Actions */}
+          {/* Profile Footer Actions */}
           <div className="border-t border-gray-200 dark:border-gray-800 pt-4 flex items-center justify-between gap-3">
             <Button
               variant="outline"
