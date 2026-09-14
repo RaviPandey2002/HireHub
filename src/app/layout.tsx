@@ -1,5 +1,3 @@
-import { Suspense } from "react";
-import Loading from "./components/loading";
 import "./globals.css";
 import { auth } from "auth";
 import Header from "@/components/common/header";
@@ -21,10 +19,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen w-full overflow-x-hidden font-sans antialiased">
         <SessionWrapper session={session}>
-          <Suspense fallback={<Loading />}>
-            <Header user={session?.user} />
-            {children}
-          </Suspense>
+          <Header user={session?.user} />
+          {children}
           <Toaster />
         </SessionWrapper>
       </body>
