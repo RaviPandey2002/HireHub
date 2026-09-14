@@ -357,133 +357,122 @@ Copy the sample environment file:
 cp sample.env .env.local
 ```
 
-Fill in every value in `.env.local`:
-Fill in your configuration keys in `.env.local`:
+Fill in your configuration keys in `.env`:
 
 ```env
 NODE_ENV=development
+AUTH_SECRET=your_auth_secret_key          # generate with: openssl rand -base64 32
+NEXTAUTH_SECRET=your_auth_secret_key
 NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=          # generate with: openssl rand -base64 32
-NEXTAUTH_SECRET=your_nextauth_secret_key
+AUTH_URL=http://localhost:3000
 
-# MongoDB (must run as a replica set)
-DATABASE_URL=mongodb://localhost:27017/hirehub?replicaSet=rs0&directConnection=true
 # MongoDB (Replica Set required for transactions)
-DATABASE_URL=mongodb+srv://<username>:<password>@cluster0.mongodb.net/hirehub?retryWrites=true&w=majority
+DATABASE_URL=mongodb://localhost:27017/Hirehub?replicaSet=rs0&directConnection=true
 
-# GitHub OAuth
 # OAuth Providers (Optional for local dev)
 GITHUB_ID=
 GITHUB_SECRET=
-
-# Google OAuth
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
 
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-# Supabase Storage
+# Supabase Storage (Optional - dynamic resume profiles used as fallback)
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-# Stripe
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
-STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
-# Stripe Payments
+# Stripe Payments (Optional - freemium toggle available in demo mode)
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
-### 3. Push the Prisma schema
-### 4. Database Initialization & Seeding
+### 3. Database Initialization & Seeding
 
 ```bash
 # Push schema to database
 npx prisma db push
 
-# Seed test recruiters, candidates, and job openings
+# Seed baseline recruiters, candidates, and job openings
 npm run seed
 ```
 
-### 4. Run the development server
-### 5. Running Quality Checks
+### 4. Start Development Server
 
 ```bash
 npm run dev
 ```
+
+Open [http://localhost:3000](http://localhost:3000).
+
+### 5. Running Quality Checks
+
+```bash
 # Typecheck
 npx tsc --noEmit
 
-Open [http://localhost:3000](http://localhost:3000).
 # Lint
 npm run lint
 
----
-# Automated Tests
+# Automated Vitest Tests (76 tests)
 npm test
 
-## Running with Docker
 # Production Build
 npm run build
 ```
 
-The included `docker-compose.yml` spins up the Next.js app and a MongoDB replica-set node together:
-### 6. Start Development Server
+---
+
+## 🐳 Running with Docker
+
+HireHub includes a production-ready multi-container `docker-compose.yml` with automated MongoDB 7 replica set initialization:
 
 ```bash
-docker compose up --build
-npm run dev
+# 1. Start HireHub and MongoDB in the background
+docker compose up --build -d
+
+# 2. Check container status
+docker compose ps
+
+# 3. Stream application logs
+docker compose logs -f nextjs-app
 ```
 
-The app will be available at [http://localhost:3000](http://localhost:3000).  
-MongoDB is exposed on host port `27027`.
-Navigate to [http://localhost:3000](http://localhost:3000).
-
-> **Note:** On first boot the replica set needs to be initialised once:
-> ```bash
-> docker exec -it mongo mongosh --eval "rs.initiate()"
-> ```
+- **Web App**: [http://localhost:3000](http://localhost:3000)
+- **MongoDB**: Exposed on host port `27027` (internal container port `27017`)
+- **Stop**: `docker compose down`
 
 ---
 
 ## Stripe Webhook (local development)
-## 🐳 Docker Deployment
 
 Use the Stripe CLI to forward events to the local webhook handler:
-To spin up HireHub and a MongoDB replica set container with a single command:
 
 ```bash
 stripe listen --forward-to localhost:3000/api/webhooks/stripe
-docker compose up --build
 ```
 
-Copy the printed webhook signing secret into `STRIPE_WEBHOOK_SECRET` in `.env.local`.
-Access the application at [http://localhost:3000](http://localhost:3000).
+Copy the printed webhook signing secret into `STRIPE_WEBHOOK_SECRET` in `.env`.
 
 ---
 
 ## Environment Variables Reference
-## 📄 License
 
 | Variable | Description |
 |---|---|
-| `NEXTAUTH_URL` | Full URL of your deployment (e.g. `https://hirehub.vercel.app`) |
-| `NEXTAUTH_SECRET` | Random secret for JWT signing |
+| `NEXTAUTH_URL` / `AUTH_URL` | Full URL of your deployment (e.g. `http://localhost:3000` or `https://hire-hub-steel.vercel.app`) |
+| `AUTH_SECRET` / `NEXTAUTH_SECRET` | Secret key for JWT session signing |
 | `DATABASE_URL` | MongoDB connection string (replica set required) |
-| `GITHUB_ID / GITHUB_SECRET` | GitHub OAuth app credentials |
-| `GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET` | Google OAuth app credentials |
+| `GITHUB_ID` / `GITHUB_SECRET` | GitHub OAuth app credentials |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth app credentials |
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase public anon key |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable key |
 | `STRIPE_SECRET_KEY` | Stripe secret key |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook endpoint signing secret |
+| `GMAIL_USER` / `GMAIL_APP_PASSWORD` | Gmail SMTP credentials for transactional emails |
 
 ---
 
-## License
+## 📄 License
 
 MIT
 Distributed under the MIT License. See `LICENSE` for details.

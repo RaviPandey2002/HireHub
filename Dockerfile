@@ -24,6 +24,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV DATABASE_URL="mongodb://localhost:27017/hirehub"
 ENV AUTH_SECRET="build-secret-placeholder"
 ENV NEXTAUTH_SECRET="build-secret-placeholder"
+ENV AUTH_URL="http://localhost:3000"
 
 # Build your project
 RUN npm run build

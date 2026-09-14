@@ -1,17 +1,18 @@
-version: '3.8'
-
 services:
   nextjs-app:
     build: .
+    container_name: hirehub-app
     ports:
       - "3000:3000"
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     environment:
-      - DATABASE_URL=mongodb://mongo:27017/docker-hirehub?replicaSet=rs0&directConnection=true
+      - DATABASE_URL=${DOCKER_DATABASE_URL:-mongodb://mongo:27017/Hirehub?replicaSet=rs0&directConnection=true}
       - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
-      - AUTH_SECRET=${AUTH_SECRET:-hirehub-local-docker-secret-key}
-      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-hirehub-local-docker-secret-key}
+      - AUTH_URL=${AUTH_URL:-http://localhost:3000}
+      - AUTH_SECRET=${AUTH_SECRET:-hirehub-local-docker-secret-key-32chars}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-hirehub-local-docker-secret-key-32chars}
       - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY}
       - NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}
@@ -21,15 +22,26 @@ services:
       - GITHUB_SECRET=${GITHUB_SECRET}
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GMAIL_USER=${GMAIL_USER}
+      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
+    restart: unless-stopped
 
   mongo:
     image: mongo:7
-    command: ["--replSet", "rs0"]
-    container_name: mongo
+    container_name: hirehub-mongo
+    command: ["--replSet", "rs0", "--bind_ip_all"]
     ports:
       - "27027:27017"  # Host port 27027 maps to container port 27017
     volumes:
       - mongo-data:/data/db
+    healthcheck:
+      test: echo "try { rs.status() } catch (err) { rs.initiate({ _id:'rs0', members:[{ _id:0, host:'mongo:27017' }] }) }" | mongosh --port 27017 --quiet
+      interval: 5s
+      timeout: 10s
+      retries: 5
+      start_period: 2s
+    restart: unless-stopped
 
 volumes:
   mongo-data:
+
